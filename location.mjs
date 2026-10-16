@@ -27,3 +27,15 @@ export function locate(node,path,graph,lang='es') {
  if(['3:578','3:581','3:584','3:587'].includes(node.id))hierarchy.push((lang==='es'?'Módulo: ':'Module: ')+node.text.split('\n')[0]);
  return {page,label,hierarchy};
 }
+
+// Explorer context only: this does not represent real authentication.
+export function registrationEntry(path,graph){
+ const privatePages=new Set(['private','prizes','collection','help','profile','myprizes','redemptions','codes','details','orders','redeem']);
+ let authenticated=false;
+ for(const id of path){
+  const node=graph.nodes.get(id);if(!node)continue;
+  if(id==='3:867'){authenticated=false;continue;}
+  if(id==='3:609'||privatePages.has(locate(node,path,graph).page))authenticated=true;
+ }
+ return authenticated?'3:616':'3:597';
+}
