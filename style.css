@@ -87,3 +87,7 @@ body{padding-bottom:96px}.topbar,main{background:#fff}.sidebar{background:#f7f7f
 #wires{z-index:2}.wire{stroke:var(--route-color);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;opacity:.8}.wire.highlight{stroke:var(--route-color);stroke-width:4;opacity:1}.wire-port{fill:#fff;stroke:var(--route-color);stroke-width:2}.wire.return{stroke-dasharray:6 6}
 @media(max-width:1200px) and (min-width:601px){.stage{padding:32px 16px;gap:56px;grid-template-columns:minmax(200px,1.15fr) minmax(168px,.85fr)}#current-node{padding:20px}#current-node h2{font-size:21px}}
 @media(max-width:600px){.stage{grid-template-columns:minmax(0,1fr);gap:48px;padding:24px 8px;min-height:0;margin-top:16px}.current-column{padding-left:16px}.choices-column{padding-left:48px}#current-node{min-height:192px;padding:20px;gap:12px}#current-node h2{font-size:22px}#current-node .context-badge{font-size:10px}#current-node .node-symbol{width:36px;height:36px}.choice{min-height:80px;padding:12px 24px 12px 12px}.choice-title{font-size:12px}.choice-context{font-size:9px}.node-caption{font-size:8px}.current-column .node-caption{font-size:10px}}
+
+/* Clear directional affordances on cards and connector destinations. */
+.choice{padding-right:48px}.choice-arrow{right:12px;color:#566579}.choice-arrow svg{width:24px;height:24px;stroke-width:2}.choice:disabled .choice-arrow svg{width:20px;height:20px}.wire-arrow{fill:none;stroke:var(--route-color);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+@media(max-width:600px){.choice{padding-right:44px}.choice-arrow{right:8px}}

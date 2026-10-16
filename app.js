@@ -47,15 +47,15 @@ function drawWires(){
   let sx,sy,d;
   if(mobile){
    sx=current.left-box.left+16;sy=current.bottom-box.top;const x=8,r=8;
-   d=`M ${sx} ${sy} V ${sy+16} Q ${sx} ${sy+24} ${sx-r} ${sy+24} H ${x+r} Q ${x} ${sy+24} ${x} ${sy+32} V ${ey-r} Q ${x} ${ey} ${x+r} ${ey} H ${ex}`;
+   d=`M ${sx} ${sy} V ${sy+16} Q ${sx} ${sy+24} ${sx-r} ${sy+24} H ${x+r} Q ${x} ${sy+24} ${x} ${sy+32} V ${ey-r} Q ${x} ${ey} ${x+r} ${ey} H ${ex-4}`;
   }else{
    sx=current.right-box.left;
    const center=current.top-box.top+current.height/2,offset=(i-(choices.length-1)/2)*12;
    sy=center+offset;
    const x=(sx+ex)/2+Math.abs(i-(choices.length-1)/2)*4,dir=ey>=sy?1:-1,r=Math.min(16,Math.abs(ey-sy)/2,(ex-sx)/4);
-   d=`M ${sx} ${sy} H ${x-r} Q ${x} ${sy} ${x} ${sy+dir*r} V ${ey-dir*r} Q ${x} ${ey} ${x+r} ${ey} H ${ex}`;
+   d=`M ${sx} ${sy} H ${x-r} Q ${x} ${sy} ${x} ${sy+dir*r} V ${ey-dir*r} Q ${x} ${ey} ${x+r} ${ey} H ${ex-4}`;
   }
-  lines+=`<g style="--route-color:${color}"><path class="wire ${e.error?'error':''} ${e.return?'return':''}" data-line="${i}" d="${d}"/><circle class="wire-port" cx="${sx}" cy="${sy}" r="3"/><circle class="wire-port" cx="${ex}" cy="${ey}" r="3"/></g>`;
+  lines+=`<g style="--route-color:${color}"><path class="wire ${e.error?'error':''} ${e.return?'return':''}" data-line="${i}" d="${d}"/><circle class="wire-port" cx="${sx}" cy="${sy}" r="3"/><path class="wire-arrow" d="M ${ex-12} ${ey-5} L ${ex-4} ${ey} L ${ex-12} ${ey+5}"/></g>`;
  });
  $('#wires').setAttribute('viewBox',`0 0 ${box.width} ${box.height}`);$('#wires').innerHTML=lines;
 }
