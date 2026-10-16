@@ -91,3 +91,7 @@ body{padding-bottom:96px}.topbar,main{background:#fff}.sidebar{background:#f7f7f
 /* Clear directional affordances on cards and connector destinations. */
 .choice{padding-right:48px}.choice-arrow{right:12px;color:#566579}.choice-arrow svg{width:24px;height:24px;stroke-width:2}.choice:disabled .choice-arrow svg{width:20px;height:20px}.wire-arrow{fill:none;stroke:var(--route-color);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
 @media(max-width:600px){.choice{padding-right:44px}.choice-arrow{right:8px}}
+
+/* Sidebar toggle remains available when the whole panel is collapsed. */
+.topbar [data-action=index]{display:inline-flex}
+@media(min-width:901px){body.sidebar-collapsed .shell{grid-template-columns:minmax(0,1fr)}body.sidebar-collapsed .sidebar{display:none}}
