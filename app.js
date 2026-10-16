@@ -1,6 +1,6 @@
 import {makeGraph,validPath,advance,normalize,canExplore} from './graph.mjs';
-import {pages,locate,registrationEntry} from './location.mjs?v=20261016-uniform5';
-import {renderMetro,initMetro} from './metro.mjs?v=20261016-uniform5';
+import {pages,locate,registrationEntry} from './location.mjs?v=20261016-hierarchy6';
+import {renderMetro,initMetro} from './metro.mjs?v=20261016-hierarchy6';
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const escape=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const drawings={arrow:'M5 12h14m-5-5 5 5-5 5',back:'M19 12H5m5-5-5 5 5 5',search:'M10.5 18a7.5 7.5 0 1 0 0-15 7.5 7.5 0 0 0 0 15Zm5.5-2 5 5',reset:'M4 10a8 8 0 1 1 1 7M4 4v6h6',history:'M3 11a9 9 0 1 1 2 7M3 5v6h6m3-4v6l4 2',share:'M12 16V3m-4 4 4-4 4 4M7 10H5a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2h-2',close:'m6 6 12 12M6 18 18 6',index:'M9 5h12M9 12h12M9 19h12M3 5h.01M3 12h.01M3 19h.01',diamond:'m12 3 9 9-9 9-9-9Z',step:'M7 4h10a3 3 0 0 1 3 3v10a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3Zm1 8h8m-3-3 3 3-3 3',branch:'M7 3v12a4 4 0 0 0 4 4h6M7 8h10m-3-3 3 3-3 3m0 8 3 3-3 3',end:'M9 12l2 2 4-4M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z',download:'M12 3v12m-4-4 4 4 4-4M4 16v4h16v-4',spark:'m12 3 2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5Z',code:'m8 6-6 6 6 6m8-12 6 6-6 6m-5 2 2-16',user:'M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0ZM4 21v-2a8 8 0 0 1 16 0v2',gift:'M3 8h18v4H3Zm2 4v9h14v-9M12 8v13m0-13C3 9 5 1 9 3c2 1 3 5 3 5Zm0 0c9 1 7-7 3-5-2 1-3 5-3 5Z',warning:'m12 3 10 18H2L12 3Zm0 6v5m0 3h.01'};
@@ -78,7 +78,7 @@ $('#choices').addEventListener('pointerover',e=>highlight(e.target.closest('[dat
  $$('[data-line]').forEach(p=>p.classList.toggle('highlight',index!==undefined&&p.dataset.line===index));
 }
 window.addEventListener('popstate',()=>{readLocation();render(true);});window.addEventListener('resize',()=>{if(!matchMedia('(max-width:900px)').matches)closeIndex();syncPanelButton();drawWires();});new ResizeObserver(drawWires).observe($('#stage'));
-try{const response=await fetch('./flow.json?v=20261016-uniform5',{cache:'no-store'});if(!response.ok)throw Error('Flow unavailable');data=await response.json();readLocation();updateURL();render();}catch(error){$('#section-title').textContent='No se pudo cargar el flujo';$('#subtitle').textContent='Vuelve a cargar la página para intentarlo de nuevo.';$('#stage').innerHTML='<button class="primary-btn" onclick="location.reload()">Reintentar</button>';console.error(error);}
+try{const response=await fetch('./flow.json?v=20261016-hierarchy6',{cache:'no-store'});if(!response.ok)throw Error('Flow unavailable');data=await response.json();readLocation();updateURL();render();}catch(error){$('#section-title').textContent='No se pudo cargar el flujo';$('#subtitle').textContent='Vuelve a cargar la página para intentarlo de nuevo.';$('#stage').innerHTML='<button class="primary-btn" onclick="location.reload()">Reintentar</button>';console.error(error);}
 
 // Recalculate from live viewport bounds as the sticky source moves.
 let wireScrollFrame=0;
@@ -94,14 +94,15 @@ function sizeJourneyCards(){
  const current=document.getElementById('current-node'),choice=document.querySelector('.choice');
  if(!current)return;
  const width=Math.floor(current.getBoundingClientRect().width);
- const key=lang+':'+width;if(key===cardSizeKey||width<1)return;cardSizeKey=key;
+ const choiceWidth=Math.floor(choice?.getBoundingClientRect().width||width*.8);
+ const key=lang+':'+width+':'+choiceWidth;if(key===cardSizeKey||width<1)return;cardSizeKey=key;
  const lab=document.createElement('div');lab.setAttribute('aria-hidden','true');lab.inert=true;
  Object.assign(lab.style,{position:'fixed',left:'-20000px',top:'0',width:width+'px',visibility:'hidden',pointerEvents:'none'});
  const probes=[];
  for(const n of graph.nodes.values()){
   for(const original of [current,choice].filter(Boolean)){
    const probe=original.cloneNode(true);probe.removeAttribute('tabindex');probe.removeAttribute('disabled');
-   Object.assign(probe.style,{width:width+'px',height:'auto',minHeight:'0',aspectRatio:'auto',transform:'none',margin:'0'});
+   Object.assign(probe.style,{width:(original===current?width:choiceWidth)+'px',height:'auto',minHeight:'0',aspectRatio:'auto',transform:'none',margin:'0'});
    const title=probe.querySelector('h2,.choice-title');title.textContent=n.text;
    const context=probe.querySelector('.context-badge,.choice-context');if(context)context.textContent=nodeContext(n)[lang];
    if(probe.matches('.choice')){
@@ -110,12 +111,15 @@ function sizeJourneyCards(){
     let destination=probe.querySelector('.destination');if(!destination){destination=document.createElement('span');destination.className='destination';probe.append(destination);}
     destination.textContent=sectionTitle(n.section);
    }
-   lab.append(probe);probes.push(probe);
+   lab.append(probe);probes.push({probe,primary:original===current});
   }
  }
  document.body.append(lab);
- const max=Math.max(width,272,...probes.map(p=>Math.ceil(p.getBoundingClientRect().height)));
- lab.remove();document.getElementById('stage').style.setProperty('--journey-card-height',Math.ceil((max+8)/4)*4+'px');
+ const secondary=Math.ceil((Math.max(choiceWidth,224,...probes.filter(p=>!p.primary).map(p=>p.probe.getBoundingClientRect().height))+8)/4)*4;
+ const primary=Math.ceil((Math.max(width,secondary+48,...probes.filter(p=>p.primary).map(p=>p.probe.getBoundingClientRect().height))+8)/4)*4;
+ lab.remove();const stage=document.getElementById('stage');stage.style.setProperty('--secondary-card-height',secondary+'px');stage.style.setProperty('--primary-card-height',primary+'px');
 }
 window.addEventListener('resize',()=>requestAnimationFrame(()=>{sizeJourneyCards();drawWires();}));
 document.fonts.ready.then(()=>{cardSizeKey='';sizeJourneyCards();drawWires();});
+
+new ResizeObserver(()=>requestAnimationFrame(()=>{sizeJourneyCards();drawWires();})).observe(document.getElementById("current-stack"));

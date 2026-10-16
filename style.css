@@ -192,3 +192,10 @@ body{padding-bottom:96px}.topbar,main{background:#fff}.sidebar{background:#f7f7f
 .choice{grid-template-columns:24px minmax(0,1fr) 64px}
 .choice .choice-arrow{width:64px;height:36px;border-radius:999px}
 .choice .choice-arrow .icon{width:24px;height:24px}
+/* Primary card remains dominant; secondary dimensions are uniform globally. */
+.stage{grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr);gap:96px}
+#current-node{height:var(--primary-card-height,auto);min-height:var(--primary-card-height,320px)}
+.choice{height:var(--secondary-card-height,auto);min-height:var(--secondary-card-height,224px)}
+.choice .choice-title{font-size:15px;line-height:1.35}
+@media(max-width:1200px) and (min-width:601px){.stage{grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr);gap:64px}.choice{padding:16px;column-gap:8px}.choice .choice-title{font-size:14px}}
+@media(max-width:600px){.stage{display:block}.current-column{padding-left:16px;padding-right:8px;margin-bottom:64px}.choices-column{padding-left:56px;padding-right:8px}#current-node{height:var(--primary-card-height,auto);min-height:var(--primary-card-height,280px)}.choice{height:var(--secondary-card-height,auto);min-height:var(--secondary-card-height,224px)}.choice .choice-title{font-size:14px}}
