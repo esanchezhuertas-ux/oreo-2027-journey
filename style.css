@@ -183,3 +183,12 @@ body{padding-bottom:96px}.topbar,main{background:#fff}.sidebar{background:#f7f7f
 .choice .choice-context,.choice .choice-symbol{align-self:stretch}
 .choice .destination,.choice .inactive-caption{align-self:end}
 @media(max-width:600px){#current-node{aspect-ratio:1.04;min-height:240px}.choice{aspect-ratio:1.08;min-height:224px}}
+/* One shared card size, determined by the longest copy in the whole flow. */
+.stage{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+#current-node,.choice{aspect-ratio:auto;height:var(--journey-card-height,auto);min-height:var(--journey-card-height,272px)}
+@media(max-width:1200px) and (min-width:601px){.stage{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
+@media(max-width:600px){.current-column,.choices-column{padding-left:32px;padding-right:8px}#current-node,.choice{aspect-ratio:auto;height:var(--journey-card-height,auto);min-height:var(--journey-card-height,272px)}}
+/* Reference-sized horizontal action capsule. */
+.choice{grid-template-columns:24px minmax(0,1fr) 64px}
+.choice .choice-arrow{width:64px;height:36px;border-radius:999px}
+.choice .choice-arrow .icon{width:24px;height:24px}

@@ -1,6 +1,6 @@
 import {makeGraph,validPath,advance,normalize,canExplore} from './graph.mjs';
-import {pages,locate,registrationEntry} from './location.mjs?v=20261016-paper4';
-import {renderMetro,initMetro} from './metro.mjs?v=20261016-paper4';
+import {pages,locate,registrationEntry} from './location.mjs?v=20261016-uniform5';
+import {renderMetro,initMetro} from './metro.mjs?v=20261016-uniform5';
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const escape=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const drawings={arrow:'M5 12h14m-5-5 5 5-5 5',back:'M19 12H5m5-5-5 5 5 5',search:'M10.5 18a7.5 7.5 0 1 0 0-15 7.5 7.5 0 0 0 0 15Zm5.5-2 5 5',reset:'M4 10a8 8 0 1 1 1 7M4 4v6h6',history:'M3 11a9 9 0 1 1 2 7M3 5v6h6m3-4v6l4 2',share:'M12 16V3m-4 4 4-4 4 4M7 10H5a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2h-2',close:'m6 6 12 12M6 18 18 6',index:'M9 5h12M9 12h12M9 19h12M3 5h.01M3 12h.01M3 19h.01',diamond:'m12 3 9 9-9 9-9-9Z',step:'M7 4h10a3 3 0 0 1 3 3v10a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3Zm1 8h8m-3-3 3 3-3 3',branch:'M7 3v12a4 4 0 0 0 4 4h6M7 8h10m-3-3 3 3-3 3m0 8 3 3-3 3',end:'M9 12l2 2 4-4M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z',download:'M12 3v12m-4-4 4 4 4-4M4 16v4h16v-4',spark:'m12 3 2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5Z',code:'m8 6-6 6 6 6m8-12 6 6-6 6m-5 2 2-16',user:'M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0ZM4 21v-2a8 8 0 0 1 16 0v2',gift:'M3 8h18v4H3Zm2 4v9h14v-9M12 8v13m0-13C3 9 5 1 9 3c2 1 3 5 3 5Zm0 0c9 1 7-7 3-5-2 1-3 5-3 5Z',warning:'m12 3 10 18H2L12 3Zm0 6v5m0 3h.01'};
@@ -15,6 +15,7 @@ const nodeContext=n=>{
  return {icon:ic,kind:'digital',es:'Dentro de la web',en:'On the website'};
 };
 const icon=name=>`<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="${drawings[name]||drawings.step}"/></svg>`;
+let cardSizeKey='';
 const copy={es:{project:'Flujo de navegación',index:'EL FLUJO',search:'Buscar un paso',explorer:'EXPLORADOR INTERACTIVO',subtitle:'Cada elección abre una nueva rama.',restart:'Desde el inicio',history:'Mi recorrido',share:'Copiar recorrido',here:'ESTÁS AQUÍ',choose:'ELIGE CÓMO CONTINUAR',decision:'Decisión',step:'Paso del flujo',outputs:'salidas',output:'salida',arrivals:'entradas',arrive:'entrada',normal:'Continuación',error:'No / Error',return:'Retorno',other:'OTROS PUNTOS DE PARTIDA',note:'Exploración del flujo · Sin operaciones reales',historyeyebrow:'TU EXPLORACIÓN',historytitle:'El camino hasta aquí.',historydescription:'Selecciona un paso para volver a ese punto y explorar otra salida.',download:'Guardar recorrido',continue:'Seguir explorando',endtitle:'Hasta aquí llega esta rama.',endtext:'Este paso no tiene una salida definida en el FigJam. Puedes volver y explorar otra decisión.',back:'Volver al paso anterior',newroute:'Explorar desde el inicio',empty:'No hay pasos con ese término.',results:'resultados',copied:'Enlace al recorrido copiado',copyfailed:'No se pudo copiar. El recorrido está en la dirección del navegador.',saved:'Recorrido guardado',stepCount:n=>`Paso ${n}`,stats:(a,b)=>`${a} pasos · ${b} conexiones`,count:n=>`${n} pasos en tu recorrido`,jump:'Nuevo punto de partida',only:'Continuar',final:'Sin salida definida',current:'Paso actual',openIndex:'Abrir índice',close:'Cerrar'},en:{project:'Navigation flow',index:'THE FLOW',search:'Find a step',explorer:'INTERACTIVE EXPLORER',subtitle:'Every choice opens a new branch.',restart:'Start over',history:'My journey',share:'Copy journey',here:'YOU ARE HERE',choose:'CHOOSE WHAT HAPPENS NEXT',decision:'Decision',step:'Flow step',outputs:'outgoing paths',output:'outgoing path',arrivals:'incoming paths',arrive:'incoming path',normal:'Continue',error:'No / Error',return:'Return',other:'OTHER STARTING POINTS',note:'Flow exploration · No real transactions',historyeyebrow:'YOUR EXPLORATION',historytitle:'The path so far.',historydescription:'Choose a step to return to that point and explore another branch.',download:'Save journey',continue:'Keep exploring',endtitle:'This branch ends here.',endtext:'This step has no outgoing connection in FigJam. Go back to explore another decision.',back:'Back to previous step',newroute:'Explore from the beginning',empty:'No steps match your search.',results:'results',copied:'Journey link copied',copyfailed:'Unable to copy. The journey is in your browser address.',saved:'Journey saved',stepCount:n=>`Step ${n}`,stats:(a,b)=>`${a} steps · ${b} connections`,count:n=>`${n} steps in your journey`,jump:'New starting point',only:'Continue',final:'No outgoing path',current:'Current step',openIndex:'Open index',close:'Close'}};
 const start=['3:565'];
 const entries={'3:574':'3:565','3:596':'3:575','3:615':'3:597','3:634':'3:616','3:674':'3:635','3:690':'3:675','3:709':'3:700','3:749':'3:722','3:774':'3:750','3:832':'3:775','3:848':'3:833','3:870':'3:855','3:898':'3:871'};
@@ -37,7 +38,7 @@ const stackDepth=Math.min(3,path.length-1);$('#current-stack').style.setProperty
 $('#current-node').className='tone-'+tone(n)+(n.error?' current-node-error':'');$('#current-node').innerHTML=`<div class="node-symbol">${icon(nodeContext(n).icon)}</div><span class="context-badge ${nodeContext(n).kind}">${escape(nodeContext(n)[lang])}</span><h2>${escape(n.text)}</h2><div class="node-type">${n.decision?C.decision:n.id==='3:671'?(lang==='es'?'Resultado':'Result'):C.step}</div>`;$('#current-meta').innerHTML=`<span>${out.length} ${out.length===1?C.output:C.outputs}</span><span>·</span><span>${incoming.length} ${incoming.length===1?C.arrive:C.arrivals}</span>${path.length>1?`<button class="stack-history" data-action="history">${icon('history')}${lang==='es'?`${path.length-1} pasos anteriores`:`${path.length-1} previous steps`}</button>`:''}`;
 $('#choices').innerHTML=out.length?out.map((e,i)=>{const target=graph.nodes.get(e.to),inactive=!canExplore(graph,e.to);return `<button class="choice tone-${tone(target)} ${inactive?'inactive':''} ${e.error?'error':''} ${e.return?'return':''}" data-next="${e.to}" ${inactiveAttrs(e.to)} data-wire="${i}" aria-label="${escape((e.label||C.only)+': '+target.text)}">${e.label||e.return?`<span class="edge-label">${e.return?icon('back'):''}${escape(e.label||(e.return?C.return:C.only))}</span>`:''}<span class="choice-symbol">${icon(nodeContext(target).icon)}</span><span class="choice-context ${nodeContext(target).kind}"><span>${escape(nodeContext(target)[lang])}</span></span><span class="choice-title">${escape(target.text)}</span>${target.section!==n.section?`<span class="destination">${escape(sectionTitle(target.section))}</span>`:''}<span class="choice-arrow">${inactive?icon('end'):(e.return||path.slice(0,-1).includes(e.to))?icon('back'):icon('arrow')}</span>${inactive?`<span class="inactive-caption">${inactiveText()}</span>`:''}</button>`;}).join(''):`<div class="end-card">${icon('end')}<h3>${inactiveText()}</h3><button class="text-btn" data-action="${path.length>1?'back':'restart'}">${icon('back')}${path.length>1?C.back:C.newroute}</button></div>`;
 const quick=lang==='es'?[['3:597','Acceso','user'],[registrationEntry(path,graph),'Registrar código','code'],['3:675','Pack dorado','spark'],['3:775','Canjear premio','gift']]:[['3:597','Access','user'],[registrationEntry(path,graph),'Enter a code','code'],['3:675','Golden pack','spark'],['3:775','Redeem a prize','gift']];$('#quick-links').innerHTML=quick.map(([id,label,ic])=>`<button class="quick-link" data-jump="${id}">${icon(ic)}${label}</button>`).join('');renderSections();syncPanelButton();renderHistory();$('#announcement').textContent=C.stepCount(path.length)+'. '+n.text+'. '+out.length+' '+C.outputs;
-delete $('#wires').dataset.activeRoute;$('#stage').classList.remove('animate');void $('#stage').offsetWidth;$('#stage').classList.add('animate');requestAnimationFrame(drawWires);clearTimeout(animationTimer);animationTimer=setTimeout(drawWires,320);if(focus)$('#current-node').focus({preventScroll:true});}
+delete $('#wires').dataset.activeRoute;$('#stage').classList.remove('animate');void $('#stage').offsetWidth;$('#stage').classList.add('animate');sizeJourneyCards();requestAnimationFrame(drawWires);clearTimeout(animationTimer);animationTimer=setTimeout(drawWires,320);if(focus)$('#current-node').focus({preventScroll:true});}
 function drawWires(){
  if(!graph)return;
  const box=$('#stage').getBoundingClientRect(),current=$('#current-node').getBoundingClientRect(),mobile=matchMedia('(max-width:600px)').matches,choices=$$('.choice'),out=graph.outgoing(path.at(-1));
@@ -77,7 +78,7 @@ $('#choices').addEventListener('pointerover',e=>highlight(e.target.closest('[dat
  $$('[data-line]').forEach(p=>p.classList.toggle('highlight',index!==undefined&&p.dataset.line===index));
 }
 window.addEventListener('popstate',()=>{readLocation();render(true);});window.addEventListener('resize',()=>{if(!matchMedia('(max-width:900px)').matches)closeIndex();syncPanelButton();drawWires();});new ResizeObserver(drawWires).observe($('#stage'));
-try{const response=await fetch('./flow.json?v=20261016-paper4',{cache:'no-store'});if(!response.ok)throw Error('Flow unavailable');data=await response.json();readLocation();updateURL();render();}catch(error){$('#section-title').textContent='No se pudo cargar el flujo';$('#subtitle').textContent='Vuelve a cargar la página para intentarlo de nuevo.';$('#stage').innerHTML='<button class="primary-btn" onclick="location.reload()">Reintentar</button>';console.error(error);}
+try{const response=await fetch('./flow.json?v=20261016-uniform5',{cache:'no-store'});if(!response.ok)throw Error('Flow unavailable');data=await response.json();readLocation();updateURL();render();}catch(error){$('#section-title').textContent='No se pudo cargar el flujo';$('#subtitle').textContent='Vuelve a cargar la página para intentarlo de nuevo.';$('#stage').innerHTML='<button class="primary-btn" onclick="location.reload()">Reintentar</button>';console.error(error);}
 
 // Recalculate from live viewport bounds as the sticky source moves.
 let wireScrollFrame=0;
@@ -85,3 +86,36 @@ function scheduleWireUpdate(){if(wireScrollFrame)return;wireScrollFrame=requestA
 window.addEventListener('scroll',scheduleWireUpdate,{passive:true});
 window.visualViewport?.addEventListener('resize',scheduleWireUpdate,{passive:true});
 new ResizeObserver(scheduleWireUpdate).observe($('.current-column'));
+
+// Measure every step at the current responsive width, including both card layouts.
+
+function sizeJourneyCards(){
+ if(!graph)return;
+ const current=document.getElementById('current-node'),choice=document.querySelector('.choice');
+ if(!current)return;
+ const width=Math.floor(current.getBoundingClientRect().width);
+ const key=lang+':'+width;if(key===cardSizeKey||width<1)return;cardSizeKey=key;
+ const lab=document.createElement('div');lab.setAttribute('aria-hidden','true');lab.inert=true;
+ Object.assign(lab.style,{position:'fixed',left:'-20000px',top:'0',width:width+'px',visibility:'hidden',pointerEvents:'none'});
+ const probes=[];
+ for(const n of graph.nodes.values()){
+  for(const original of [current,choice].filter(Boolean)){
+   const probe=original.cloneNode(true);probe.removeAttribute('tabindex');probe.removeAttribute('disabled');
+   Object.assign(probe.style,{width:width+'px',height:'auto',minHeight:'0',aspectRatio:'auto',transform:'none',margin:'0'});
+   const title=probe.querySelector('h2,.choice-title');title.textContent=n.text;
+   const context=probe.querySelector('.context-badge,.choice-context');if(context)context.textContent=nodeContext(n)[lang];
+   if(probe.matches('.choice')){
+    let edge=probe.querySelector('.edge-label');if(!edge){edge=document.createElement('span');edge.className='edge-label';probe.prepend(edge);}
+    edge.textContent=lang==='es'?'Revisar y corregir':'Review and correct';
+    let destination=probe.querySelector('.destination');if(!destination){destination=document.createElement('span');destination.className='destination';probe.append(destination);}
+    destination.textContent=sectionTitle(n.section);
+   }
+   lab.append(probe);probes.push(probe);
+  }
+ }
+ document.body.append(lab);
+ const max=Math.max(width,272,...probes.map(p=>Math.ceil(p.getBoundingClientRect().height)));
+ lab.remove();document.getElementById('stage').style.setProperty('--journey-card-height',Math.ceil((max+8)/4)*4+'px');
+}
+window.addEventListener('resize',()=>requestAnimationFrame(()=>{sizeJourneyCards();drawWires();}));
+document.fonts.ready.then(()=>{cardSizeKey='';sizeJourneyCards();drawWires();});
