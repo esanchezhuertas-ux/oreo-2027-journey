@@ -289,3 +289,6 @@ button.stack-sheet:focus-visible{outline:2px solid #0666e8;outline-offset:2px}
 @media(max-width:900px){.choice .choice-title,#current-node h2{overflow:visible;max-height:none}}
 /* Expand the canvas into the space released by the collapsed sidebar. */
 @media(min-width:901px){body.sidebar-collapsed main{padding-left:16px;padding-right:16px}body.sidebar-collapsed .stage{width:100%;max-width:none;justify-content:center}}
+
+/* Compact vector language markers */
+.language button{display:inline-flex;align-items:center;justify-content:center;gap:4px;min-height:44px}.language-flag{width:16px;height:16px;flex:none;display:block;border-radius:50%}

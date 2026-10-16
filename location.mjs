@@ -11,7 +11,7 @@ export const pages=[
  {id:'orders',es:'Pedidos y seguimiento',en:'Orders and tracking',entry:'3:852',group:'profile'}
 ];
 export function locate(node,path,graph,lang='es') {
- const exact={'3:578':'home','3:581':'home','3:584':'home','3:587':'home','3:691':'collection','3:694':'prizes','3:697':'profile','3:703':'help','164:2468':'help','3:706':'code','231:1667':'code','231:1670':'prizes','3:671':'code','3:849':'details','3:852':'orders','3:855':'profile','3:833':'prizes','3:858':'prizes','261:1690':'history','3:861':'history','3:867':'access','40:1172':'history','125:1202':'prizes','125:1205':'history','125:1208':'history','125:1211':'details','125:1214':'orders','164:2456':'details','164:2459':'details','164:2462':'details'};
+ const exact={'266:1723':'history','266:1726':'history','266:1729':'history','3:578':'home','3:581':'home','3:584':'home','3:587':'home','3:691':'collection','3:694':'prizes','3:697':'profile','3:703':'help','164:2468':'help','3:706':'code','231:1667':'code','231:1670':'prizes','3:671':'code','3:849':'details','3:852':'orders','3:855':'profile','3:833':'prizes','3:858':'prizes','261:1690':'history','3:861':'history','3:867':'access','40:1172':'history','125:1202':'prizes','125:1205':'history','125:1208':'history','125:1211':'details','125:1214':'orders','164:2456':'details','164:2459':'details','164:2462':'details'};
  let page=exact[node.id]||({'3:574':'home','3:596':'home','3:615':'access','3:634':'code','3:674':'code','3:690':'code','3:709':'private','3:749':'collection','3:774':'prizes','3:832':'redeem','3:848':'prizes','3:870':'profile','3:898':'states'}[node.section])||'home';
  let label=pages.find(p=>p.id===page)?.[lang]||({private:lang==='es'?'Área privada':'Private area',redeem:lang==='es'?'Canje de premio':'Prize redemption',states:lang==='es'?'Estado transversal':'Cross-site state'}[page]);
  let hierarchy=[label];
@@ -26,6 +26,7 @@ export function locate(node,path,graph,lang='es') {
  if(node.id==='3:858'||node.section==='3:848'||node.id==='125:1202')hierarchy.push(lang==='es'?'Módulo: Mis premios':'Module: My prizes');
  if(['3:861','125:1205'].includes(node.id))hierarchy.push(lang==='es'?'Pestaña: Canjes':'Tab: Redemptions');
  if(['40:1172','125:1208'].includes(node.id))hierarchy.push(lang==='es'?'Pestaña: Códigos':'Tab: Codes');
+ if(['266:1723','266:1726','266:1729'].includes(node.id))hierarchy.push(lang==='es'?'Soporte contextual':'Contextual support');
  return {page,label,hierarchy};
 }
 
