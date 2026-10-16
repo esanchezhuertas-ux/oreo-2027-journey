@@ -294,6 +294,7 @@ button.stack-sheet:focus-visible{outline:2px solid #0666e8;outline-offset:2px}
 .language button{display:inline-flex;align-items:center;justify-content:center;gap:4px;min-height:44px}.language-flag{width:12px;height:12px;flex:none;display:block;border-radius:50%}
 
 .language button{padding-inline:12px;gap:4px}
+.choice-pagination{display:none}
 
 /* Mobile adaptation: the desktop composition and measurements remain untouched. */
 @media(max-width:600px){
@@ -320,19 +321,35 @@ button.stack-sheet:focus-visible{outline:2px solid #0666e8;outline-offset:2px}
  .crumb{min-height:44px}
  .crumb.current{max-width:100%}
  .stage{display:block;margin-inline:0;padding:28px 0 36px;overflow:clip;isolation:isolate}
- .current-column{top:calc(var(--header-height) + 8px);padding:8px 12px 12px;margin-bottom:40px;background-color:#f7f7f7;max-width:100%}
+ .current-column{top:calc(var(--header-height) + 8px);padding:8px;margin-bottom:32px;background-color:#f7f7f7;max-width:100%}
  .current-column.mobile-sticky-off{position:relative;top:auto}
- .choices-column{padding-left:32px;padding-right:12px}
- #current-node{height:auto;min-height:208px;padding:20px;gap:16px}
- #current-node h2{font-size:21px;line-height:1.3}
+ .choices-column{padding-left:0;padding-right:0;min-width:0}
+ #current-node{height:auto;min-height:192px;padding:16px;gap:12px}
+ #current-node h2{font-size:20px;line-height:1.28;padding-bottom:4px}
+ #current-node .node-type{padding-top:12px}
  #current-meta{padding:12px 0 0;min-height:0}
  #current-meta>span{display:none}
  #current-meta:empty{display:none}
- #choices{gap:16px}
- .choice{height:auto;min-height:200px;padding:16px;gap:12px}
- .choice .choice-title{font-size:16px;line-height:1.35}
+ #choices{gap:8px}
+ #choices.is-carousel{position:relative;display:flex;flex-direction:row;align-items:stretch;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;overscroll-behavior-inline:contain;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:4px 0 16px}
+ #choices.is-carousel::-webkit-scrollbar{display:none}
+ #choices.is-carousel:after{content:'';display:block;flex:0 0 24px}
+ #choices.is-carousel .choice{flex:0 0 calc(100% - 32px);width:auto;min-width:0;scroll-snap-align:start}
+ #choices.is-carousel .choice:focus-visible{outline-offset:-4px}
+ .choice{height:auto;min-height:176px;padding:16px;gap:8px}
+ .choice .choice-title{font-size:15px;line-height:1.3;padding-bottom:8px}
+ .choice .choice-context,.choice .choice-symbol{padding-top:12px}
+ .choice .choice-arrow{margin-top:8px}
  .node-caption{font-size:10px}
  .choice .destination,.choice .inactive-caption{font-size:11px;line-height:1.4}
+ .choice-pagination{display:flex;align-items:center;justify-content:center;gap:8px;min-height:28px;margin:0;padding:0 4px}
+ .choice-pagination[hidden]{display:none}
+ .choice-dots{display:flex;align-items:center;justify-content:center;gap:0;min-width:0}
+ .choice-dot{display:grid;place-items:center;width:24px;height:24px;min-width:24px;padding:0;border-radius:8px}
+ .choice-dot span{display:block;width:6px;height:6px;border-radius:999px;background:#aeb7c1;transition:width .18s ease,background .18s ease}
+ .choice-dot[aria-current=true] span{width:12px;background:#0666e8}
+ .choice-dot:focus-visible{outline-offset:0}
+ .choice-count{min-width:32px;color:#68717b;font-size:10px;line-height:1;font-variant-numeric:tabular-nums;text-align:right}
  .station-name,.legend,.note{font-size:10px}
  .stack-sheets{pointer-events:none}
  button.stack-sheet{pointer-events:none}
