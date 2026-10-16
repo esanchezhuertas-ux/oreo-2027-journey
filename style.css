@@ -95,3 +95,9 @@ body{padding-bottom:96px}.topbar,main{background:#fff}.sidebar{background:#f7f7f
 /* Sidebar toggle remains available when the whole panel is collapsed. */
 .topbar [data-action=index]{display:inline-flex}
 @media(min-width:901px){body.sidebar-collapsed .shell{grid-template-columns:minmax(0,1fr)}body.sidebar-collapsed .sidebar{display:none}}
+
+/* Panel controls belong to the sidebar, outside global navigation. */
+.side-head .panel-toggle{display:inline-flex;margin-right:-8px}.side-head{padding-right:8px}
+.panel-reopen{display:none;position:fixed;left:8px;top:calc(var(--header-height) + 12px);z-index:24;width:40px;min-width:40px;height:44px;background:#f7f7f8;border:1px solid #e1e4e9;border-radius:8px}
+@media(min-width:901px){body.sidebar-collapsed .panel-reopen{display:inline-flex}body.sidebar-collapsed .shell{margin-left:56px}.side-head .panel-toggle{display:inline-flex}}
+@media(max-width:900px){.panel-reopen{display:inline-flex;left:0;border-left:0;border-radius:0 8px 8px 0;width:32px;min-width:32px}body.index-open .panel-reopen{display:none}.where-bar{padding-left:24px}}
