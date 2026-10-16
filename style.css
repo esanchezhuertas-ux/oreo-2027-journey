@@ -108,3 +108,38 @@ body{padding-bottom:96px}.topbar,main{background:#fff}.sidebar{background:#f7f7f
 /* The active station stays in view only while its flow module is on screen. */
 .current-column{position:sticky;top:calc(var(--header-height) + 16px);align-self:start;z-index:3}
 @media(max-width:600px){.stage{display:block}.current-column{top:calc(var(--header-height) + 8px);margin-bottom:48px;background:#f7f8fa;padding-top:8px;padding-bottom:8px;border-radius:8px;box-shadow:0 8px 16px #1423410a}.choices-column{position:relative}#current-meta{padding-bottom:4px}}
+
+/* Paper cards: a visible stack records actual journey depth. */
+.current-stack{position:relative;isolation:isolate;margin-bottom:calc(var(--stack-depth,0)*8px)}
+.stack-sheets{position:absolute;inset:0;pointer-events:none}
+.stack-sheet{position:absolute;inset:0 calc(var(--sheet)*8px);transform:translateY(calc(var(--sheet)*8px));border:1px solid #deded5;border-radius:8px;background:#f1f0e7;box-shadow:0 4px 8px #1519110a;animation:sheet-in .24s ease-out both}
+#current-node{z-index:4;min-height:240px;padding:24px;gap:20px;border:1px solid #dadbd4;border-radius:8px;background:#fffef8;box-shadow:0 4px 8px #14191108,0 16px 32px -20px #14191130}
+#current-node .node-symbol{background:transparent;color:#0666e8;margin:0;width:40px;height:40px}
+#current-node .context-badge{color:#525650}
+#current-node h2{font-size:24px;line-height:1.32;letter-spacing:-.6px;color:#151713;font-weight:650}
+#current-node .node-type{border-top:1px solid #dcded5;border-radius:0;padding:16px 0 0;background:transparent;color:#555b53;font-size:11px}
+#current-node.tone-registration{background:#fff1f8;border:1px solid #cf357f}
+#current-node.tone-registration .node-type{background:transparent;border-color:#edbed5}
+#current-meta{padding-top:20px;align-items:center}
+.stack-history{display:flex;align-items:center;gap:8px;min-height:44px;padding:8px;color:#075bc4;font-size:11px;border-radius:4px;text-align:left}
+.stack-history:hover{background:#e9f1fc}.stack-history .icon{width:16px;height:16px}
+.choice{grid-template-columns:24px minmax(0,1fr) 40px;gap:12px;min-height:144px;padding:16px;border:1px solid #dedfd7;border-radius:8px;background:#fffef8;box-shadow:0 4px 8px #14191105,0 12px 24px -20px #14191130}
+.choice .edge-label{grid-column:1 / -1;grid-row:1;font-size:11px}
+.choice .choice-title{grid-column:1 / -1;grid-row:2;font-size:15px;line-height:1.4;font-weight:650;letter-spacing:-.2px;padding-bottom:8px;color:#151713}
+.choice .choice-symbol{grid-column:1;grid-row:3;align-self:center;padding:12px 0 0;border-top:1px solid #dcded5;height:100%;display:flex;align-items:center}
+.choice .choice-context{grid-column:2;grid-row:3;background:transparent!important;border-top:1px solid #dcded5;border-radius:0;padding:12px 0 0;font-size:10px;color:#535b55;align-self:stretch;display:flex;align-items:center}
+.choice .choice-arrow{position:static;grid-column:3;grid-row:3;transform:none;align-self:end;display:grid;place-items:center;width:40px;height:40px;border-radius:999px;background:#171a15;color:white}
+.choice:hover .choice-arrow{transform:none;background:#0666e8;color:white}
+.choice .destination{grid-column:1 / -1;grid-row:4;color:#5b625e}
+.choice .inactive-caption{grid-column:1 / -1;grid-row:5}
+.choice:not(:disabled):hover{background:#fffefb;border-color:#0666e8;transform:translateY(-4px);box-shadow:0 8px 20px #14234112}
+.choice.error .choice-arrow{background:#c52a35}.choice.tone-registration .choice-arrow{background:#a3155a}.choice:disabled .choice-arrow{background:#e4e5df;color:#666d65}
+.choice:disabled:hover{transform:none}.choices-column{z-index:3}
+@keyframes sheet-in{from{opacity:0;transform:translateY(0)}to{opacity:1;transform:translateY(calc(var(--sheet)*8px))}}
+@media(max-width:600px){#current-node{min-height:192px;padding:20px;gap:16px}#current-node h2{font-size:22px}.choice{padding:16px;min-height:128px;gap:8px}.choice .choice-title{font-size:14px}.choice:not(:disabled):hover{transform:none}#current-meta{gap:8px;padding-top:12px}.stack-history{font-size:10px}.current-column{padding-right:8px}.stack-sheet{inset-inline:calc(var(--sheet)*4px)}}
+@media(prefers-reduced-motion:reduce){.stack-sheet{animation:none}.choice{transition:none}}
+/* White surfaces; route colors remain on borders, icons and controls. */
+.stack-sheet{background:#f3f4f6;border-color:#dce0e5}
+#current-node,#current-node.tone-registration,.choice,.choice.tone-registration:not(:disabled),.choice:not(:disabled):hover,.choice.tone-registration:hover{background:#fff}
+#current-node{border-color:#dce0e5}
+#current-node .node-type,.choice .choice-symbol,.choice .choice-context{border-top-color:#e3e6ea}
