@@ -1,11 +1,14 @@
 import {makeGraph,validPath,advance,normalize,canExplore} from './graph.mjs';
-import {pages,locate,registrationEntry} from './location.mjs?v=20261016-canvas14';
-import {renderMetro,initMetro} from './metro.mjs?v=20261016-canvas14';
+import {pages,locate,registrationEntry} from './location.mjs?v=20261016-profile15';
+import {renderMetro,initMetro} from './metro.mjs?v=20261016-profile15';
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const escape=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const drawings={arrow:'M5 12h14m-5-5 5 5-5 5',back:'M19 12H5m5-5-5 5 5 5',search:'M10.5 18a7.5 7.5 0 1 0 0-15 7.5 7.5 0 0 0 0 15Zm5.5-2 5 5',reset:'M4 10a8 8 0 1 1 1 7M4 4v6h6',history:'M3 11a9 9 0 1 1 2 7M3 5v6h6m3-4v6l4 2',share:'M12 16V3m-4 4 4-4 4 4M7 10H5a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2h-2',close:'m6 6 12 12M6 18 18 6',index:'M9 5h12M9 12h12M9 19h12M3 5h.01M3 12h.01M3 19h.01',diamond:'m12 3 9 9-9 9-9-9Z',step:'M7 4h10a3 3 0 0 1 3 3v10a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3Zm1 8h8m-3-3 3 3-3 3',branch:'M7 3v12a4 4 0 0 0 4 4h6M7 8h10m-3-3 3 3-3 3m0 8 3 3-3 3',end:'M9 12l2 2 4-4M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z',download:'M12 3v12m-4-4 4 4 4-4M4 16v4h16v-4',spark:'m12 3 2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5Z',code:'m8 6-6 6 6 6m8-12 6 6-6 6m-5 2 2-16',user:'M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0ZM4 21v-2a8 8 0 0 1 16 0v2',gift:'M3 8h18v4H3Zm2 4v9h14v-9M12 8v13m0-13C3 9 5 1 9 3c2 1 3 5 3 5Zm0 0c9 1 7-7 3-5-2 1-3 5-3 5Z',warning:'m12 3 10 18H2L12 3Zm0 6v5m0 3h.01'};
 Object.assign(drawings,{panel:'M6 3h12a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V6a3 3 0 0 1 3-3ZM9 3v18',settings:'M9.5 3h5l.5 2.5 2 1.2 2.4-.8 2.5 4.2-1.9 1.7v2.4l1.9 1.7-2.5 4.2-2.4-.8-2 1.2-.5 2.5h-5L9 20.5l-2-1.2-2.4.8-2.5-4.2L4 14.2v-2.4L2.1 10.1l2.5-4.2 2.4.8 2-1.2Z M15.5 13a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z',pack:'m12 3 9 5v9l-9 5-9-5V8Zm-9 5 9 5 9-5m-9 5v9M7 5l10 6',qr:'M3 3h6v6H3Zm12 0h6v6h-6ZM3 15h6v6H3Zm12 0h2v2h-2Zm4 4h2v2h-2Zm-4 2v-2m6-4v2M12 3v3m0 6h3M3 12h3',web:'M3 5h18v14H3ZM3 9h18M6 7h.01M9 7h.01',filter:'M3 5h18l-7 8v7l-4-2v-5Z',truck:'M2 5h12v12H2Zm12 5h4l4 5v2h-8M8 19a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm12 0a2 2 0 1 1-4 0 2 2 0 0 1 4 0Z',cards:'M7 6h14v15H7ZM3 17V2h14',check:'m5 12 4 4L19 6',lock:'M5 10h14v11H5Zm3 0V7a4 4 0 0 1 8 0v3'});
 const nodeContext=n=>{
+ if(['3:833','3:858'].includes(n.id))return {icon:'gift',kind:'module',es:'Módulo · Premios',en:'Module · Prizes'};
+ if(['3:861','40:1172'].includes(n.id))return {icon:'history',kind:'module',es:'Pestaña · Historial',en:'Tab · History'};
+ if(n.id==='261:1690')return {icon:'history',kind:'digital',es:'Página · Perfil',en:'Page · Profile'};
  if(['3:855','3:697','3:849'].includes(n.id))return {icon:'settings',kind:'digital',es:'Dentro de la web',en:'On the website'};
  if(['3:578','3:581','3:584','3:587'].includes(n.id))return {icon:n.id==='3:581'?'gift':n.id==='3:584'?'pack':'web',kind:'module',es:'Módulo · Landing Oreo',en:'Module · Oreo Landing'};
  if(n.id==='3:565')return {icon:'pack',kind:'physical',es:'Fuera de la web · Pack físico',en:'Outside the website · Physical pack'};
@@ -87,7 +90,7 @@ $('#choices').addEventListener('pointerover',e=>highlight(e.target.closest('[dat
  $$('[data-line]').forEach(p=>p.classList.toggle('highlight',index!==undefined&&p.dataset.line===index));
 }
 window.addEventListener('popstate',()=>{readLocation();render(true);});window.addEventListener('resize',()=>{if(!matchMedia('(max-width:900px)').matches)closeIndex();syncPanelButton();drawWires();});new ResizeObserver(drawWires).observe($('#stage'));
-try{const response=await fetch('./flow.json?v=20261016-canvas14',{cache:'no-store'});if(!response.ok)throw Error('Flow unavailable');data=await response.json();readLocation();updateURL();render();}catch(error){$('#section-title').textContent='No se pudo cargar el flujo';$('#subtitle').textContent='Vuelve a cargar la página para intentarlo de nuevo.';$('#stage').innerHTML='<button class="primary-btn" onclick="location.reload()">Reintentar</button>';console.error(error);}
+try{const response=await fetch('./flow.json?v=20261016-profile15',{cache:'no-store'});if(!response.ok)throw Error('Flow unavailable');data=await response.json();readLocation();updateURL();render();}catch(error){$('#section-title').textContent='No se pudo cargar el flujo';$('#subtitle').textContent='Vuelve a cargar la página para intentarlo de nuevo.';$('#stage').innerHTML='<button class="primary-btn" onclick="location.reload()">Reintentar</button>';console.error(error);}
 
 // Recalculate from live viewport bounds as the sticky source moves.
 let wireScrollFrame=0;
