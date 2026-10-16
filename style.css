@@ -143,3 +143,6 @@ body{padding-bottom:96px}.topbar,main{background:#fff}.sidebar{background:#f7f7f
 #current-node,#current-node.tone-registration,.choice,.choice.tone-registration:not(:disabled),.choice:not(:disabled):hover,.choice.tone-registration:hover{background:#fff}
 #current-node{border-color:#dce0e5}
 #current-node .node-type,.choice .choice-symbol,.choice .choice-context{border-top-color:#e3e6ea}
+/* The arrow is a visual button; the entire card is the single hit target. */
+.choice:not(:disabled) .choice-arrow,.choice:not(:disabled):hover .choice-arrow{background:#151515;color:#fff}
+.choice:focus-visible .choice-arrow{box-shadow:0 0 0 4px #0666e826}
