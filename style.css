@@ -199,3 +199,11 @@ body{padding-bottom:96px}.topbar,main{background:#fff}.sidebar{background:#f7f7f
 .choice .choice-title{font-size:15px;line-height:1.35}
 @media(max-width:1200px) and (min-width:601px){.stage{grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr);gap:64px}.choice{padding:16px;column-gap:8px}.choice .choice-title{font-size:14px}}
 @media(max-width:600px){.stage{display:block}.current-column{padding-left:16px;padding-right:8px;margin-bottom:64px}.choices-column{padding-left:56px;padding-right:8px}#current-node{height:var(--primary-card-height,auto);min-height:var(--primary-card-height,280px)}.choice{height:var(--secondary-card-height,auto);min-height:var(--secondary-card-height,224px)}.choice .choice-title{font-size:14px}}
+/* Desktop secondary cards have a strict 250px ceiling. */
+@media(min-width:901px){
+ .choice{height:min(var(--secondary-card-height,250px),250px);min-height:0;max-height:250px;padding:16px;row-gap:8px;grid-template-rows:auto minmax(0,1fr) auto}
+ .choice .choice-title{font-size:14px;line-height:1.35;min-height:0;max-height:100%;overflow:auto;overscroll-behavior:contain;scrollbar-width:thin;align-self:stretch;padding:4px 0 8px}
+ .choice .choice-context,.choice .choice-symbol{padding-top:12px}
+ .choice .choice-arrow{margin-top:12px}
+ .choice .destination,.choice .inactive-caption{font-size:9px;line-height:1.3}
+}
