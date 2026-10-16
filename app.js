@@ -76,7 +76,7 @@ $('#choices').addEventListener('pointerover',e=>highlight(e.target.closest('[dat
  $$('[data-line]').forEach(p=>p.classList.toggle('highlight',index!==undefined&&p.dataset.line===index));
 }
 window.addEventListener('popstate',()=>{readLocation();render(true);});window.addEventListener('resize',()=>{if(!matchMedia('(max-width:900px)').matches)closeIndex();syncPanelButton();drawWires();});new ResizeObserver(drawWires).observe($('#stage'));
-try{const response=await fetch('./flow.json');if(!response.ok)throw Error('Flow unavailable');data=await response.json();readLocation();updateURL();render();}catch(error){$('#section-title').textContent='No se pudo cargar el flujo';$('#subtitle').textContent='Vuelve a cargar la página para intentarlo de nuevo.';$('#stage').innerHTML='<button class="primary-btn" onclick="location.reload()">Reintentar</button>';console.error(error);}
+try{const response=await fetch('./flow.json?v=20261016-home',{cache:'no-store'});if(!response.ok)throw Error('Flow unavailable');data=await response.json();readLocation();updateURL();render();}catch(error){$('#section-title').textContent='No se pudo cargar el flujo';$('#subtitle').textContent='Vuelve a cargar la página para intentarlo de nuevo.';$('#stage').innerHTML='<button class="primary-btn" onclick="location.reload()">Reintentar</button>';console.error(error);}
 
 // Recalculate from live viewport bounds as the sticky source moves.
 let wireScrollFrame=0;
