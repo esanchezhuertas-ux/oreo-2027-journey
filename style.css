@@ -104,3 +104,7 @@ body{padding-bottom:96px}.topbar,main{background:#fff}.sidebar{background:#f7f7f
 
 /* Spotlight the hovered or keyboard-focused route, including both ports. */
 .wire-route{opacity:1;transition:opacity .18s ease}.wire-route.route-muted{opacity:.16}.wire-route.route-active .wire{opacity:1}.choice:focus-visible{border-color:var(--blue);box-shadow:0 4px 16px #10162212}
+
+/* The active station stays in view only while its flow module is on screen. */
+.current-column{position:sticky;top:calc(var(--header-height) + 16px);align-self:start;z-index:3}
+@media(max-width:600px){.stage{display:block}.current-column{top:calc(var(--header-height) + 8px);margin-bottom:48px;background:#f7f8fa;padding-top:8px;padding-bottom:8px;border-radius:8px;box-shadow:0 8px 16px #1423410a}.choices-column{position:relative}#current-meta{padding-bottom:4px}}
