@@ -287,3 +287,5 @@ button.stack-sheet:focus-visible{outline:2px solid #0666e8;outline-offset:2px}
 }
 @media(min-width:901px) and (max-width:1200px){.stage{grid-template-columns:380px 216px;gap:32px;padding-left:8px;padding-right:8px}}
 @media(max-width:900px){.choice .choice-title,#current-node h2{overflow:visible;max-height:none}}
+/* Expand the canvas into the space released by the collapsed sidebar. */
+@media(min-width:901px){body.sidebar-collapsed main{padding-left:16px;padding-right:16px}body.sidebar-collapsed .stage{width:100%;max-width:none;justify-content:center}}
