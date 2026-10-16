@@ -271,3 +271,19 @@ button.stack-sheet:focus-visible{outline:2px solid #0666e8;outline-offset:2px}
 /* Quiet dotted canvas matching the supplied reference. */
 .stage{background-color:#f7f7f7;background-image:radial-gradient(circle,#b9bec5 .5px,transparent .75px);background-size:32px 32px;background-position:16px 16px}
 @media(max-width:600px){.current-column{background-color:#f7f7f7;background-image:radial-gradient(circle,#b9bec5 .5px,transparent .75px);background-size:32px 32px;background-position:16px 16px}}
+/* Full readable copy, without inner scrolling or clamping. */
+.choice .choice-title,#current-node h2{overflow:visible;max-height:none;text-overflow:clip;-webkit-line-clamp:unset}
+.choice .choice-title{font-size:14px;line-height:1.4;align-self:start}
+.choice .edge-label{font-size:10px;line-height:1.4}
+.choice .choice-context{font-size:10px;line-height:1.4}
+.choice:disabled{opacity:1;background:#f8f9fa;border-color:#dce1e5}
+.choice:disabled .choice-title{color:#555c65}.choice:disabled .choice-context,.choice:disabled .inactive-caption{color:#626a73}
+@media(min-width:901px){
+ .stage{grid-template-columns:380px 216px;gap:80px}
+ .choices-column,#choices{width:216px}
+ .choice{width:216px;height:var(--secondary-card-height,auto);min-height:var(--secondary-card-height,216px);max-height:none;padding:16px;grid-template-rows:auto 1fr auto}
+ #current-node{height:var(--primary-card-height,380px);min-height:380px;max-height:none}
+ #current-node h2{font-size:22px;line-height:1.35;overflow:visible;max-height:none}
+}
+@media(min-width:901px) and (max-width:1200px){.stage{grid-template-columns:380px 216px;gap:32px;padding-left:8px;padding-right:8px}}
+@media(max-width:900px){.choice .choice-title,#current-node h2{overflow:visible;max-height:none}}
