@@ -67,3 +67,23 @@ body{padding-bottom:96px}.topbar,main{background:#fff}.sidebar{background:#f7f7f
 .journey-dock{border-radius:999px;padding:4px;width:max-content;max-width:calc(100vw - 32px)}
 .journey-dock button{border-radius:999px;padding:12px 24px}
 @media(max-width:600px){#current-node{padding:16px;grid-template-columns:32px minmax(0,1fr)}#current-node .node-symbol{width:32px;height:32px}#current-node:before{left:56px;top:12px;bottom:12px}#current-node h2{font-size:16px}.choice{padding:16px 32px 16px 12px;grid-template-columns:28px minmax(0,1fr)}.choice:before{left:48px}.choice-symbol .icon{width:20px;height:20px}.journey-dock{left:auto;right:16px}.choice:hover{transform:none}}
+
+/* Metro workflow: prominent current station, compact next stops. */
+.stage{grid-template-columns:minmax(260px,1.2fr) minmax(200px,.8fr);gap:80px;padding:48px 24px;min-height:480px;background-color:#f7f8fa;background-image:radial-gradient(#d9dde4 .75px,transparent .75px);background-size:12px 12px;border-radius:8px;margin-top:24px;margin-bottom:24px}
+.current-column .node-caption{font-size:11px;letter-spacing:.12em;font-weight:700;color:#065ccd;display:flex;align-items:center;gap:8px}
+.current-column .node-caption:before{content:'';width:8px;height:8px;border:2px solid #0666e8;border-radius:50%;background:white;box-shadow:0 0 0 4px #0666e815}
+#current-node{display:grid;grid-template-columns:40px minmax(0,1fr);padding:24px;gap:16px;border:2px solid #0666e8;background:#fff;box-shadow:0 12px 32px #14234112;min-height:208px}
+#current-node:before,.choice:before{display:none}
+#current-node .node-symbol{grid-column:1;grid-row:1;align-self:center;background:#edf4ff;width:40px;height:40px;border-radius:4px}
+#current-node .node-symbol svg{width:24px;height:24px}
+#current-node h2{grid-column:1 / -1;grid-row:2;font-size:24px;line-height:1.35;letter-spacing:-.6px;font-weight:600}
+#current-node .context-badge{grid-column:2;grid-row:1;align-self:center;font-size:11px;line-height:1.5}
+#current-node .node-type{grid-column:1 / -1;grid-row:3;margin:0;padding:12px;background:#f1f3f6;border-radius:4px;font-size:11px;color:#596270}
+#current-node.tone-registration{border-width:2px}#current-node.tone-registration .node-type{background:#f9dfec}#current-node.tone-registration .node-symbol{background:#fbe0ee;color:#a3155a}
+#current-meta{font-size:11px;padding:16px 4px;color:#616977}
+#choices{gap:16px}.choice{display:grid;grid-template-columns:20px minmax(0,1fr);column-gap:8px;row-gap:8px;padding:12px 28px 12px 12px;min-height:88px;border:1px solid #e1e5eb;background:#fff;box-shadow:0 4px 12px #14234108}
+.choice-symbol{grid-column:1;grid-row:2;align-self:start;padding-top:2px}.choice-symbol .icon{width:20px;height:20px}.choice-title{grid-column:2;grid-row:2;font-size:12px;line-height:1.5;letter-spacing:0;font-weight:600}.choice .edge-label{grid-column:1 / -1;grid-row:1;margin:0;font-size:10px}.choice-context{grid-column:1 / -1;grid-row:3;font-size:9px;line-height:1.5;padding:8px;border-radius:4px;background:#f3f4f6}.choice .destination{grid-column:1 / -1;grid-row:4;font-size:9px}.choice .inactive-caption{grid-column:1 / -1;grid-row:5;font-size:9px}.choice-arrow{right:8px}.choice-arrow svg{width:12px;height:12px}
+.choice.tone-registration .choice-context{background:#fbe0ee;color:#9f1455}.choice.error .choice-context{background:#ffebea}.choice.tone-decision .choice-context{background:#f1e9fa}.choice.tone-result .choice-context{background:#e4f3eb}.choice.tone-golden .choice-context{background:#fcf0d3}
+#wires{z-index:2}.wire{stroke:var(--route-color);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;opacity:.8}.wire.highlight{stroke:var(--route-color);stroke-width:4;opacity:1}.wire-port{fill:#fff;stroke:var(--route-color);stroke-width:2}.wire.return{stroke-dasharray:6 6}
+@media(max-width:1200px) and (min-width:601px){.stage{padding:32px 16px;gap:56px;grid-template-columns:minmax(200px,1.15fr) minmax(168px,.85fr)}#current-node{padding:20px}#current-node h2{font-size:21px}}
+@media(max-width:600px){.stage{grid-template-columns:minmax(0,1fr);gap:48px;padding:24px 8px;min-height:0;margin-top:16px}.current-column{padding-left:16px}.choices-column{padding-left:48px}#current-node{min-height:192px;padding:20px;gap:12px}#current-node h2{font-size:22px}#current-node .context-badge{font-size:10px}#current-node .node-symbol{width:36px;height:36px}.choice{min-height:80px;padding:12px 24px 12px 12px}.choice-title{font-size:12px}.choice-context{font-size:9px}.node-caption{font-size:8px}.current-column .node-caption{font-size:10px}}
