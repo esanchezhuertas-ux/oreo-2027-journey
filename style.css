@@ -268,3 +268,6 @@ button.stack-sheet:focus-visible{outline:2px solid #0666e8;outline-offset:2px}
 .stack-tooltip{position:absolute;z-index:8;left:50%;top:calc(100% + var(--stack-depth,0)*12px + 8px);transform:translateX(-50%);padding:8px 12px;border-radius:8px;background:#17191d;color:#fff;box-shadow:0 4px 12px #0002;font-size:11px;line-height:1.4;width:max-content;max-width:100%;pointer-events:none}
 .stack-tooltip[hidden]{display:none}
 @media(prefers-reduced-motion:reduce){button.stack-sheet{transition:none}}
+/* Quiet dotted canvas matching the supplied reference. */
+.stage{background-color:#f7f7f7;background-image:radial-gradient(circle,#bfc3c7 1px,transparent 1px);background-size:32px 32px;background-position:16px 16px}
+@media(max-width:600px){.current-column{background-color:#f7f7f7;background-image:radial-gradient(circle,#bfc3c7 1px,transparent 1px);background-size:32px 32px;background-position:16px 16px}}
