@@ -101,3 +101,6 @@ body{padding-bottom:96px}.topbar,main{background:#fff}.sidebar{background:#f7f7f
 .panel-reopen{display:none;position:fixed;left:8px;top:calc(var(--header-height) + 12px);z-index:24;width:40px;min-width:40px;height:44px;background:#f7f7f8;border:1px solid #e1e4e9;border-radius:8px}
 @media(min-width:901px){body.sidebar-collapsed .panel-reopen{display:inline-flex}body.sidebar-collapsed .shell{margin-left:56px}.side-head .panel-toggle{display:inline-flex}}
 @media(max-width:900px){.panel-reopen{display:inline-flex;left:0;border-left:0;border-radius:0 8px 8px 0;width:32px;min-width:32px}body.index-open .panel-reopen{display:none}.where-bar{padding-left:24px}}
+
+/* Spotlight the hovered or keyboard-focused route, including both ports. */
+.wire-route{opacity:1;transition:opacity .18s ease}.wire-route.route-muted{opacity:.16}.wire-route.route-active .wire{opacity:1}.choice:focus-visible{border-color:var(--blue);box-shadow:0 4px 16px #10162212}
