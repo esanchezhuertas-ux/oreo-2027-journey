@@ -291,4 +291,6 @@ button.stack-sheet:focus-visible{outline:2px solid #0666e8;outline-offset:2px}
 @media(min-width:901px){body.sidebar-collapsed main{padding-left:16px;padding-right:16px}body.sidebar-collapsed .stage{width:100%;max-width:none;justify-content:center}}
 
 /* Compact vector language markers */
-.language button{display:inline-flex;align-items:center;justify-content:center;gap:4px;min-height:44px}.language-flag{width:16px;height:16px;flex:none;display:block;border-radius:50%}
+.language button{display:inline-flex;align-items:center;justify-content:center;gap:4px;min-height:44px}.language-flag{width:12px;height:12px;flex:none;display:block;border-radius:50%}
+
+.language button{padding-inline:12px;gap:4px}
