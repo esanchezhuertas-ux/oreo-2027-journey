@@ -269,5 +269,5 @@ button.stack-sheet:focus-visible{outline:2px solid #0666e8;outline-offset:2px}
 .stack-tooltip[hidden]{display:none}
 @media(prefers-reduced-motion:reduce){button.stack-sheet{transition:none}}
 /* Quiet dotted canvas matching the supplied reference. */
-.stage{background-color:#f7f7f7;background-image:radial-gradient(circle,#b9bec5 .5px,transparent .75px);background-size:16px 16px;background-position:8px 8px}
-@media(max-width:600px){.current-column{background-color:#f7f7f7;background-image:radial-gradient(circle,#b9bec5 .5px,transparent .75px);background-size:16px 16px;background-position:8px 8px}}
+.stage{background-color:#f7f7f7;background-image:radial-gradient(circle,#b9bec5 .5px,transparent .75px);background-size:32px 32px;background-position:16px 16px}
+@media(max-width:600px){.current-column{background-color:#f7f7f7;background-image:radial-gradient(circle,#b9bec5 .5px,transparent .75px);background-size:32px 32px;background-position:16px 16px}}
