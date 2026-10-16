@@ -1,5 +1,5 @@
 export const pages=[
- {id:'home',es:'Inicio',en:'Home',entry:'3:575',group:'public'},
+ {id:'home',es:'Landing Oreo',en:'Oreo Landing',entry:'3:575',group:'public'},
  {id:'access',es:'Acceso',en:'Access',entry:'3:597',group:'public'},
  {id:'code',es:'Registrar código',en:'Enter a code',entry:'3:616',group:'public'},
  {id:'prizes',es:'Premios',en:'Prizes',entry:'3:694',group:'private'},
