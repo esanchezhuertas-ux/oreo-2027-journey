@@ -146,3 +146,40 @@ body{padding-bottom:96px}.topbar,main{background:#fff}.sidebar{background:#f7f7f
 /* The arrow is a visual button; the entire card is the single hit target. */
 .choice:not(:disabled) .choice-arrow,.choice:not(:disabled):hover .choice-arrow{background:#151515;color:#fff}
 .choice:focus-visible .choice-arrow{box-shadow:0 0 0 4px #0666e826}
+
+/* Physical white cards: contact shadows, paper edges and a grounded stack. */
+.stage{background:#e8eef0;background-image:none;padding-top:56px;padding-bottom:56px}
+.current-stack{margin-bottom:calc(var(--stack-depth,0)*12px);filter:drop-shadow(0 20px 16px #233b451a)}
+.stack-sheet{inset:0 calc(var(--sheet)*8px);transform:translateY(calc(var(--sheet)*12px));background:linear-gradient(180deg,#fff 88%,#f8f9fa 100%);border:1px solid #dce1e3;border-bottom:2px solid #d1d8db;box-shadow:0 2px 2px #20343c16,0 6px 8px -4px #20343c26,inset 0 -2px 0 #fff;border-radius:8px}
+#current-node{min-height:272px;padding:28px;gap:24px;border:1px solid #e4e8e9;border-bottom:2px solid #d6dcdf;background:#fff;box-shadow:0 2px 2px #20343c12,0 8px 12px -8px #20343c40,inset 0 -3px 0 #f5f7f7;grid-template-columns:40px minmax(0,1fr)}
+#current-node h2{font-size:28px;font-weight:700;line-height:1.2;letter-spacing:-.8px;padding:4px 0 12px;align-self:center}
+#current-node .node-symbol{background:transparent;margin:0}
+#current-node .context-badge{font-size:12px;color:#535b5e}
+#current-node .node-type{padding-top:20px;font-size:12px;background:transparent;border-top:1px solid #e2e7e8}
+#current-meta{padding-top:24px}
+#choices{gap:24px}
+.choice{min-height:176px;padding:20px;column-gap:12px;row-gap:16px;border:1px solid #e0e5e7;border-bottom:2px solid #cfd8dc;background:#fff;box-shadow:0 2px 2px #20343c0d,0 8px 12px -8px #20343c33,0 16px 24px -20px #20343c30,inset 0 -3px 0 #f4f6f6;transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease}
+.choice .choice-title{font-size:18px;line-height:1.28;letter-spacing:-.4px;padding:4px 0 16px;font-weight:700}
+.choice .choice-context{font-size:11px;line-height:1.35;padding-top:16px;color:#555e62}
+.choice .choice-symbol{padding-top:16px;justify-content:flex-start}
+.choice .choice-symbol .icon{width:24px;height:24px}
+.choice .choice-arrow{width:48px;height:36px;border-radius:999px;margin-top:16px;align-self:center;box-shadow:inset 0 1px 0 #ffffff20,0 2px 2px #00000012}
+.choice{grid-template-columns:24px minmax(0,1fr) 48px}
+.choice .choice-arrow .icon{width:24px;height:24px}
+.choice:not(:disabled):hover{transform:translateY(-4px);border-color:#c7d7e4;box-shadow:0 3px 4px #20343c12,0 12px 20px -8px #20343c30,0 24px 32px -20px #20343c30,inset 0 -3px 0 #f5f7f7}
+.choice:not(:disabled):active{transform:translateY(-1px);box-shadow:0 2px 4px #20343c20,inset 0 -2px 0 #f3f5f5}
+.choice:disabled{box-shadow:0 2px 4px #20343c08;opacity:.5}
+#current-node.tone-registration{border-color:#cf357f;box-shadow:0 2px 2px #20343c12,0 8px 12px -8px #20343c40,inset 0 -3px 0 #faedf3}
+@keyframes sheet-in{from{opacity:0;transform:translateY(0)}to{opacity:1;transform:translateY(calc(var(--sheet)*12px))}}
+@media(max-width:1200px) and (min-width:601px){#current-node{padding:24px}#current-node h2{font-size:24px}.choice{padding:16px}.choice .choice-title{font-size:16px}}
+@media(max-width:600px){.stage{padding-top:32px;padding-bottom:40px}.current-column{background:#e8eef0;box-shadow:none}#current-node{min-height:216px;padding:20px;gap:16px}#current-node h2{font-size:23px;padding-bottom:8px}.stack-sheet{inset-inline:calc(var(--sheet)*4px)}.choice{min-height:148px;padding:16px;gap:12px}.choice .choice-title{font-size:16px;padding-bottom:12px}.choice .choice-context{font-size:10px}.choice:not(:disabled):hover{transform:none}#current-meta{padding-top:20px}.current-column{margin-bottom:56px}}
+@media(prefers-reduced-motion:reduce){.choice{transition:none}.stack-sheet{animation:none}}
+/* Near-square silhouettes, with content-driven expansion for long copy. */
+#current-node{aspect-ratio:1.04;grid-template-rows:auto 1fr auto;height:auto;min-height:272px;align-content:stretch}
+#current-node h2{align-self:center}
+.choice{aspect-ratio:1.08;grid-template-rows:auto 1fr auto;height:auto;min-height:224px;align-content:stretch}
+.choice .choice-title{align-self:center}
+.choice .edge-label{align-self:start}
+.choice .choice-context,.choice .choice-symbol{align-self:stretch}
+.choice .destination,.choice .inactive-caption{align-self:end}
+@media(max-width:600px){#current-node{aspect-ratio:1.04;min-height:240px}.choice{aspect-ratio:1.08;min-height:224px}}
