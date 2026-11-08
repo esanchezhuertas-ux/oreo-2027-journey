@@ -482,7 +482,9 @@ function registrationResult() {
  </section>`;
 }
 function draw(){
- const page=route(), a=db.account;
+ let page=route();
+ const a=db.account;
+ if(page==='received'&&!registered){page=a?'home':'login';history.replaceState(null,'','#'+page);}
  const collection=!!a&&['home','collection','login'].includes(page);
  document.body.classList.toggle('public-mode',!a);
  const overlay=!!a&&!collection;
