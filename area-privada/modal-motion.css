@@ -107,3 +107,22 @@
  #card-dialog .detail-scroll{max-height:240px}
  #card-dialog.modal-intro #detail-content{overflow:visible}
 }
+
+#card-dialog .associated-codes ul{margin:4px 0 0;max-height:224px}
+#card-dialog .associated-codes li{min-height:50px;height:auto;gap:8px;padding:3px 12px}
+#card-dialog .code-reference{min-width:0;flex:1}
+#card-dialog .code-reference code{font-size:13px;line-height:18px;overflow-wrap:anywhere}
+#card-dialog .code-reference small{font-size:12px;line-height:16px;margin:2px 0 0}
+#card-dialog .code-status{padding:2px 8px}
+#card-dialog .copy-code{width:44px;height:44px;min-height:44px;min-width:44px}
+#card-dialog .redeem-action:not([hidden]){display:flex;align-items:center;gap:8px}
+#card-dialog .detail-choice{flex:1;min-width:0;display:flex;flex-direction:column;font-size:11px;line-height:13px;gap:2px}
+#card-dialog .detail-choice select{width:100%;border:1px solid var(--line);height:32px;border-radius:6px;background:white;font-size:13px;padding:0 4px}
+#card-dialog .redeem-action .button{flex:1;gap:6px;min-width:0}
+#card-dialog .redeem-action .icon{width:20px;height:20px;flex:none}
+@media(max-width:420px){
+ #card-dialog .associated-codes li{padding-inline:8px;gap:4px}
+ #card-dialog .code-reference small{font-size:11px}
+ #card-dialog .detail-choice{max-width:43%}
+ #card-dialog .redeem-action .button{font-size:13px;padding-inline:8px}
+}

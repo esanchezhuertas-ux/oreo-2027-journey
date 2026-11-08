@@ -30,3 +30,20 @@
  .activity-heading {align-items:flex-start;flex-direction:column}
  .activity-heading small {margin-top:2px}
 }
+.activity-row{padding:8px 12px;gap:2px}
+.activity-row .activity-toggle{align-items:center}
+.activity-chevron,.activity-reference button{width:36px;height:36px}
+.activity-read{line-height:16px}
+@media(hover:none){.activity-reference button{min-width:44px}}
+.claim-review .panel-body>h2{font:500 20px/28px var(--ui-font);margin:24px 0 8px}
+.claim-review .panel-body>p,.claim-review .panel-actions p{margin:8px 0;font:400 14px/20px var(--ui-font)}
+.claim-review .panel-actions{display:grid;gap:12px}
+@media(min-width:761px){
+ .activity-row{grid-template-columns:minmax(0,1fr) auto;column-gap:16px;align-items:center}
+ .activity-toggle{grid-column:1/-1}
+ .activity-toggle .activity-chevron{height:28px}
+ .activity-reference{grid-column:1;grid-row:2}
+ .activity-row>p{grid-column:1}
+ .activity-read{grid-column:2;grid-row:2}
+ .activity-detail{grid-column:1/-1}
+}

@@ -11,3 +11,8 @@
 @media(max-width:760px){.copy-stack{scale:.825}.club-scroller .copy-stack{scale:.75}}
 @media(max-width:350px){.club-scroller .copy-stack{scale:.68}}
 @media(prefers-reduced-motion:reduce){.copy-sheet{transition:none}}
+
+/* A redeemed golden design remains recognisable, including with an empty inventory. */
+.card-tile .holo-card.gold-spent{filter:none}
+.spent-gold-badge{gap:4px;padding:3px 6px;border-radius:10px;background:#fff5d7;color:#72540b;font:500 11px/16px var(--ui-font,Arial,sans-serif);white-space:nowrap}
+.card-meta .spent-gold-badge .icon{width:14px;height:14px}

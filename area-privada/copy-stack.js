@@ -22,7 +22,7 @@
  function attach(card){
   if(card.hasAttribute('data-detail'))return;
   const type=card.classList.contains('gold')?'gold':'blue';
-  const count=Math.max(0,Math.min(3,Number(card.dataset.available)||0)-1);
+  const count=Math.max(0,Math.min(3,Number(card.dataset.copies)||0)-1);
   const previous=mounted.get(card);
   if(previous?.count===count)return;
   previous?.element?.remove();

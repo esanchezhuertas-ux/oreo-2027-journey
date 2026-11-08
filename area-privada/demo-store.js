@@ -37,35 +37,64 @@
     const bytes=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(password));
     return Array.from(new Uint8Array(bytes),b=>b.toString(16).padStart(2,'0')).join('');
   }
+  async function matchesPassword(account,password){
+    return !!account && await digest(password)===(account.digest || '9ff0ecba59c7281b77941c7a758979716e8ceb971e205ec9819ba7f305b5eb3f');
+  }
+  function changeEmail(account,value){
+    const id=value.trim().toLowerCase();
+    if(!id||!account)return false;
+    if(account.email===id)return true;
+    const all=accounts();
+    if(all[id]||id===email)return false;
+    delete all[account.email];
+    if(account.email===email)localStorage.setItem(accountsKey+'-seed-retired','1');
+    account.email=id;all[id]=account;
+    localStorage.setItem(accountsKey,JSON.stringify(all));save();
+    return true;
+  }
+  function seedAccount(id){return id===email && !localStorage.getItem(accountsKey+'-seed-retired')?makePablo():null;}
   async function login(input,password){
     const id=input.trim().toLowerCase();
-    const a=accounts()[id] || (id===email?makePablo():null);
-    if(!a || (a.digest ? a.digest!==await digest(password) : await digest(password)!=='9ff0ecba59c7281b77941c7a758979716e8ceb971e205ec9819ba7f305b5eb3f'))return false;
+    const a=accounts()[id] || seedAccount(id);
+    if(!await matchesPassword(a,password))return false;
     db.account=a;save();return true;
   }
-  async function signup(name,surname,input,password,phone){
+  async function signup(name,surname,input,password,phone,preferences={}){
     const id=input.trim().toLowerCase();
     if(accounts()[id] || id===email)return false;
-    db.account={name,surname,email:id,phone,digest:await digest(password),cards:[],codes:[],orders:[],profileEvents:[],address:{}};
+    db.account={name,surname,email:id,phone,preferences:{communications:!!preferences.communications,personalization:!!preferences.personalization},digest:await digest(password),cards:[],codes:[],orders:[],profileEvents:[],address:{}};
     save();return true;
   }
   function logout(){db.account=null;save();}
-  function locate(value){return Object.values(accounts()).find(a=>a.email===value||a.phone===value)||(value===email?makePablo():null);}
+  function locate(value){
+    const query=String(value||'').trim().toLowerCase();
+    if(!query)return null;
+    const number=s=>{
+      let digits=String(s||'').replace(/[\s().-]/g,'');
+      if(/^\d{9}$/.test(digits))digits='+34'+digits;
+      return digits;
+    };
+    return Object.values(accounts()).find(a=>a.email===query||(!query.includes('@')&&a.phone&&number(a.phone)===number(query)))||seedAccount(query);
+  }
   function smsLogin(a){db.account=a;save();}
   async function password(a,value){a.digest=await digest(value);const all=accounts();all[a.email]=a;localStorage.setItem(accountsKey,JSON.stringify(all));if(db.account?.email===a.email){db.account=a;save();}}
   function entries(){
     const groups=new Map();
-    for(const c of db.account?.cards||[]){
-      const id=c.player+'--'+c.rarity;
-      if(!groups.has(id)){
-        const p=catalog.find(p=>p.id===c.player);
-        if(!p)continue;
-        groups.set(id,{...p,id,playerId:p.id,type:c.rarity,copies:0,available:0,records:[],daysAgo:Infinity});
+    const playerById=new Map(catalog.map(player=>[player.id,player]));
+    const now=Date.now();
+    for(const copy of db.account?.cards||[]){
+      const player=playerById.get(copy.player);
+      if(!player)continue;
+      if(!groups.has(player.id)){
+        groups.set(player.id,{...player,playerId:player.id,type:'blue',copies:0,available:0,records:[],daysAgo:Infinity});
       }
-      const p=groups.get(id);
-      p.copies++;p.available+=Number(!c.used);p.records.push(c);
-      p.daysAgo=Math.min(p.daysAgo,Math.max(0,Math.floor((Date.now()-c.time)/day)));
-      p.isNew=p.daysAgo===0;
+      const entry=groups.get(player.id);
+      entry.copies++;
+      entry.available+=Number(!copy.used);
+      entry.records.push(copy);
+      if(copy.rarity==='gold')entry.type='gold';
+      entry.daysAgo=Math.min(entry.daysAgo,Math.max(0,Math.floor((now-copy.time)/day)));
+      entry.isNew=entry.daysAgo===0;
     }
     return [...groups.values()];
   }
@@ -83,5 +112,5 @@
     for(const p of picks)a.cards.push({player:p.id,rarity:gold?'gold':'blue',code,used:false,time});
     save();return {picks,gold};
   }
-  window.Demo={get account(){return db.account},get lang(){return db.lang},setLang(lang){db.lang=lang;save()},remove(){const all=accounts();delete all[db.account.email];localStorage.setItem(accountsKey,JSON.stringify(all));logout();},login,signup,logout,locate,smsLogin,password,save,entries,register};
+  window.Demo={get account(){return db.account},get lang(){return db.lang},setLang(lang){db.lang=lang;save()},remove(){const all=accounts();if(db.account.email===email)localStorage.setItem(accountsKey+'-seed-retired','1');delete all[db.account.email];localStorage.setItem(accountsKey,JSON.stringify(all));logout();},matchesPassword,changeEmail,login,signup,logout,locate,smsLogin,password,save,entries,register};
 })();

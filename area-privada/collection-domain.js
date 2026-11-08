@@ -23,6 +23,7 @@
       (!state.positions?.length || state.positions.includes(player.position)) &&
       (!state.gold || player.type === 'gold') &&
       (!state.available || player.available > 0) &&
+      (!state.gold || !state.available || !player.records || player.records.some(copy=>copy.rarity==='gold'&&!copy.used)) &&
       (state.date === 'all' || player.daysAgo < limit)
     ).sort((a, b) => state.sort === 'name'
       ? a.name.localeCompare(b.name, 'es')

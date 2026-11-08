@@ -251,3 +251,69 @@
   .help-contact small, .contact-methods b {display: inline; font-weight: 500;}
   .contact-methods a + a {background: transparent; border-color: transparent;}
 }
+
+/* Account creation, legal preferences and telephone controls */
+.access-panel [data-flow="signup"] {gap:24px;}
+.signup-group, .signup-actions, .pref-options, .pref-row {display:grid; gap:12px;}
+.signup-group h2 {margin:0; font:500 14px/20px var(--ui-font, Arial, sans-serif);}
+.signup-note, .signup-group > small {color:var(--muted); font-size:13px; line-height:20px;}
+.signup-group > .signup-note {margin:0;}
+.signup-actions {padding-top:8px; gap:16px;}
+.signup-preferences {border-bottom:1px solid #82828f;}
+.signup-preferences[open] {border-color:#00757b;}
+.signup-preferences > summary {display:flex; gap:12px; padding:16px 32px; align-items:center; justify-content:space-between; list-style:none; cursor:pointer;}
+.signup-preferences summary::-webkit-details-marker {display:none;}
+.signup-preferences summary strong {display:block;font-size:16px;line-height:24px;font-weight:500;}
+.signup-preferences summary small {display:block;color:var(--muted);font-size:14px;line-height:21px;letter-spacing:.52px;margin-top:4px;}
+.signup-preferences summary .icon {width:20px;height:20px;}
+.signup-preferences[open] > summary .icon {transform:rotate(180deg);}
+.pref-options {padding:16px 32px; gap:12px;}
+.pref-row {gap:4px;}
+.consent-check {display:flex;align-items:flex-start;gap:12px;padding:12px 4px;min-height:48px;cursor:pointer;font-size:16px;line-height:24px;}
+.consent-check input, .signup-captcha input {
+  flex:none;appearance:none;background:white;margin:0;width:24px;height:24px;border:1.5px solid #82828f;border-radius:4px;
+  cursor:pointer;display:grid;place-items:center;
+}
+.consent-check input:checked,.signup-captcha input:checked {background:#18fbff;border-color:var(--ink);}
+.consent-check input:checked:after,.signup-captcha input:checked:after {content:"";width:9px;height:5px;border:solid var(--ink);border-width:0 0 2px 2px;transform:translateY(-1px) rotate(-45deg);}
+.promotion-terms {margin-left:40px;font-size:13px;}
+.promotion-terms summary {list-style:none;cursor:pointer;font-weight:500;color:var(--blue);text-decoration:underline;}
+.promotion-terms summary::-webkit-details-marker {display:none;}
+.promotion-terms p {line-height:20px;margin:8px 0 0;}
+.pref-terms > summary {display:inline-block;list-style:none;font:500 14px/20px var(--ui-font,Arial,sans-serif);color:#006b71;text-decoration:underline;cursor:pointer;padding-block:3px;}
+.pref-terms > p {margin:8px 0;line-height:21px;}
+.phone-field > label {line-height:20px;}
+.phone-entry {display:flex;align-items:center;gap:12px;min-width:0;width:100%;}
+.phone-entry input {flex:1;min-width:0;}
+.phone-prefix {position:relative;display:inline-flex;flex:none;width:81px;align-items:center;border-right:1px solid var(--line);}
+.phone-prefix select,.entry-field .phone-prefix select {width:100%;background:transparent;appearance:none;border:0;border-radius:0;cursor:pointer;height:24px;padding:0 26px 0 0;color:var(--ink);font-size:16px;line-height:24px;}
+.phone-prefix .icon {position:absolute;width:16px;height:16px;right:12px;pointer-events:none;}
+.signup-captcha {border:1px solid #c9c9d0;border-radius:4px;background:#fafafa;padding:12px;display:flex;align-items:center;gap:20px;height:78px;cursor:pointer;}
+.signup-captcha:has(:checked) {background:#edf9f1;}
+.signup-captcha input {margin-left:4px;}
+.signup-captcha-brand {margin-left:auto;display:flex;align-items:center;flex-direction:column;justify-content:center;gap:1px;width:64px;height:50px;flex:none;}
+.signup-captcha-brand strong {font:500 10px/12px var(--ui-font,Arial,sans-serif);}
+.signup-captcha-brand small {font:400 7px/9px var(--ui-font,Arial,sans-serif);white-space:nowrap;}
+.access-panel .sms-target, .access-panel .resend-actions, .access-panel .sms-status {margin:0;}
+.access-panel .sms-status:empty {display:none;}
+.resend-actions {display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.inline-link {color:var(--blue);text-decoration:underline;font-weight:500;min-height:44px;padding:0;}
+@media(min-width:701px){
+  .has-panel .journey-panel:is(.account-panel,.help-panel) {width:clamp(640px,72.2222vw,1040px);}
+  .account-tabs::before {width:min(calc(100vw - 48px),clamp(640px,72.2222vw,1040px));}
+  .settings-links {position:sticky;top:0;}
+  .opening-panel .journey-panel {animation:journey-panel-enter .28s cubic-bezier(.16,.85,.27,1) both;}
+  @keyframes journey-panel-enter {from{transform:translateX(100%);opacity:.12;}to{transform:translateX(0);opacity:1;}}
+}
+@media(max-width:700px){
+  .signup-preferences > summary,.pref-options {padding-inline:16px;}
+  .has-panel .opening-panel .journey-panel {animation:journey-sheet-enter .25s ease-out both;}
+  @keyframes journey-sheet-enter {from{transform:translateY(52px);opacity:.16;}to{transform:translateY(0);opacity:1;}}
+}
+@media(prefers-reduced-motion:reduce){.has-panel .opening-panel .journey-panel{animation:none;}}
+
+.signup-group .phone-field + small {margin-top:-4px;}
+.signup-group:has([name="confirm"]) {gap:8px;}
+.signup-group:has([name="confirm"]) .entry-field + .entry-field {margin-top:8px;}
+.mandatory-consent {display:grid;gap:4px;}
+@media (max-width:700px){.signup-actions .primary {margin-block:4px 12px;}}

@@ -42,21 +42,41 @@ $$('[data-total-unique]').forEach(e=>e.textContent=`${players.filter(p=>p.copies
 // The medallion is generated from vector primitives: no image or texture download.
 function medallion(){let details='';for(let i=0;i<68;i++)details+=`<rect x="71.8" y="4" width="4.4" height="10" rx="2.2" transform="rotate(${(i*360/68).toFixed(2)} 74 74)"/>`;for(let i=0;i<20;i++)details+=`<path d="M74 19l3 5-3 5-3-5z" transform="rotate(${i*18} 74 74)"/>`;for(let i=0;i<10;i++)details+=`<g transform="rotate(${i*36} 74 74)"><path d="m74 31 4 6-4 6-4-6z"/><circle cx="66" cy="39" r="2"/></g>`;return `<svg viewBox="0 0 148 148" aria-hidden="true"><circle cx="74" cy="74" r="74" fill="currentColor"/><g fill="var(--biscuit-ink,#09b6ff)">${details}<circle cx="74" cy="74" r="57" fill="none" stroke="var(--biscuit-ink,#09b6ff)" stroke-width="2"/><circle cx="74" cy="74" r="42" fill="none" stroke="var(--biscuit-ink,#09b6ff)" stroke-width="2"/><path d="m74 41 10 22 23 11-23 10-10 23-10-23-23-10 23-11z" fill="none" stroke="var(--biscuit-ink,#09b6ff)" stroke-width="2"/></g></svg>`;}
 const cookie=medallion();
-function copiesBadge(p){const id=`counter-${p.id}`,shape='M94.7092 62.4634L76.9888 8.03405C75.4289 3.2429 70.9627 0 65.924 0H28.7883C23.7498 0 19.2838 3.24262 17.7237 8.03347L0 62.4634Z',inner='M0.051 110.248C-0.593 126.217 4.87 141.508 15.63 154.092C38.386 180.707 78.225 183.843 104.755 160.79C119.732 147.775 127.937 129.389 127.19 110.248V0H0.001L0.052 110.248Z';return `<svg class="copies-overlay" viewBox="0 0 160 232" aria-hidden="true"><defs><clipPath id="${id}-mask" clipPathUnits="userSpaceOnUse"><path d="${inner}" transform="translate(16.38 30.75)"/></clipPath><clipPath id="${id}-badge" clipPathUnits="userSpaceOnUse"><path d="${shape}"/></clipPath></defs><g clip-path="url(#${id}-mask)"><g transform="translate(32.6454 169.83)"><path d="${shape}" fill="white" stroke="#272425" stroke-width="4.36364" stroke-linejoin="round" clip-path="url(#${id}-badge)"/></g><g class="copies-letter" text-anchor="middle" stroke-width="4.36364" stroke-linejoin="round" paint-order="stroke fill"><text x="80" y="198" fill="#000" stroke="#000" opacity=".25" transform="translate(2.182 2.182)">x${p.available}</text><text x="80" y="198" fill="#fff" stroke="#272425">x${p.available}</text></g></g></svg>`;}
+function copiesBadge(p,suffix=''){const id=`counter-${p.id}${suffix}`,shape='M94.7092 62.4634L76.9888 8.03405C75.4289 3.2429 70.9627 0 65.924 0H28.7883C23.7498 0 19.2838 3.24262 17.7237 8.03347L0 62.4634Z',inner='M0.051 110.248C-0.593 126.217 4.87 141.508 15.63 154.092C38.386 180.707 78.225 183.843 104.755 160.79C119.732 147.775 127.937 129.389 127.19 110.248V0H0.001L0.052 110.248Z';return `<svg class="copies-overlay" viewBox="0 0 160 232" aria-hidden="true"><defs><clipPath id="${id}-mask" clipPathUnits="userSpaceOnUse"><path d="${inner}" transform="translate(16.38 30.75)"/></clipPath><clipPath id="${id}-badge" clipPathUnits="userSpaceOnUse"><path d="${shape}"/></clipPath></defs><g clip-path="url(#${id}-mask)"><g transform="translate(32.6454 169.83)"><path d="${shape}" fill="white" stroke="#272425" stroke-width="4.36364" stroke-linejoin="round" clip-path="url(#${id}-badge)"/></g><g class="copies-letter" text-anchor="middle" stroke-width="4.36364" stroke-linejoin="round" paint-order="stroke fill"><text x="80" y="198" fill="#000" stroke="#000" opacity=".25" transform="translate(2.182 2.182)">x${p.available}</text><text x="80" y="198" fill="#fff" stroke="#272425">x${p.available}</text></g></g></svg>`;}
 
-function codesFor(p){return p.records.map(c=>({value:c.code,available:!c.used,date:new Date(c.time).toLocaleDateString(window.Demo.lang==='en'?'en-GB':'es-ES')}));}
-function codeList(inventory, t) {
- const rows=codesFor(inventory).map(c=>{
-  const status=c.available?t('Disponible','Available'):t('Usado','Used');
-  return `<li><div class="code-reference"><code>${esc(c.value)}</code><small>${t('Obtenido el','Collected on')} ${c.date}</small></div><span class="code-status ${c.available?'is-available':'is-used'}">${icon('check')}${status}</span><button class="icon-button copy-code" data-copy="${esc(c.value)}" aria-label="${t('Copiar código','Copy code')} ${esc(c.value)}">${icon('copy')}</button></li>`;
+function codeList(inventory,t){
+ const lang=window.Demo.lang==='en'?'en-GB':'es-ES';
+ const date=new Intl.DateTimeFormat(lang,{day:'2-digit',month:'2-digit',year:'numeric'});
+ const records=[...inventory.records].sort((a,b)=>b.time-a.time);
+ const rows=records.map(copy=>{
+  const status=copy.used?t('Usado','Used'):t('Disponible','Available');
+  const rarity=copy.rarity==='gold'?t('Dorada','Gold'):t('Común','Common');
+  return `<li><div class="code-reference"><code>${esc(copy.code)}</code><small>${date.format(copy.time)} · ${rarity}</small></div><span class="code-status ${copy.used?'is-used':'is-available'}">${icon(copy.used?'lock':'check')}${status}</span><button class="icon-button copy-code" data-copy="${esc(copy.code)}" aria-label="${t('Copiar código','Copy code')} ${esc(copy.code)}">${icon('copy')}</button></li>`;
  }).join('');
  return `<details class="associated-codes"><summary><span>${t('Códigos asociados','Associated codes')}</span><b>${inventory.copies}</b>${icon('chevron')}</summary>
- <p>${t('Un código por cada copia obtenida.','One code per copy collected.')}</p><ul tabindex="0" aria-label="${t('Lista de códigos asociados','Associated code list')}">${rows}</ul></details>`;
+ <ul tabindex="0" aria-label="${t('Lista de códigos asociados','Associated code list')}">${rows}</ul></details>`;
 }
 
 function crest(key,suffix){if(window.CATALOG_CRESTS?.[key])return '<img src="'+window.CATALOG_CRESTS[key]+'" alt="" loading="lazy">';return (window.CRESTS?.[key]||'').replace(/id="([^"]+)"/g,(_,id)=>`id="${id}-${suffix}"`).replace(/url\(#([^)]+)\)/g,(_,id)=>`url(#${id}-${suffix})`).replace(/(?:xlink:)?href="#([^"]+)"/g,(_,id)=>`href="#${id}-${suffix}"`);}
-function card(p,detail=false){return `<button class="holo-card ${p.type}${p.available===0?' no-copies':''}" data-player="${p.id}" data-available="${p.available}" ${detail?'data-detail="true"':''} aria-label="${esc(p.name)}, ${p.type==='gold'?'cromo dorado':'cromo azul'}, ${p.available} ${p.available===1?'copia disponible':'copias disponibles'}${detail?'. Mueve el cursor para ver el brillo.':'. Ver cromo.'}" style="--biscuit-ink:${p.type==='gold'?'#f4d74c':'#0cbcff'}"><span class="card-face"><span class="cookie-emblem">${cookie}</span><span class="player-crop"><img class="player-photo player-${p.id}" src="${p.image}" width="320" height="460" alt="" loading="${detail||players.indexOf(p)<4?'eager':'lazy'}" decoding="async" draggable="false"></span><svg class="card-name card-lettering" viewBox="0 0 142 24" aria-hidden="true"><text x="71" y="18" text-anchor="middle">${esc(p.label)}</text></svg><span class="crest">${crest(p.clubKey,p.id+(detail?'-detail':''))}</span><svg class="player-number card-lettering" viewBox="0 0 30 30" aria-hidden="true"><text x="15" y="23" text-anchor="middle">${p.number}</text></svg><span class="player-position">${p.position}</span>${p.available&&!detail?copiesBadge(p):''}<span class="holo-foil" aria-hidden="true"></span><span class="holo-glare" aria-hidden="true"></span><span class="holo-sparkles" aria-hidden="true"></span></span></button>`;}
-function tile(p,slot=false){return `<article class="card-tile">${slot?`<span class="club-slot">${p.position}</span>`:''}<div class="card-meta">${p.isNew?'<span class="new-badge">NUEVO</span>':''}${p.type==='gold'?`<span class="shiny-badge" aria-label="Acabado dorado">${icon('sparkles')}</span>`:''}</div><div class="card-scene">${card(p)}</div><div class="mobile-card-caption"><span>${esc(p.name)}</span><span>${esc(p.club)}</span></div><div class="availability-badge-wrap">${p.available?`<span class="available-badge">${icon('check')}Canjeable</span>`:''}</div></article>`;}
+function cardFace(p,detail,suffix) {
+ return `<span class="card-face"><span class="cookie-emblem">${cookie}</span><span class="player-crop"><img class="player-photo player-${p.id}" src="${p.image}" width="320" height="460" alt="" loading="${detail||players.indexOf(p)<4?'eager':'lazy'}" decoding="async" draggable="false"></span><svg class="card-name card-lettering" viewBox="0 0 142 24" aria-hidden="true"><text x="71" y="18" text-anchor="middle">${esc(p.label)}</text></svg><span class="crest">${crest(p.clubKey,p.id+suffix)}</span><svg class="player-number card-lettering" viewBox="0 0 30 30" aria-hidden="true"><text x="15" y="23" text-anchor="middle">${p.number}</text></svg><span class="player-position">${p.position}</span>${p.available&&!detail?copiesBadge(p,suffix):''}<span class="holo-foil" aria-hidden="true"></span><span class="holo-glare" aria-hidden="true"></span><span class="holo-sparkles" aria-hidden="true"></span></span>`;
+}
+function receivedCard(player,gold) {
+ const card = {...player, type:gold?'gold':'blue', available:1};
+ return '<span class="holo-card '+card.type+'" aria-hidden="true" style="--biscuit-ink:'+(gold?'#f4d74c':'#0cbcff')+'">'+cardFace(card,false,'-receipt')+'</span>';
+}
+function card(p,detail=false){return `<button class="holo-card ${p.type}${p.available===0?(p.type==='gold'?' gold-spent':' no-copies'):''}" data-player="${p.id}" data-copies="${p.copies}" ${detail?'data-detail="true"':''} aria-label="${esc(p.name)}, ${p.type==='gold'?'cromo dorado':'cromo azul'}, ${p.available} ${p.available===1?'copia disponible':'copias disponibles'}${detail?'. Mueve el cursor para ver el brillo.':'. Ver cromo.'}" style="--biscuit-ink:${p.type==='gold'?'#f4d74c':'#0cbcff'}">${cardFace(p,detail,detail?'-detail':'')}</button>`;}
+function tile(p,slot=false){
+ const goldSpent=p.type==='gold'&&!p.records.some(copy=>copy.rarity==='gold'&&!copy.used);
+ const english=window.Demo.lang==='en';
+ const finish=goldSpent?(english?'Gold redeemed':'Dorada canjeada'):'';
+ const availableLabel=goldSpent
+  ?(english?`${p.available} common`:`${p.available} ${p.available===1?'común':'comunes'}`)
+  :(english?'Redeemable':'Canjeable');
+ const mark=p.type==='gold'?`<span class="shiny-badge${goldSpent?' spent-gold-badge':''}" aria-label="${finish||(english?'Gold finish':'Acabado dorado')}">${icon('sparkles')}${finish}</span>`:'';
+ const availability=p.available?`<span class="available-badge">${icon('check')}${availableLabel}</span>`:'';
+ return `<article class="card-tile">${slot?`<span class="club-slot">${p.position}</span>`:''}<div class="card-meta">${p.isNew&&!goldSpent?'<span class="new-badge">NUEVO</span>':''}${mark}</div><div class="card-scene">${card(p)}</div><div class="mobile-card-caption"><span>${esc(p.name)}</span><span>${esc(p.club)}</span></div><div class="availability-badge-wrap">${availability}</div></article>`;
+}
 function placeholder(pos,key,suffix){return `<div class="missing-card" aria-hidden="true"><span class="cookie-emblem">${cookie}</span><span class="crest">${crest(key,suffix)}</span><span class="player-position">${pos}</span><img class="missing-player" src="assets/player-uncollected-clipped.svg" width="175" height="242" alt="" draggable="false"></div>`;}
 function missing(pos,key){return `<article class="card-tile missing-tile" aria-label="${positions[pos]} de ${clubs[key]} aún no conseguido"><div class="card-meta"></div><div class="card-scene">${placeholder(pos,key,`missing-${pos}`)}</div><div class="availability-badge-wrap"></div></article>`;}
 function restoreLiftedCard(){if(!liftedCard)return;liftedCard.classList.remove('is-lifted');liftedCard.parentElement?.querySelector('.lifted-placeholder')?.remove();liftedCard=null;}
@@ -148,12 +168,13 @@ function openDetail(id){
  if(!picked)return;
  const dialog=$('#card-dialog'), content=$('#detail-content');
  const source=$(`[data-player="${id}"]`,$('#card-results')), sourceRect=source?.getBoundingClientRect();
- const variants=players.filter(p=>p.playerId===picked.playerId);
- const initial=variants.find(p=>p.type==='gold')||picked;
- const total=variants.reduce((sum,p)=>sum+p.copies,0);
- const available=variants.reduce((sum,p)=>sum+p.available,0);
- const gold=variants.find(p=>p.type==='gold')?.available||0, common=available-gold;
- const inventory={copies:total,records:variants.flatMap(p=>p.records).sort((a,b)=>b.time-a.time)};
+ const variants=['blue','gold'].flatMap(type=>{
+  const records=picked.records.filter(copy=>copy.rarity===type);
+  return records.length?[{...picked,type,records,copies:records.length,available:records.filter(copy=>!copy.used).length}]:[];
+ });
+ const initial=variants.find(p=>p.type===picked.type);
+ const total=picked.copies,available=picked.available;
+ const gold=variants.find(p=>p.type==='gold')?.available||0,common=available-gold;
  const t=(es,en)=>window.Demo.lang==='en'?en:es;
  const breakdown=t(`${common} ${common===1?'común':'comunes'} · ${gold} ${gold===1?'dorada':'doradas'}`,`${common} common · ${gold} gold`);
  const history=t('Ver historial completo','View full history');
@@ -163,16 +184,40 @@ function openDetail(id){
  <div class="detail-info"><header class="detail-identity"><h2 id="detail-title">${esc(picked.name)}</h2><p>${esc(picked.club)} · ${positions[picked.position]} · #${picked.number}</p></header>
  <div class="detail-inventory"><span class="inventory-status ${available?'':'exhausted'}">${available?icon('check'):''}${available?t('Copias disponibles','Available copies'):t('Sin copias disponibles','No copies available')}</span>
  <div class="inventory-count"><strong>${available}</strong><b>${breakdown}</b></div><small>${total} ${t(total===1?'copia obtenida':'copias obtenidas',total===1?'copy collected':'copies collected')} · ${used} ${t(used===1?'utilizada':'utilizadas','used')}</small></div>
- <div class="detail-scroll">${codeList(inventory,t)}<button type="button" class="detail-history">${history}</button></div>
- <div class="redeem-action"><button type="button" class="button primary full-width" ${available?'':'disabled'}></button><p class="redeem-feedback" role="status" hidden></p></div></div></div>`;
- const action=content.querySelector('.redeem-action button');
- function setAction(player){
-  const shirt=player.type==='gold';
-  action.dataset.redeem=shirt?'camiseta':'bufanda';
-  action.textContent=shirt?t('Quiero mi camiseta','Get my shirt'):t('Quiero mi bufanda','Get my scarf');
-  action.disabled=!player.available;
+ <div class="detail-scroll">${codeList(picked,t)}<button type="button" class="detail-history">${history}</button></div>
+ <div class="redeem-action"></div></div></div>`;
+ const availableRewards=window.Rewards?.available()||[];
+ const action=content.querySelector('.redeem-action');
+ if(availableRewards.length){
+  const rewardIcons={gold:'shirt',shirt:'shirt',scarf:'scarf',ball:'ball'};
+  const ctaText={gold:t('Quiero mi camiseta','Get my shirt'),shirt:t('Quiero mi camiseta','Get my shirt'),scarf:t('Quiero mi bufanda','Get my scarf'),ball:t('Quiero mi balón','Get my ball')};
+  if(availableRewards.length>1){
+   const label=document.createElement('label');
+   label.className='detail-choice';
+   label.textContent=t('Premio','Reward');
+   const select=document.createElement('select');
+   for(const reward of availableRewards)select.add(new Option(reward.label,reward.id));
+   label.append(select);
+   action.append(label);
+  }
+  const button=document.createElement('button');
+  button.type='button';
+  button.className='button primary';
+  action.append(button);
+  const select=action.querySelector('select');
+  const selectedId=()=>select?.value||availableRewards[0].id;
+  const paint=()=>{const id=selectedId();button.innerHTML=icon(rewardIcons[id])+esc(ctaText[id]||t('Canjear premio','Redeem reward'));};
+  paint();
+  if(select)select.onchange=paint;
+  button.onclick=()=>{
+   const id=selectedId();
+   if(dialog.dataset.closing)return;
+   dialog.addEventListener('close',()=>window.Rewards.open(id),{once:true});
+   closeDialog(dialog);
+  };
+ }else{
+  action.hidden=true;
  }
- setAction(initial);
  content.querySelector('.detail-history').onclick=()=>{
   dialog.addEventListener('close',()=>{location.hash='history';},{once:true});
   closeDialog(dialog);
@@ -187,7 +232,6 @@ function openDetail(id){
    for(const attr of ['class','data-player','aria-label','style'])element.setAttribute(attr,face.getAttribute(attr));
    element.replaceChildren(...face.childNodes);
    content.querySelectorAll('[data-rarity]').forEach(b=>b.setAttribute('aria-pressed',String(b===toggle)));
-   setAction(next);
   };
  }
  showDialog(dialog);
@@ -227,7 +271,7 @@ function closeMenus(){['account','mobile'].forEach(x=>{const menu=$(`#${x}-menu`
 function toggleMenu(button,menu){const isOpen=!menu.hidden;closeMenus();menu.hidden=isOpen;button.setAttribute('aria-expanded',String(!isOpen));}
 $('#account-button').onclick=()=>toggleMenu($('#account-button'),$('#account-menu'));$('#menu-button').onclick=()=>toggleMenu($('#menu-button'),$('#mobile-menu'));
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMenus();});
-document.addEventListener('click',e=>{const t=e.target;if(!t.closest('.account-wrap,.mobile-nav,#menu-button'))closeMenus();const copy=t.closest('[data-copy]');if(copy){if(navigator.clipboard?.writeText){navigator.clipboard.writeText(copy.dataset.copy).then(()=>{copy.innerHTML=icon('check');copy.setAttribute('aria-label','Código '+copy.dataset.copy+' copiado');copy.title='Copiado';}).catch(()=>{copy.title='Selecciona el código para copiarlo manualmente';});}else{copy.title='Selecciona el código para copiarlo manualmente';}}const redeem=t.closest('[data-redeem]');if(redeem&&!redeem.disabled){const feedback=redeem.parentElement.querySelector('.redeem-feedback');feedback.textContent=`Canje de ${redeem.dataset.redeem} seleccionado. Es una demostración: no se ha enviado ninguna solicitud.`;feedback.hidden=false;}const close=t.closest('[data-close]');if(close)closeDialog(close.closest('dialog'));const register=t.closest('[data-register-code]');if(register){$('#register-form').reset();$('#register-result').hidden=true;showDialog($('#register-dialog'));if(document.documentElement.classList.contains('keyboard-nav'))$('#register-code').focus({preventScroll:true});}const unbuilt=t.closest('[data-unbuilt]');if(unbuilt){toast(`${unbuilt.dataset.unbuilt}: este prototipo se centra en Mi colección.`);closeMenus();}const p=t.closest('[data-player]');if(p&&!p.hasAttribute('data-detail'))openDetail(p.dataset.player);if(t.closest('[data-reset]')){Object.assign(state,emptyFilters(),{q:'',selectedPlayer:''});$('#search').value='';render();}if(t.closest('[data-clear-filters]')){Object.assign(state,emptyFilters());render();}const remove=t.closest('[data-remove]');if(remove){const key=remove.dataset.remove;if(key.startsWith('position:'))state.positions=state.positions.filter(p=>p!==key.slice(9));else state[key]=emptyFilters()[key];render();}const c=t.closest('[data-carousel]');if(c){const el=$(`#club-${c.dataset.carousel}`);el.scrollBy({left:Number(c.dataset.dir)*(el.clientWidth+parseFloat(getComputedStyle(el).columnGap)),behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});}});
+document.addEventListener('click',e=>{const t=e.target;if(!t.closest('.account-wrap,.mobile-nav,#menu-button'))closeMenus();const copy=t.closest('[data-copy]');if(copy){if(navigator.clipboard?.writeText){navigator.clipboard.writeText(copy.dataset.copy).then(()=>{copy.innerHTML=icon('check');copy.setAttribute('aria-label','Código '+copy.dataset.copy+' copiado');copy.title='Copiado';}).catch(()=>{copy.title='Selecciona el código para copiarlo manualmente';});}else{copy.title='Selecciona el código para copiarlo manualmente';}}const close=t.closest('[data-close]');if(close)closeDialog(close.closest('dialog'));const register=t.closest('[data-register-code]');if(register){$('#register-form').reset();$('#register-result').hidden=true;showDialog($('#register-dialog'));if(document.documentElement.classList.contains('keyboard-nav'))$('#register-code').focus({preventScroll:true});}const unbuilt=t.closest('[data-unbuilt]');if(unbuilt){toast(`${unbuilt.dataset.unbuilt}: este prototipo se centra en Mi colección.`);closeMenus();}const p=t.closest('[data-player]');if(p&&!p.hasAttribute('data-detail'))openDetail(p.dataset.player);if(t.closest('[data-reset]')){Object.assign(state,emptyFilters(),{q:'',selectedPlayer:''});$('#search').value='';render();}if(t.closest('[data-clear-filters]')){Object.assign(state,emptyFilters());render();}const remove=t.closest('[data-remove]');if(remove){const key=remove.dataset.remove;if(key.startsWith('position:'))state.positions=state.positions.filter(p=>p!==key.slice(9));else state[key]=emptyFilters()[key];render();}const c=t.closest('[data-carousel]');if(c){const el=$(`#club-${c.dataset.carousel}`);el.scrollBy({left:Number(c.dataset.dir)*(el.clientWidth+parseFloat(getComputedStyle(el).columnGap)),behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});}});
 const codeCells=[...document.querySelectorAll('.code-cell')];
 const registrationForm = $('#register-form');
 const registrationSubmit = registrationForm.querySelector('.register-submit');
@@ -243,6 +287,6 @@ cell.addEventListener('keydown',e=>{if(e.key==='Backspace'&&!cell.value&&i>0)cod
 cell.addEventListener('paste',e=>{e.preventDefault();const text=e.clipboardData.getData('text').replace(/[^a-z0-9]/gi,'').toUpperCase().slice(0,codeCells.length);const offset=text.length===codeCells.length?0:i;[...text].forEach((v,j)=>{if(codeCells[offset+j])codeCells[offset+j].value=v;});codeCells[Math.min(codeCells.length-1,offset+text.length)].focus();$('#register-result').hidden=true;updateRegistrationSubmit();});
 });
 $('#register-form').addEventListener('submit',e=>{e.preventDefault();if(!e.target.reportValidity())return;const result=$('#register-result'),r=window.Demo.register(codeCells.map(c=>c.value).join(''));if(r.error){result.textContent=r.error==='duplicate'?'Este código ya se ha registrado.':'Código no válido.';result.hidden=false;return;}$('#register-dialog').close();window.dispatchEvent(new CustomEvent('oreo:registered',{detail:r}));});
-window.CollectionUI={refresh(){players.splice(0,players.length,...window.Demo.entries());render();},openDetail,icon,showDialog};
+window.CollectionUI={refresh(){players.splice(0,players.length,...window.Demo.entries());render();},openDetail,icon,showDialog,receivedCard};
 render();
 })();
