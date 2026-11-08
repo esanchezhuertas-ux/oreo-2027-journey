@@ -1,4 +1,4 @@
-.oreo-footer { margin:0; width:100%; background:#272425; color:#fff; font-family:Gotham,Arial,sans-serif; font-size:14px; line-height:20px; text-align:left; }
+.oreo-footer { margin:0; width:100%; background:#272425; color:#fff; font-family:var(--ui-font); font-size:14px; line-height:20px; text-align:left; }
 .oreo-footer *, .oreo-footer *::after { box-sizing:border-box; }
 .oreo-footer p { margin:0; }
 .oreo-footer img { display:block; flex-shrink:0; }

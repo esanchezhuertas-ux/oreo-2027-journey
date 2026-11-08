@@ -8,3 +8,7 @@
 h1{font-family:'Gotham','Gotham Narrow',Arial,sans-serif;font-weight:700}
 .card-name,.player-number,.player-position{font-family:'LALIGA Players','Arial Narrow',Arial,sans-serif;font-weight:400;font-synthesis:none}
 .copies-letter{font-family:'Gotham Narrow Black','Arial Narrow',Arial,sans-serif;font-weight:900;font-synthesis:none}
+@font-face{font-family:'Gotham UI';src:local('Gotham Book'),local('Gotham-Book');font-weight:400;font-style:normal}
+@font-face{font-family:'Gotham UI';src:local('Gotham Medium'),local('Gotham-Medium');font-weight:500;font-style:normal}
+@font-face{font-family:'Gotham UI';src:url('assets/fonts/gotham-bold.woff') format('woff');font-weight:700;font-display:swap}
+:root{--ui-font:'Gotham UI',Arial,sans-serif}

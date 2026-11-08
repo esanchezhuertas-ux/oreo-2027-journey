@@ -1,0 +1,32 @@
+.activity-feed {display:grid;gap:16px;font:400 14px/20px var(--ui-font);color:#272425}
+.activity-feed h2,.activity-feed p {margin:0}
+.activity-feed h2 {font:500 24px/32px var(--ui-font)}
+.activity-feed p {color:#555560}
+.activity-filters {display:flex;gap:4px}
+.activity-filters button {height:48px;width:104px;padding:0 8px;color:#272425;background:#f8f8fa;border:1.5px solid transparent;border-radius:8px;font:500 14px/20px var(--ui-font)}
+.activity-filters button[aria-pressed=true] {background:white;border-color:#dedee4}
+.activity-list {max-height:530px;overflow:auto;overscroll-behavior:contain;border:1px solid #dedee4;border-radius:16px}
+.activity-row {display:grid;gap:4px;padding:12px 16px;border-bottom:1px solid #dedee4}
+.activity-row:last-child {border:0}
+.activity-row[data-read=true] {background:#f8f8fa}
+.activity-toggle {display:flex;align-items:flex-start;justify-content:space-between;gap:12px;text-align:left;padding:0;width:100%}
+.activity-heading {display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px}
+.activity-heading strong {font-weight:500}
+.activity-heading small {display:inline-flex;align-items:center;gap:4px;font-size:12px;line-height:18px;color:#555560}
+.activity-chevron,.activity-reference button {display:grid;place-items:center;width:44px;height:44px;flex:none}
+.activity-chevron .icon {width:20px;height:20px}
+.activity-toggle[aria-expanded=true] .activity-chevron {transform:rotate(180deg)}
+.activity-reference {display:flex;align-items:center;gap:4px;color:#555560}
+.activity-reference code {color:#272425}
+.activity-reference button .icon {width:20px;height:20px}
+.activity-read {width:max-content;padding:2px 8px;color:#272425;background:#f8f8fa;border-radius:8px;font-weight:500}
+.activity-row[data-read=true] .activity-read {padding:0;color:#555560;font:400 12px/18px var(--ui-font)}
+.activity-detail {padding:12px 0 0;margin-top:8px;border-top:1px solid #dedee4}
+.activity-empty {padding:24px}
+@media(max-width:760px) {
+ .activity-list {max-height:350px}
+ .activity-filters {display:grid;grid-template-columns:minmax(0,64px) minmax(0,80px) minmax(0,72px) minmax(0,80px)}
+ .activity-filters button {width:100%;padding:0}
+ .activity-heading {align-items:flex-start;flex-direction:column}
+ .activity-heading small {margin-top:2px}
+}

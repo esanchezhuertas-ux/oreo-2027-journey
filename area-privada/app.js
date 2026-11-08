@@ -1,14 +1,27 @@
 'use strict';
 (()=>{
 const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
-const icons={logout:'<path d="M10 4H5v16h5M9 12h12m-4-4 4 4-4 4"/>',scarf:'<path d="M4 4h16v5H4zM5 9v11h5V9m4 0v11h5V9M5 17h5m4 0h5M5 20v2m2-2v2m3-2v2m4-2v2m3-2v2m2-2v2"/>',shirt:'<path d="m8 3-5 3-2 5 4 2 2-3v11h10V10l2 3 4-2-2-5-5-3c0 2-1.8 3-4 3S8 5 8 3Z"/>',copy:'<rect x="8" y="8" width="12" height="13" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/>',search:'<circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 5 5"/>',close:'<path d="m6 6 12 12M18 6 6 18"/>',plus:'<path d="M12 5v14M5 12h14"/>',chevron:'<path d="m7 10 5 5 5-5"/>',arrow:'<path d="M4 12h16m-6-6 6 6-6 6"/>',back:'<path d="M20 12H4m6-6-6 6 6 6"/>',grid:'<rect x="4" y="4" width="16" height="16" rx=".5"/><path d="M12 4v16M4 12h16"/>',filter:'<path d="M3 4h18l-7 9v7h-4v-7Z"/>',sort:'<path d="M7 3v18M3 7l4-4 4 4M17 21V3m-4 14 4 4 4-4"/>',shield:'<path d="m12 3 8 3v6c0 4-5 7-8 9-3-2-8-5-8-9V6Z"/><path d="m8.5 12 2.5 2.5 4.5-5"/>',check:'<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>',user:'<circle cx="12" cy="8" r="4"/><path d="M5 21v-2a7 7 0 0 1 14 0v2"/>',menu:'<path d="M4 6h16M4 12h16M4 18h16"/>',ball:'<circle cx="12" cy="12" r="9"/><path d="m12 7 5 4-2 6H9l-2-6Zm0 0V3m5 8 4-2m-6 8 3 3m-9-3-3 3m1-9L3 9"/>',sparkles:'<path d="m9 8 2.5 7 6.5 2.5-6.5 2.5L9 27l-2.5-7L0 17.5 6.5 15Zm13-5 1.7 4.3L28 9l-4.3 1.7L22 15l-1.7-4.3L16 9l4.3-1.7ZM14 0l1 2.5L18 3.5 15 4.5 14 7l-1-2.5-3-1L13 2.5Z"/>'};
-function icon(name){return `<svg class="icon" viewBox="0 0 ${name==='sparkles'?'32 32':'24 24'}" aria-hidden="true">${icons[name]||icons.grid}</svg>`;}
+// Monochrome controls take their tone from their component. Reward illustrations keep their original colours.
+const iconNames = new Set([
+  'arrow', 'back', 'ball', 'check', 'chevron', 'close', 'copy', 'external', 'eye',
+  'eye-off', 'filter', 'forward', 'grid', 'help', 'lock', 'logout', 'map-pin',
+  'mail', 'menu', 'pencil', 'phone', 'plus', 'scarf', 'search', 'shield', 'shirt', 'sort',
+  'sparkles', 'trash', 'user', 'reward-ball', 'reward-shirt'
+]);
+function icon(name) {
+  if (!iconNames.has(name)) return '';
+  const src = `assets/icons/${name}.svg`;
+  if (name === 'scarf' || name.startsWith('reward-')) {
+    return `<img class="icon prize-icon" src="${src}" alt="">`;
+  }
+  return `<span class="icon figma-icon icon-${name}" style="--icon-file:url('${src}')" aria-hidden="true"></span>`;
+}
 $$('[data-icon]').forEach(e=>e.innerHTML=icon(e.dataset.icon));
 $('#brand').innerHTML=window.BRAND_SVG||'<b>OREO</b> × LALIGA';
 const players=window.Demo.entries(), clubs=Object.fromEntries(window.PLAYERS.map(p=>[p.clubKey,p.club])), positions={POR:'Portero',DEF:'Defensa',MED:'Centrocampista',DEL:'Delantero'};
 const emptyFilters=()=>({club:'',positions:[],date:'all',gold:false,available:false});
 const state={...emptyFilters(),q:'',selectedPlayer:'',view:'grid',group:'none',sort:'recent'};
-let reward=0, toastTimer, liftedCard=null;
+let toastTimer, liftedCard=null;
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function toast(message){const e=$('#toast');clearTimeout(toastTimer);e.textContent=message;e.hidden=false;toastTimer=setTimeout(()=>e.hidden=true,3800);}
 function filter(list=players,s=state){return window.CollectionDomain.filterCollection(list,s);}
@@ -32,11 +45,18 @@ const cookie=medallion();
 function copiesBadge(p){const id=`counter-${p.id}`,shape='M94.7092 62.4634L76.9888 8.03405C75.4289 3.2429 70.9627 0 65.924 0H28.7883C23.7498 0 19.2838 3.24262 17.7237 8.03347L0 62.4634Z',inner='M0.051 110.248C-0.593 126.217 4.87 141.508 15.63 154.092C38.386 180.707 78.225 183.843 104.755 160.79C119.732 147.775 127.937 129.389 127.19 110.248V0H0.001L0.052 110.248Z';return `<svg class="copies-overlay" viewBox="0 0 160 232" aria-hidden="true"><defs><clipPath id="${id}-mask" clipPathUnits="userSpaceOnUse"><path d="${inner}" transform="translate(16.38 30.75)"/></clipPath><clipPath id="${id}-badge" clipPathUnits="userSpaceOnUse"><path d="${shape}"/></clipPath></defs><g clip-path="url(#${id}-mask)"><g transform="translate(32.6454 169.83)"><path d="${shape}" fill="white" stroke="#272425" stroke-width="4.36364" stroke-linejoin="round" clip-path="url(#${id}-badge)"/></g><g class="copies-letter" text-anchor="middle" stroke-width="4.36364" stroke-linejoin="round" paint-order="stroke fill"><text x="80" y="198" fill="#000" stroke="#000" opacity=".25" transform="translate(2.182 2.182)">x${p.available}</text><text x="80" y="198" fill="#fff" stroke="#272425">x${p.available}</text></g></g></svg>`;}
 
 function codesFor(p){return p.records.map(c=>({value:c.code,available:!c.used,date:new Date(c.time).toLocaleDateString(window.Demo.lang==='en'?'en-GB':'es-ES')}));}
-function codeList(p){return `<section class="associated-codes" aria-labelledby="codes-title"><h3 id="codes-title">Códigos asociados <span>${p.copies}</span></h3><p>Un código por cada copia obtenida.</p><ul tabindex="0" aria-label="Lista de códigos asociados">${codesFor(p).map(c=>`<li><div class="code-reference"><code>${c.value}</code><small>Obtenido el ${c.date}</small></div><span class="code-status ${c.available?'is-available':'is-used'}">${icon(c.available?'check':'check')}${c.available?'Disponible':'Usado'}</span><button class="icon-button copy-code" data-copy="${c.value}" aria-label="Copiar código ${c.value}">${icon('copy')}</button></li>`).join('')}</ul><p class="demo-caption">Códigos de ejemplo para probar el prototipo.</p></section>`;}
+function codeList(inventory, t) {
+ const rows=codesFor(inventory).map(c=>{
+  const status=c.available?t('Disponible','Available'):t('Usado','Used');
+  return `<li><div class="code-reference"><code>${esc(c.value)}</code><small>${t('Obtenido el','Collected on')} ${c.date}</small></div><span class="code-status ${c.available?'is-available':'is-used'}">${icon('check')}${status}</span><button class="icon-button copy-code" data-copy="${esc(c.value)}" aria-label="${t('Copiar código','Copy code')} ${esc(c.value)}">${icon('copy')}</button></li>`;
+ }).join('');
+ return `<details class="associated-codes"><summary><span>${t('Códigos asociados','Associated codes')}</span><b>${inventory.copies}</b>${icon('chevron')}</summary>
+ <p>${t('Un código por cada copia obtenida.','One code per copy collected.')}</p><ul tabindex="0" aria-label="${t('Lista de códigos asociados','Associated code list')}">${rows}</ul></details>`;
+}
 
 function crest(key,suffix){if(window.CATALOG_CRESTS?.[key])return '<img src="'+window.CATALOG_CRESTS[key]+'" alt="" loading="lazy">';return (window.CRESTS?.[key]||'').replace(/id="([^"]+)"/g,(_,id)=>`id="${id}-${suffix}"`).replace(/url\(#([^)]+)\)/g,(_,id)=>`url(#${id}-${suffix})`).replace(/(?:xlink:)?href="#([^"]+)"/g,(_,id)=>`href="#${id}-${suffix}"`);}
-function card(p,detail=false){return `<button class="holo-card ${p.type}${p.available===0?' no-copies':''}" data-player="${p.id}" ${detail?'data-detail="true"':''} aria-label="${esc(p.name)}, ${p.type==='gold'?'cromo dorado':'cromo azul'}, ${p.available} ${p.available===1?'copia disponible':'copias disponibles'}${detail?'. Mueve el cursor para ver el brillo.':'. Ver cromo.'}" style="--biscuit-ink:${p.type==='gold'?'#f4d74c':'#0cbcff'}"><span class="card-face"><span class="cookie-emblem">${cookie}</span><span class="player-crop"><img class="player-photo player-${p.id}" src="${p.image}" width="320" height="460" alt="" loading="${detail||players.indexOf(p)<4?'eager':'lazy'}" decoding="async" draggable="false"></span><svg class="card-name card-lettering" viewBox="0 0 142 24" aria-hidden="true"><text x="71" y="18" text-anchor="middle">${esc(p.label)}</text></svg><span class="crest">${crest(p.clubKey,p.id+(detail?'-detail':''))}</span><svg class="player-number card-lettering" viewBox="0 0 30 30" aria-hidden="true"><text x="15" y="23" text-anchor="middle">${p.number}</text></svg><span class="player-position">${p.position}</span>${p.available&&!detail?copiesBadge(p):''}<span class="holo-foil" aria-hidden="true"></span><span class="holo-glare" aria-hidden="true"></span><span class="holo-sparkles" aria-hidden="true"></span></span></button>`;}
-function tile(p,slot=false){return `<article class="card-tile">${slot?`<span class="club-slot">${p.position}</span>`:''}<div class="card-meta">${p.isNew?'<span class="new-badge">NUEVO</span>':''}${p.type==='gold'?`<span class="shiny-badge" aria-label="Acabado dorado">${icon('sparkles')}</span>`:''}</div><div class="card-scene">${card(p)}</div><div class="availability-badge-wrap">${p.available?`<span class="available-badge">${icon('check')}Canjeable</span>`:''}</div></article>`;}
+function card(p,detail=false){return `<button class="holo-card ${p.type}${p.available===0?' no-copies':''}" data-player="${p.id}" data-available="${p.available}" ${detail?'data-detail="true"':''} aria-label="${esc(p.name)}, ${p.type==='gold'?'cromo dorado':'cromo azul'}, ${p.available} ${p.available===1?'copia disponible':'copias disponibles'}${detail?'. Mueve el cursor para ver el brillo.':'. Ver cromo.'}" style="--biscuit-ink:${p.type==='gold'?'#f4d74c':'#0cbcff'}"><span class="card-face"><span class="cookie-emblem">${cookie}</span><span class="player-crop"><img class="player-photo player-${p.id}" src="${p.image}" width="320" height="460" alt="" loading="${detail||players.indexOf(p)<4?'eager':'lazy'}" decoding="async" draggable="false"></span><svg class="card-name card-lettering" viewBox="0 0 142 24" aria-hidden="true"><text x="71" y="18" text-anchor="middle">${esc(p.label)}</text></svg><span class="crest">${crest(p.clubKey,p.id+(detail?'-detail':''))}</span><svg class="player-number card-lettering" viewBox="0 0 30 30" aria-hidden="true"><text x="15" y="23" text-anchor="middle">${p.number}</text></svg><span class="player-position">${p.position}</span>${p.available&&!detail?copiesBadge(p):''}<span class="holo-foil" aria-hidden="true"></span><span class="holo-glare" aria-hidden="true"></span><span class="holo-sparkles" aria-hidden="true"></span></span></button>`;}
+function tile(p,slot=false){return `<article class="card-tile">${slot?`<span class="club-slot">${p.position}</span>`:''}<div class="card-meta">${p.isNew?'<span class="new-badge">NUEVO</span>':''}${p.type==='gold'?`<span class="shiny-badge" aria-label="Acabado dorado">${icon('sparkles')}</span>`:''}</div><div class="card-scene">${card(p)}</div><div class="mobile-card-caption"><span>${esc(p.name)}</span><span>${esc(p.club)}</span></div><div class="availability-badge-wrap">${p.available?`<span class="available-badge">${icon('check')}Canjeable</span>`:''}</div></article>`;}
 function placeholder(pos,key,suffix){return `<div class="missing-card" aria-hidden="true"><span class="cookie-emblem">${cookie}</span><span class="crest">${crest(key,suffix)}</span><span class="player-position">${pos}</span><img class="missing-player" src="assets/player-uncollected-clipped.svg" width="175" height="242" alt="" draggable="false"></div>`;}
 function missing(pos,key){return `<article class="card-tile missing-tile" aria-label="${positions[pos]} de ${clubs[key]} aún no conseguido"><div class="card-meta"></div><div class="card-scene">${placeholder(pos,key,`missing-${pos}`)}</div><div class="availability-badge-wrap"></div></article>`;}
 function restoreLiftedCard(){if(!liftedCard)return;liftedCard.classList.remove('is-lifted');liftedCard.parentElement?.querySelector('.lifted-placeholder')?.remove();liftedCard=null;}
@@ -60,8 +80,12 @@ function render(){
   grid.innerHTML=Object.entries(clubs).map(([key,name])=>{
    const items=list.filter(p=>p.clubKey===key);if(!items.length)return '';
    const showMissing=!state.gold&&!state.available&&!state.q&&!state.positions.length&&state.date==='all';
-   const cards=showMissing?Object.keys(positions).map(pos=>{const found=items.filter(p=>p.position===pos);return found.length?found.map(p=>tile(p)).join(''):missing(pos,key)}).join(''):items.sort((a,b)=>Object.keys(positions).indexOf(a.position)-Object.keys(positions).indexOf(b.position)).map(p=>tile(p)).join('');
-   return `<section class="club-section"><h3 class="club-heading">${name} · ${new Set(players.filter(p=>p.clubKey===key).map(p=>p.playerId)).size}/4 cromos</h3><div class="club-row">${clubRail(key,name)}<div class="card-grid club-scroller" id="club-${key}" tabindex="0" aria-label="Cromos de ${name}">${cards}</div></div><div class="club-controls"><button data-carousel="${key}" data-dir="-1" aria-label="Cromos anteriores de ${name}" disabled>${icon('back')}</button><span id="page-${key}">1 / ${Math.ceil((showMissing?4:items.length)/2)}</span><button data-carousel="${key}" data-dir="1" aria-label="Siguientes cromos de ${name}" ${items.length<=2&&!showMissing?'disabled':''}>${icon('arrow')}</button></div></section>`;
+   const slots=showMissing?Object.keys(positions).map(pos=>{const found=items.filter(p=>p.position===pos);return found.length?found.map(p=>tile(p)).join(''):missing(pos,key)}):items.sort((a,b)=>Object.keys(positions).indexOf(a.position)-Object.keys(positions).indexOf(b.position)).map(p=>tile(p));
+   const cards=slots.join('');
+   const count=showMissing?Object.keys(positions).reduce((total,pos)=>total+Math.max(1,items.filter(p=>p.position===pos).length),0):items.length;
+   const pages=Math.ceil(count/2);
+   const dots=Array.from({length:pages},(_,i)=>`<button type="button" data-pair="${key}" data-index="${i}" aria-label="${window.Demo.lang==='en'?'Show pair':'Ver pareja'} ${i+1}" aria-pressed="${i===0}"></button>`).join('');
+   return `<section class="club-section"><h3 class="club-heading">${name}<span class="club-heading-count"><span> · </span>${new Set(players.filter(p=>p.clubKey===key).map(p=>p.playerId)).size}/4<span> cromos</span></span></h3><div class="club-row">${clubRail(key,name)}<div class="card-grid club-scroller" id="club-${key}" tabindex="0" aria-label="Cromos de ${name}">${cards}</div></div><div class="club-controls"><button data-carousel="${key}" data-dir="-1" aria-label="Cromos anteriores de ${name}" disabled>${icon('back')}</button><div class="club-pages">${dots}</div><button data-carousel="${key}" data-dir="1" aria-label="Siguientes cromos de ${name}" ${pages<2?'disabled':''}>${icon('arrow')}</button></div><p class="club-page-index" id="page-${key}">${pairLabel(1,pages)}</p></section>`;
   }).join('');
   $$('.club-scroller').forEach(el=>el.addEventListener('scroll',()=>updateCarousel(el),{passive:true}));
  }else if(state.group!=='none'){
@@ -70,7 +94,24 @@ function render(){
  }else grid.innerHTML=`<div class="card-grid">${list.map(p=>tile(p)).join('')}${list.length===11?'<div class="blank-tile" aria-hidden="true"></div>':''}</div>`;
  renderChips();renderSuggestions(list);window.CopyStack?.init(grid);window.Holo?.init(grid);
 }
-function updateCarousel(el){const key=el.id.slice(5),step=el.clientWidth+4,page=Math.round(el.scrollLeft/step)+1,total=Math.ceil((el.scrollWidth+4)/step);$(`#page-${key}`).textContent=`${page} / ${total}`;$(`[data-carousel="${key}"][data-dir="-1"]`).disabled=el.scrollLeft<4;$(`[data-carousel="${key}"][data-dir="1"]`).disabled=el.scrollLeft+el.clientWidth>=el.scrollWidth-4;}
+function pairLabel(page,total){
+ return window.Demo.lang==='en'?`Pair ${page} of ${total}`:`Pareja ${page} de ${total}`;
+}
+function updateCarousel(el){
+ const key=el.id.slice(5),step=el.clientWidth+parseFloat(getComputedStyle(el).columnGap);
+ const dots=$$(`[data-pair="${key}"]`),page=Math.min(dots.length,Math.round(el.scrollLeft/step)+1);
+ $(`#page-${key}`).textContent=pairLabel(page,dots.length);
+ dots.forEach((button,i)=>button.setAttribute('aria-pressed',String(i+1===page)));
+ $(`[data-carousel="${key}"][data-dir="-1"]`).disabled=el.scrollLeft<4;
+ $(`[data-carousel="${key}"][data-dir="1"]`).disabled=el.scrollLeft+el.clientWidth>=el.scrollWidth-4;
+}
+$('#card-results').addEventListener('click',e=>{
+ const pair=e.target.closest('[data-pair]');
+ if(!pair)return;
+ const el=document.getElementById('club-'+pair.dataset.pair);
+ const step=el.clientWidth+parseFloat(getComputedStyle(el).columnGap);
+ el.scrollTo({left:Number(pair.dataset.index)*step,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});
+});
 function renderChips(){const chips=[];if(state.club)chips.push(['club',clubs[state.club]]);state.positions.forEach(p=>chips.push(['position:'+p,positions[p]]));if(state.gold)chips.push(['gold','Solo dorados']);if(state.date!=='all')chips.push(['date',{today:'Hoy',week:'Últimos 7 días',month:'Últimos 30 días'}[state.date]]);if(state.available)chips.push(['available','Canjeables']);const e=$('#active-filters');e.hidden=!chips.length;e.innerHTML=chips.map(([key,label])=>`<button class="filter-chip" data-remove="${key}" aria-label="Quitar filtro ${label}">${label}${icon('close')}</button>`).join('')+(chips.length?'<button class="clear-all" data-clear-filters>Limpiar filtros</button>':'');$('#filter-count').textContent=chips.length;$('#filter-count').hidden=!chips.length;}
 const mobileSheet=matchMedia('(max-width:760px)');
 function closeDialog(dialog){
@@ -102,7 +143,58 @@ document.addEventListener('keydown',e=>{if(e.key==='Tab')document.documentElemen
 document.addEventListener('pointerdown',()=>document.documentElement.classList.remove('keyboard-nav'),true);
 function showDialog(dialog){closeMenus();closeSuggestions();dialog.tabIndex=-1;dialog.showModal();dialog.focus({preventScroll:true});document.documentElement.style.overflow='hidden';}
 $$('dialog').forEach(d=>{d.addEventListener('click',e=>{if(e.target===d){const r=d.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)closeDialog(d);}});d.addEventListener('close',()=>{d.style.transform='';d.classList.remove('sheet-dragging');delete d.dataset.closing;document.documentElement.style.overflow='';if(d.id==='card-dialog'){window.ModalMotion?.close(d);restoreLiftedCard();$('#detail-content').innerHTML='';}});});
-function openDetail(id){const p=players.find(p=>p.id===id);if(!p)return;const source=$(`[data-player="${p.id}"]`,$('#card-results'));const sourceRect=source?.getBoundingClientRect();$('#detail-content').innerHTML=`<div class="detail-layout"><div class="detail-stage ${p.type==='gold'&&p.available>0?'is-gold':''}">${card(p,true)}</div><div class="detail-info"><div class="detail-summary"><span class="eyebrow ${p.type==='gold'?'gold-text':''}">${p.type==='gold'?'Dorada':'Común'}</span><h2 id="detail-title">${p.name}</h2><p>${p.club} · ${positions[p.position]} · #${p.number}</p><dl><div><dt>Copias obtenidas</dt><dd>${p.copies}</dd></div><div><dt>Disponibles</dt><dd>${p.available}</dd></div></dl><div class="detail-availability">${p.available?`<span class="available-badge">${icon('check')}Canjeable</span>`:'<span class="field-help">Sin copias disponibles para canjear</span>'}</div></div><div class="detail-scroll" tabindex="0" role="region" aria-label="Códigos asociados y canje">${codeList(p)}<div class="redeem-action"><button class="button primary full-width" data-redeem="${p.type==='gold'?'camiseta':'bufanda'}" ${p.available?'':'disabled aria-describedby="redeem-unavailable"'}>${icon(p.type==='gold'?'shirt':'scarf')}Quiero mi ${p.type==='gold'?'camiseta':'bufanda'}</button>${p.available?'':'<p id="redeem-unavailable">Necesitas una copia disponible para canjear.</p>'}<p class="redeem-feedback" role="status" hidden></p></div></div></div></div>`;showDialog($('#card-dialog'));liftCard(p);window.Holo?.init($('#card-dialog'));window.ModalMotion?.open($('#card-dialog'),sourceRect,source);}
+function openDetail(id){
+ const picked=players.find(p=>p.id===id);
+ if(!picked)return;
+ const dialog=$('#card-dialog'), content=$('#detail-content');
+ const source=$(`[data-player="${id}"]`,$('#card-results')), sourceRect=source?.getBoundingClientRect();
+ const variants=players.filter(p=>p.playerId===picked.playerId);
+ const initial=variants.find(p=>p.type==='gold')||picked;
+ const total=variants.reduce((sum,p)=>sum+p.copies,0);
+ const available=variants.reduce((sum,p)=>sum+p.available,0);
+ const gold=variants.find(p=>p.type==='gold')?.available||0, common=available-gold;
+ const inventory={copies:total,records:variants.flatMap(p=>p.records).sort((a,b)=>b.time-a.time)};
+ const t=(es,en)=>window.Demo.lang==='en'?en:es;
+ const breakdown=t(`${common} ${common===1?'común':'comunes'} · ${gold} ${gold===1?'dorada':'doradas'}`,`${common} common · ${gold} gold`);
+ const history=t('Ver historial completo','View full history');
+ const used=total-available;
+ const selector=variants.length>1?`<div class="detail-rarities" role="group" aria-label="${t('Rareza','Rarity')}">${['blue','gold'].map(type=>`<button type="button" data-rarity="${type}" aria-pressed="${type===initial.type}">${type==='gold'?t('Dorada','Gold'):t('Común','Common')}</button>`).join('')}</div>`:'';
+ content.innerHTML=`<div class="detail-layout"><div class="detail-figure"><div class="detail-stage">${card(initial,true)}</div>${selector}</div>
+ <div class="detail-info"><header class="detail-identity"><h2 id="detail-title">${esc(picked.name)}</h2><p>${esc(picked.club)} · ${positions[picked.position]} · #${picked.number}</p></header>
+ <div class="detail-inventory"><span class="inventory-status ${available?'':'exhausted'}">${available?icon('check'):''}${available?t('Copias disponibles','Available copies'):t('Sin copias disponibles','No copies available')}</span>
+ <div class="inventory-count"><strong>${available}</strong><b>${breakdown}</b></div><small>${total} ${t(total===1?'copia obtenida':'copias obtenidas',total===1?'copy collected':'copies collected')} · ${used} ${t(used===1?'utilizada':'utilizadas','used')}</small></div>
+ <div class="detail-scroll">${codeList(inventory,t)}<button type="button" class="detail-history">${history}</button></div>
+ <div class="redeem-action"><button type="button" class="button primary full-width" ${available?'':'disabled'}></button><p class="redeem-feedback" role="status" hidden></p></div></div></div>`;
+ const action=content.querySelector('.redeem-action button');
+ function setAction(player){
+  const shirt=player.type==='gold';
+  action.dataset.redeem=shirt?'camiseta':'bufanda';
+  action.textContent=shirt?t('Quiero mi camiseta','Get my shirt'):t('Quiero mi bufanda','Get my scarf');
+  action.disabled=!player.available;
+ }
+ setAction(initial);
+ content.querySelector('.detail-history').onclick=()=>{
+  dialog.addEventListener('close',()=>{location.hash='history';},{once:true});
+  closeDialog(dialog);
+ };
+ for(const toggle of content.querySelectorAll('[data-rarity]')){
+  toggle.onclick=()=>{
+   const next=variants.find(p=>p.type===toggle.dataset.rarity);
+   if(!next||toggle.getAttribute('aria-pressed')==='true')return;
+   const element=content.querySelector('.holo-card'), template=document.createElement('template');
+   template.innerHTML=card(next,true);
+   const face=template.content.firstElementChild;
+   for(const attr of ['class','data-player','aria-label','style'])element.setAttribute(attr,face.getAttribute(attr));
+   element.replaceChildren(...face.childNodes);
+   content.querySelectorAll('[data-rarity]').forEach(b=>b.setAttribute('aria-pressed',String(b===toggle)));
+   setAction(next);
+  };
+ }
+ showDialog(dialog);
+ liftCard(picked);
+ window.Holo?.init(dialog);
+ window.ModalMotion?.open(dialog,sourceRect,source);
+}
 searchInput.addEventListener('input',e=>{state.q=e.target.value;state.selectedPlayer='';suggestionsOpen=true;render();});
 searchInput.addEventListener('focus',()=>{if(state.q.trim()&&!state.selectedPlayer){suggestionsOpen=true;renderSuggestions();}});
 searchInput.addEventListener('keydown',e=>{
@@ -123,29 +215,34 @@ const filterForm=$('#filter-form');filterForm.elements.club.replaceChildren(new 
 function fillFilterForm(s){filterForm.elements.club.value=s.club;filterForm.elements.date.value=s.date;filterForm.elements.gold.checked=s.gold;filterForm.elements.available.checked=s.available;filterForm.elements.group.value=s.group;filterForm.elements.sort.value=s.sort;$$('[name=position]',filterForm).forEach(el=>el.checked=s.positions.includes(el.value));updateDraftCount();}
 function draft(){return {...state,club:filterForm.elements.club.value,positions:$$('[name=position]:checked',filterForm).map(e=>e.value),date:filterForm.elements.date.value,gold:filterForm.elements.gold.checked,available:filterForm.elements.available.checked,group:filterForm.elements.group.value,sort:filterForm.elements.sort.value};}
 function updateDraftCount(){const n=filter(players,draft()).length;$('#apply-filters').textContent=`Ver ${n} ${n===1?'cromo':'cromos'}`;}
-$('#filter-button').onclick=()=>{fillFilterForm(state);showDialog($('#filter-dialog'));};filterForm.addEventListener('change',updateDraftCount);filterForm.addEventListener('submit',e=>{e.preventDefault();const previousGroup=state.group;Object.assign(state,draft());if(state.group!==previousGroup)state.view='grid';render();$('#filter-dialog').close();});$('#reset-draft').onclick=()=>fillFilterForm({...state,...emptyFilters()});
+$('#filter-button').onclick=()=>{
+ const sortDialog=$('#sort-dialog');
+ if(sortDialog.open){
+  sortDialog.addEventListener('close',()=>{fillFilterForm(state);showDialog($('#filter-dialog'));},{once:true});
+  sortDialog.close();
+ }else{fillFilterForm(state);showDialog($('#filter-dialog'));}
+};filterForm.addEventListener('change',updateDraftCount);filterForm.addEventListener('submit',e=>{e.preventDefault();const previousGroup=state.group;Object.assign(state,draft());if(state.group!==previousGroup)state.view='grid';render();$('#filter-dialog').close();});$('#reset-draft').onclick=()=>fillFilterForm({...state,...emptyFilters()});
 const sortForm=$('#sort-form');$('#sort-button').onclick=()=>{sortForm.elements.group.value=state.group;sortForm.elements.sort.value=state.sort;showDialog($('#sort-dialog'));};sortForm.onsubmit=e=>{e.preventDefault();state.group=sortForm.elements.group.value;state.sort=sortForm.elements.sort.value;if(state.group!=='none')state.view='grid';render();$('#sort-dialog').close();};
 function closeMenus(){['account','mobile'].forEach(x=>{const menu=$(`#${x}-menu`);menu.hidden=true;$(x==='account'?'#account-button':'#menu-button').setAttribute('aria-expanded','false');});}
 function toggleMenu(button,menu){const isOpen=!menu.hidden;closeMenus();menu.hidden=isOpen;button.setAttribute('aria-expanded',String(!isOpen));}
 $('#account-button').onclick=()=>toggleMenu($('#account-button'),$('#account-menu'));$('#menu-button').onclick=()=>toggleMenu($('#menu-button'),$('#mobile-menu'));
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMenus();});
-document.addEventListener('click',e=>{const t=e.target;if(!t.closest('.account-wrap,.mobile-nav,#menu-button'))closeMenus();const copy=t.closest('[data-copy]');if(copy){if(navigator.clipboard?.writeText){navigator.clipboard.writeText(copy.dataset.copy).then(()=>{copy.innerHTML=icon('check');copy.setAttribute('aria-label','Código '+copy.dataset.copy+' copiado');copy.title='Copiado';}).catch(()=>{copy.title='Selecciona el código para copiarlo manualmente';});}else{copy.title='Selecciona el código para copiarlo manualmente';}}const redeem=t.closest('[data-redeem]');if(redeem&&!redeem.disabled){const feedback=redeem.parentElement.querySelector('.redeem-feedback');feedback.textContent=`Canje de ${redeem.dataset.redeem} seleccionado. Es una demostración: no se ha enviado ninguna solicitud.`;feedback.hidden=false;}const close=t.closest('[data-close]');if(close)closeDialog(close.closest('dialog'));const register=t.closest('[data-register-code]');if(register){$('#register-form').reset();$('#register-result').hidden=true;showDialog($('#register-dialog'));if(document.documentElement.classList.contains('keyboard-nav'))$('#register-code').focus({preventScroll:true});}const unbuilt=t.closest('[data-unbuilt]');if(unbuilt){toast(`${unbuilt.dataset.unbuilt}: este prototipo se centra en Mi colección.`);closeMenus();}const p=t.closest('[data-player]');if(p&&!p.hasAttribute('data-detail'))openDetail(p.dataset.player);if(t.closest('[data-reset]')){Object.assign(state,emptyFilters(),{q:'',selectedPlayer:''});$('#search').value='';render();}if(t.closest('[data-clear-filters]')){Object.assign(state,emptyFilters());render();}const remove=t.closest('[data-remove]');if(remove){const key=remove.dataset.remove;if(key.startsWith('position:'))state.positions=state.positions.filter(p=>p!==key.slice(9));else state[key]=emptyFilters()[key];render();}const c=t.closest('[data-carousel]');if(c){const el=$(`#club-${c.dataset.carousel}`);el.scrollBy({left:Number(c.dataset.dir)*(el.clientWidth+4),behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});}});
-$$('[data-reward]').forEach(button=>button.onclick=()=>{reward=Number(button.dataset.reward);$$('[data-reward]').forEach(b=>b.setAttribute('aria-pressed',String(b===button)));$('#reward-card .reward-icon').innerHTML=icon(reward?'shirt':'ball');$('#reward-title').textContent=reward?'Camiseta asegurada':'Bufanda — 3/4 posiciones';$('#reward-subtitle').textContent=reward?'2 dorados disponibles':'Te falta MED del mismo club';$('#reward-link').textContent=reward?'Ver canje':'Ver progreso';});
-$('#reward-card').onclick=()=>{if(reward){state.gold=true;render();$('#card-results').scrollIntoView({block:'start',behavior:'smooth'});}else{setView('clubs');toast('Atlético de Madrid: 3 de 4 posiciones. Te falta el centrocampista.');}};
+document.addEventListener('click',e=>{const t=e.target;if(!t.closest('.account-wrap,.mobile-nav,#menu-button'))closeMenus();const copy=t.closest('[data-copy]');if(copy){if(navigator.clipboard?.writeText){navigator.clipboard.writeText(copy.dataset.copy).then(()=>{copy.innerHTML=icon('check');copy.setAttribute('aria-label','Código '+copy.dataset.copy+' copiado');copy.title='Copiado';}).catch(()=>{copy.title='Selecciona el código para copiarlo manualmente';});}else{copy.title='Selecciona el código para copiarlo manualmente';}}const redeem=t.closest('[data-redeem]');if(redeem&&!redeem.disabled){const feedback=redeem.parentElement.querySelector('.redeem-feedback');feedback.textContent=`Canje de ${redeem.dataset.redeem} seleccionado. Es una demostración: no se ha enviado ninguna solicitud.`;feedback.hidden=false;}const close=t.closest('[data-close]');if(close)closeDialog(close.closest('dialog'));const register=t.closest('[data-register-code]');if(register){$('#register-form').reset();$('#register-result').hidden=true;showDialog($('#register-dialog'));if(document.documentElement.classList.contains('keyboard-nav'))$('#register-code').focus({preventScroll:true});}const unbuilt=t.closest('[data-unbuilt]');if(unbuilt){toast(`${unbuilt.dataset.unbuilt}: este prototipo se centra en Mi colección.`);closeMenus();}const p=t.closest('[data-player]');if(p&&!p.hasAttribute('data-detail'))openDetail(p.dataset.player);if(t.closest('[data-reset]')){Object.assign(state,emptyFilters(),{q:'',selectedPlayer:''});$('#search').value='';render();}if(t.closest('[data-clear-filters]')){Object.assign(state,emptyFilters());render();}const remove=t.closest('[data-remove]');if(remove){const key=remove.dataset.remove;if(key.startsWith('position:'))state.positions=state.positions.filter(p=>p!==key.slice(9));else state[key]=emptyFilters()[key];render();}const c=t.closest('[data-carousel]');if(c){const el=$(`#club-${c.dataset.carousel}`);el.scrollBy({left:Number(c.dataset.dir)*(el.clientWidth+parseFloat(getComputedStyle(el).columnGap)),behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});}});
 const codeCells=[...document.querySelectorAll('.code-cell')];
+const registrationForm = $('#register-form');
+const registrationSubmit = registrationForm.querySelector('.register-submit');
+function updateRegistrationSubmit() {
+  registrationSubmit.disabled = !codeCells.every(cell => /^[A-Z0-9]$/.test(cell.value))
+    || !registrationForm.querySelector('[type="checkbox"]').checked;
+}
+registrationForm.addEventListener('input', updateRegistrationSubmit);
+registrationForm.addEventListener('reset', () => { registrationSubmit.disabled = true; });
 codeCells.forEach((cell,i)=>{
 cell.addEventListener('input',()=>{cell.value=cell.value.replace(/[^a-z0-9]/gi,'').toUpperCase().slice(-1);$('#register-result').hidden=true;if(cell.value&&i<codeCells.length-1)codeCells[i+1].focus();});
 cell.addEventListener('keydown',e=>{if(e.key==='Backspace'&&!cell.value&&i>0)codeCells[i-1].focus();if(e.key==='ArrowLeft'&&i>0)codeCells[i-1].focus();if(e.key==='ArrowRight'&&i<codeCells.length-1)codeCells[i+1].focus();});
-cell.addEventListener('paste',e=>{e.preventDefault();const text=e.clipboardData.getData('text').replace(/[^a-z0-9]/gi,'').toUpperCase().slice(0,codeCells.length);const offset=text.length===codeCells.length?0:i;[...text].forEach((v,j)=>{if(codeCells[offset+j])codeCells[offset+j].value=v;});codeCells[Math.min(codeCells.length-1,offset+text.length)].focus();});
+cell.addEventListener('paste',e=>{e.preventDefault();const text=e.clipboardData.getData('text').replace(/[^a-z0-9]/gi,'').toUpperCase().slice(0,codeCells.length);const offset=text.length===codeCells.length?0:i;[...text].forEach((v,j)=>{if(codeCells[offset+j])codeCells[offset+j].value=v;});codeCells[Math.min(codeCells.length-1,offset+text.length)].focus();$('#register-result').hidden=true;updateRegistrationSubmit();});
 });
 $('#register-form').addEventListener('submit',e=>{e.preventDefault();if(!e.target.reportValidity())return;const result=$('#register-result'),r=window.Demo.register(codeCells.map(c=>c.value).join(''));if(r.error){result.textContent=r.error==='duplicate'?'Este código ya se ha registrado.':'Código no válido.';result.hidden=false;return;}$('#register-dialog').close();window.dispatchEvent(new CustomEvent('oreo:registered',{detail:r}));});
-let dragStart=null,dragged=false;
-const rewards=$('.reward-carousel');
-rewards.addEventListener('pointerdown',e=>{dragStart={x:e.clientX,y:e.clientY};dragged=false;});
-rewards.addEventListener('pointermove',e=>{if(dragStart&&Math.abs(e.clientX-dragStart.x)>12){dragged=true;rewards.setPointerCapture(e.pointerId);$('#reward-card').style.transform=`translateX(${Math.max(-45,Math.min(45,e.clientX-dragStart.x))}px)`;}});
-rewards.addEventListener('pointerup',e=>{if(!dragStart)return;const dx=e.clientX-dragStart.x,dy=e.clientY-dragStart.y;dragStart=null;$('#reward-card').style.transform='';if(Math.abs(dx)>32&&Math.abs(dx)>Math.abs(dy)){$(`[data-reward="${reward?0:1}"]`).click();}});
-rewards.addEventListener('pointercancel',()=>{dragStart=null;dragged=false;$('#reward-card').style.transform='';});
-rewards.addEventListener('click',e=>{if(dragged&&e.isTrusted){e.preventDefault();e.stopPropagation();dragged=false;}},true);
 window.CollectionUI={refresh(){players.splice(0,players.length,...window.Demo.entries());render();},openDetail,icon,showDialog};
 render();
 })();

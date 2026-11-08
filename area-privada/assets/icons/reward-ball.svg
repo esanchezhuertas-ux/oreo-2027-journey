@@ -1,0 +1,11 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="24" height="20" viewBox="0 0 24 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Ilustraci&#195;&#179;n">
+<path id="Vector" d="M12 19.1C15.866 19.1 19 18.7866 19 18.4C19 18.0134 15.866 17.7 12 17.7C8.13401 17.7 5 18.0134 5 18.4C5 18.7866 8.13401 19.1 12 19.1Z" fill="#E7E7EB"/>
+<path id="Vector_2" d="M12 17.4C16.3078 17.4 19.8 13.9078 19.8 9.6C19.8 5.29218 16.3078 1.8 12 1.8C7.69218 1.8 4.2 5.29218 4.2 9.6C4.2 13.9078 7.69218 17.4 12 17.4Z" fill="white" stroke-width="0.2" stroke="#272425"/>
+<g id="Vector_3">
+<path d="M12 6.4L15.1 8.7L13.9 12.3H10.1L8.9 8.7L12 6.4Z" fill="#DADAE1"/>
+<path d="M12 6.4L15.1 8.7L13.9 12.3H10.1L8.9 8.7L12 6.4Z" stroke-width="0.183333" stroke-linejoin="round" stroke="#272425"/>
+</g>
+<path id="Vector_4" d="M12 6.4V3.6M12 3.6L9.6 2.2M12 3.6L14.4 2.2M15.1 8.7L18.2 7.7M18.2 7.7L19.6 9.8M18.2 7.7L18.5 5M13.9 12.3L15.7 15M15.7 15L15.3 16.6M15.7 15L18.1 14.4M10.1 12.3L8.3 15M8.3 15L8.7 16.6M8.3 15L5.9 14.4M8.9 8.7L5.8 7.7M5.8 7.7L4.4 9.8M5.8 7.7L5.5 5" stroke-width="0.166667" stroke="#272425"/>
+</g>
+</svg>

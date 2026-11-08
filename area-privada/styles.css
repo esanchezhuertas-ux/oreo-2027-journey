@@ -207,3 +207,97 @@ html:not(.keyboard-nav) #card-dialog :focus,html:not(.keyboard-nav) #register-di
 
 /* Original Figma silhouette and mask (874:13483), at its 220 × 319 proportions. */
 .missing-card .missing-player{inset:auto;left:16.49px;top:40px;width:127.24px;height:176.25px;z-index:2}
+
+/* Mi zona, desktop 1440 and mobile 360. */
+#collection.container{width:100%;margin-inline:auto;font-family:var(--ui-font,Arial,sans-serif)}
+#collection .collection-heading{align-items:center;grid-template-columns:minmax(0,1fr) auto;gap:24px 20px;min-height:0}
+#collection #page-title{margin:0;font:500 40px/48px var(--ui-font,Arial,sans-serif);letter-spacing:0}
+#collection .collection-stats{width:auto;justify-content:flex-end}
+#collection .collected-desktop{width:auto;text-align:right;gap:4px}
+#collection .collected-desktop strong{font:500 24px/28px var(--ui-font,Arial,sans-serif);letter-spacing:0}
+#collection .collected-desktop span{font-size:12px;line-height:16px}
+#collection .collected-mobile,.mobile-card-caption,#hub-progress .reward-pages{display:none}
+#collection #hub-progress{display:flex;flex-direction:column;gap:16px;min-width:0}
+#hub-progress>strong{font-size:16px;line-height:24px;font-weight:500}
+#collection #hub-progress>p{font-size:12px;line-height:20px;margin:0;color:var(--muted)}
+#hub-progress .reward-grid{margin:0;gap:24px}
+#hub-progress .reward-progress{min-width:0;min-height:0;height:96px;border:1px solid var(--line);border-radius:16px;gap:16px;padding:15px}
+#hub-progress .reward-text{min-width:0}
+#hub-progress .reward-text strong{font-size:14px;line-height:20px;font-weight:500}
+#hub-progress .reward-text small{font-size:12px;line-height:20px;margin:8px 0 0}
+#hub-progress .prize-art{width:20px;height:20px;border-radius:12px;overflow:hidden;display:grid;justify-content:center;align-items:center;background:var(--bg)}
+#hub-progress .prize-art img{display:block;max-width:none}
+#hub-progress .ring{position:relative;display:grid;place-items:center;width:64px;height:64px;background:none}
+#hub-progress .ring svg{position:absolute;inset:0;width:64px;height:64px;fill:none;stroke-width:6}
+#hub-progress .ring-track{stroke:#dedee4}
+#hub-progress .ring-arc{stroke:#b36b00;stroke-linecap:round;transform:rotate(-90deg);transform-origin:50% 50%}
+#hub-progress .reward-progress:first-child .ring-arc{stroke:#c63232}
+#hub-progress .ring b{position:relative;background:transparent;width:auto;height:auto;font:500 14px/24px var(--ui-font,Arial,sans-serif)}
+#collection .toolbar-sticky{margin-top:24px}
+#collection .results-heading{margin-block:24px}
+#collection .club-heading{font-family:var(--ui-font,Arial,sans-serif);font-weight:500}
+#collection .toolbar-button .icon{width:20px;height:20px}
+#collection .available-badge{justify-content:center;width:104px;font-weight:500}
+#card-results{scroll-margin-top:180px}
+@media(min-width:761px){
+ #collection .toolbar #sort-button{width:140px}
+ #collection .club-heading-count{white-space:pre}
+}
+@media(max-width:760px){
+ #collection.container{padding:24px 16px 80px}
+ #collection .collection-heading{gap:24px 8px}
+ #collection #page-title{font-size:28px;line-height:32px}
+ #collection .collected-desktop{display:none}
+ #collection .collected-mobile{display:flex;align-items:center;justify-content:flex-end;min-height:32px;font-size:12px;line-height:16px;color:var(--muted);text-decoration:underline}
+ #hub-progress>strong{font-size:14px}
+ #hub-progress .reward-grid{display:flex;gap:12px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;scrollbar-width:none}
+ #hub-progress .reward-grid::-webkit-scrollbar{display:none}
+ #hub-progress .reward-grid:after{content:'';flex:0 0 max(0px,calc(100% - min(280px,90%) - 12px))}
+ #hub-progress .reward-progress{flex:0 0 min(280px,90%);scroll-snap-align:start}
+ #hub-progress .reward-pages{display:flex;gap:8px;align-items:center;justify-content:center;margin-top:8px}
+ #hub-progress .reward-pages button{width:24px;height:24px;display:grid;place-items:center;padding:0}
+ #hub-progress .reward-pages button:after{content:'';width:8px;height:8px;border-radius:50%;background:var(--line)}
+ #hub-progress .reward-pages button[aria-pressed=true]:after{background:var(--ink)}
+ #collection .toolbar-sticky{margin-top:40px;padding-inline:16px}
+ #collection .toolbar{display:grid;grid-template-columns:minmax(0,1fr) repeat(2,48px);height:124px;gap:12px 8px;padding:8px 0}
+ #collection .toolbar .search-field{grid-column:1/-1;width:100%;height:48px;padding:0 16px;gap:12px}
+ #collection .toolbar .search-field input{font-size:14px}
+ #collection .toolbar .availability{width:100%;gap:8px;padding-inline:0;font-size:13px}
+ #collection .toolbar #filter-button,#collection .toolbar #sort-button,#collection .toolbar #mobile-view{display:grid;place-items:center;width:48px;height:48px;min-width:0;padding:0}
+ #collection .toolbar .filter-count{position:absolute;top:0;right:0}
+ #collection .results-heading{align-items:flex-start;flex-direction:column;gap:16px;margin:16px 0}
+ #collection .results-heading h2{font-size:16px;line-height:24px}
+ #collection #sort-label{font-size:12px;line-height:16px}
+ #collection .card-tile{height:304px;padding:12px 8px}
+ #collection .card-meta{height:28px}
+ #collection .card-scene{height:180px;flex:none;min-height:0}
+ #collection .card-scene :is(.holo-card,.missing-card,.copy-stack){scale:.75}
+ #collection .mobile-card-caption{display:flex;flex-direction:column;justify-content:center;height:32px;width:100%;flex:none;font-size:12px;font-weight:500;line-height:16px;text-align:center}
+ #collection .mobile-card-caption span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+ #collection .card-grid:not(.club-scroller) .mobile-card-caption span+span{display:none}
+ #collection .club-heading{font-size:16px;line-height:24px;justify-content:space-between;gap:12px;margin-bottom:12px}
+ #collection .club-heading-count{font-size:14px;font-weight:400}
+ #collection .club-heading-count span{display:none}
+ #collection .club-section{margin-bottom:24px}
+ #collection .club-row{gap:8px}
+ #collection .club-scroller{gap:8px}
+ #collection .club-rail,#collection .club-scroller .card-tile{height:240px;border-radius:4px}
+ #collection .club-scroller .card-tile{flex-basis:calc((100% - 8px)/2);padding:8px}
+ #collection .club-scroller .card-meta{height:20px}
+ #collection .club-scroller .card-scene{height:120px}
+ #collection .club-scroller .card-scene :is(.holo-card,.missing-card,.copy-stack){scale:.495}
+ #collection .club-scroller .card-meta .icon{width:16px;height:16px}
+ #collection .club-controls{margin:0 auto;padding:12px 0 0}
+ #collection .club-controls button{width:48px;height:48px}
+ #collection .club-scroller .new-badge{height:19px;padding-inline:4px;font-size:10px}
+ #card-results{scroll-margin-top:204px}
+}
+.club-page-index{display:none}
+@media(max-width:760px){
+ #collection .club-controls>button{border:0;border-radius:12px}
+ #collection .club-pages{display:flex}
+ #collection .club-pages>button{display:grid;place-items:center;width:24px;min-width:24px;height:48px;background:none;border:0;padding:0}
+ #collection .club-pages>button:after{content:'';width:4px;height:4px;border-radius:50%;background:#c7c7d0}
+ #collection .club-pages>button[aria-pressed=true]:after{width:8px;height:8px;background:var(--ink)}
+ #collection .club-page-index{display:block;margin:12px 0 0;text-align:center;font:400 12px/16px var(--ui-font,Arial,sans-serif);color:var(--muted)}
+}

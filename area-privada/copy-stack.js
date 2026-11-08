@@ -21,26 +21,26 @@
  }
  function attach(card){
   if(card.hasAttribute('data-detail'))return;
-  const player=(window.PLAYERS||[]).find(p=>p.id===card.dataset.player);
-  const count=Math.max(0,Math.min(3,Number(player?.available)||0)-1);
+  const type=card.classList.contains('gold')?'gold':'blue';
+  const count=Math.max(0,Math.min(3,Number(card.dataset.available)||0)-1);
   const previous=mounted.get(card);
   if(previous?.count===count)return;
   previous?.element?.remove();
   if(!count){mounted.set(card,{count,element:null});return;}
   const stack=document.createElement('span');
-  stack.className='copy-stack'+(player.type==='gold'?' copy-stack-gold':'');
+  stack.className='copy-stack'+(type==='gold'?' copy-stack-gold':'');
   stack.setAttribute('aria-hidden','true');
   const suffix=`copy-${++serial}`;
   const positions=[[0,0,8,.72],[0,0,16,.42]];
   for(let depth=count;depth>0;depth--){
    const sheet=document.createElement('span');
-   sheet.className=`copy-sheet ${player.type}`;
+   sheet.className=`copy-sheet ${type}`;
    const [x,y,angle,opacity]=positions[depth-1];
    sheet.style.setProperty('--copy-x',`${x}px`);
    sheet.style.setProperty('--copy-y',`${y}px`);
    sheet.style.setProperty('--copy-angle',`${angle}deg`);
    sheet.style.setProperty('--copy-opacity',opacity);
-   sheet.style.setProperty('--biscuit-ink',card.style.getPropertyValue('--biscuit-ink')||(player.type==='gold'?'#f4d74c':'#0cbcff'));
+   sheet.style.setProperty('--biscuit-ink',card.style.getPropertyValue('--biscuit-ink')||(type==='gold'?'#f4d74c':'#0cbcff'));
    sheet.append(copyFace(card,`${suffix}-${depth}`));
    stack.append(sheet);
   }

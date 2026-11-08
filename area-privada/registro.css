@@ -1,0 +1,102 @@
+#register-dialog {
+  width: 600px;
+  padding: 32px;
+  border: 0;
+  border-radius: 32px;
+  background: #f8f8fa;
+  font-family: var(--ui-font, Arial, sans-serif);
+}
+#register-dialog .register-close {
+  top: 12px;
+  right: 12px;
+  width: 48px;
+  height: 48px;
+  padding: 14px;
+  border: 0;
+  border-radius: 12px;
+  background: #f8f8fa;
+}
+#register-dialog .register-close .icon { width: 20px; height: 20px; }
+#register-dialog #register-form { gap: 24px; padding-bottom: 64px; }
+#register-dialog #register-title { font: 500 24px/36px var(--ui-font, Arial, sans-serif); }
+#register-dialog .code-help { color: #555560; font: 400 14px/20px var(--ui-font, Arial, sans-serif); }
+#register-dialog .code-fields legend { margin-bottom: 12px; font: 500 14px/20px var(--ui-font, Arial, sans-serif); }
+#register-dialog .code-cells {
+  grid-template-columns: repeat(10, minmax(0, 46px)) !important;
+  gap: 8px !important;
+}
+#register-dialog .code-cell {
+  height: 64px;
+  margin: 0;
+  border: 1px solid #82828f;
+  border-radius: 12px;
+  font: 400 20px/24px ui-monospace, SFMono-Regular, Consolas, monospace;
+}
+#register-dialog .demo-captcha {
+  width: 100%;
+  margin: 8px 0 0;
+  padding: 12px;
+  gap: 0;
+  flex: none;
+}
+#register-dialog .demo-captcha input { flex: none; margin: 0 20px 0 4px; }
+#register-dialog .demo-captcha:has(input:checked) { background: #edf9f1; }
+#register-dialog .captcha-label { margin: 0; font: 400 14px/20px var(--ui-font, Arial, sans-serif); color: #272425; }
+#register-dialog .captcha-brand {
+  width: 64px;
+  height: 50px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  color: #555560;
+}
+#register-dialog .captcha-brand strong { font: 500 8px/10px var(--ui-font, Arial, sans-serif); }
+#register-dialog .captcha-brand small { font: 400 6px/8px var(--ui-font, Arial, sans-serif); color: #70707c; }
+#register-dialog .register-submit {
+  flex: none;
+  width: 100%;
+  border: 1.5px solid #dedee4;
+  border-radius: 8px;
+  background: #272425;
+  clip-path: none;
+  color: white;
+  font: 900 18px/24px 'Gotham Narrow Black', Arial, sans-serif;
+  letter-spacing: normal;
+}
+#register-dialog .register-submit:disabled { color: #82828f; cursor: default; opacity: 1; }
+#register-dialog .register-help summary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font: 500 14px/20px var(--ui-font, Arial, sans-serif);
+}
+#register-dialog .register-help summary::-webkit-details-marker { display: none; }
+#register-dialog .register-question {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  background: currentColor;
+  mask: url('assets/registro/question.svg') center / 83.333% no-repeat;
+}
+#register-dialog #register-result { color: #c63232; }
+@media (max-width: 760px) {
+  #register-dialog {
+    width: 100%;
+    max-width: 100%;
+    padding: 64px 0 0;
+    border-radius: 24px 24px 0 0;
+  }
+  #register-dialog .register-close { top: 20px; right: 24px; }
+  #register-dialog .sheet-handle { padding-top: 12px; }
+  #register-dialog .sheet-handle span { width: 32px; }
+  #register-dialog #register-form { padding: 12px 24px max(24px, env(safe-area-inset-bottom)); }
+  #register-dialog .code-cells {
+    grid-template-columns: repeat(5, minmax(0, 52px)) !important;
+    gap: 12px !important;
+  }
+  #register-dialog .code-cell { height: 56px; }
+  #register-dialog .demo-captcha { width: min(280px, 100%); }
+  #register-dialog .register-help { margin-top: -8px; }
+}

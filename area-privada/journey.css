@@ -45,3 +45,209 @@
 .journey-panel header{padding:32px 32px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px}.journey-panel header h1{font-size:24px;margin:0}.journey-panel header button{flex:none;background:#f8f8fa}.panel-body{padding:0 32px 32px;overflow:auto;overscroll-behavior:contain;min-height:0}
 .prize-summary,.address-choice{background:#f8f8fa;padding:20px;border-radius:12px;margin-bottom:20px}.prize-summary{display:flex;align-items:center;gap:16px}.prize-summary .icon{width:40px;height:40px}.prize-summary small{display:block;margin-top:4px}.size-picker{border:0;padding:0}.size-picker legend{padding-bottom:12px}.size-picker label{display:inline-flex;margin-right:8px}.size-picker input{position:absolute;opacity:0}.size-picker span{display:grid;place-items:center;border:1px solid #898995;border-radius:12px;width:48px;height:48px}.size-picker input:checked+span{background:#272425;color:white}.size-picker input:focus-visible+span{outline:2px solid #0044ad}
 @media(max-width:700px){.has-panel #journey{padding:max(64px,env(safe-area-inset-top)) 0 0}.has-panel .journey-panel{width:100%;border-radius:24px 24px 0 0}.journey-panel:before{content:'';width:32px;height:4px;background:#c9c9d2;border-radius:8px;align-self:center;margin:12px 0 0}.journey-panel header{padding:16px 24px}.panel-body{padding:0 24px max(24px,env(safe-area-inset-bottom))}}
+
+/* Public access and private account panels share the form controls in Figma. */
+.public-mode #journey {
+  padding: 48px 16px 64px;
+  min-height: 0;
+}
+.access-panel, .journey-panel {
+  font-family: var(--ui-font, Arial, sans-serif);
+  font-size: 14px;
+  line-height: 20px;
+}
+.access-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 32px;
+  border-radius: 32px;
+}
+.access-panel:has([data-flow="signup"]) {max-width: 640px;}
+.access-panel header h1, .journey-panel header h1 {
+  font-family: inherit;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+.access-panel header h1 {font-size: 28px; line-height: 36px; margin: 0;}
+.access-panel header p {margin: 8px 0 0; color: var(--muted);}
+.access-panel form, .journey-panel form {gap: 24px;}
+.access-panel .entry-field, .journey-panel .entry-field {
+  min-height: 84px;
+  gap: 8px;
+  padding: 0 31px;
+  border-color: #82828f;
+  font-weight: 500;
+}
+.entry-field input, .entry-field select {
+  font: 400 16px/24px var(--ui-font, Arial, sans-serif);
+}
+.entry-field input {padding-block: 0;}
+.entry-field input::placeholder {color: #70707c; opacity: 1;}
+.entry-field [data-eye] {
+  width: 44px;
+  height: 44px;
+  right: 31px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+}
+.entry-field [data-eye] .icon {width: 20px; height: 20px;}
+.login-fields, .password-recovery, .login-actions {display: grid; gap: 24px;}
+.password-recovery {gap: 8px;}
+.password-recovery a {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  padding-inline: 4px;
+}
+.access-panel .button, .journey-panel .button {font-weight: 500; line-height: 20px;}
+.access-panel .button:not(.primary) {color: var(--ink); text-decoration: none;}
+.access-panel a {color: var(--blue); font-weight: 500;}
+.login-actions {gap: 16px; padding-top: 8px;}
+.auth-alternative {
+  min-height: 44px;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  color: var(--muted);
+}
+.access-panel aside {padding: 16px; font-size: 14px; line-height: 20px;}
+.access-panel aside strong {font-weight: 500;}
+.access-panel aside small {font-size: 12px; line-height: 20px; margin-top: 8px;}
+.access-panel [data-flow="signup"] {gap: 12px;}
+.access-panel [data-flow="signup"] > strong:not(:first-child) {margin-top: 12px;}
+.journey-panel header {flex: none; padding: 32px 32px 24px; gap: 8px;}
+.journey-panel header h1 {font-size: 24px; line-height: 32px;}
+.journey-panel header .icon-button {width: 48px; height: 48px; border-radius: 12px;}
+.journey-panel header .icon {width: 20px; height: 20px;}
+.panel-body {flex: 1 1 auto;}
+.prize-summary {padding: 16px; margin-bottom: 24px;}
+.prize-summary strong {font-size: 20px; line-height: 24px; font-weight: 500;}
+.prize-summary small {font-size: 14px; line-height: 20px; color: var(--muted); margin-top: 8px;}
+.prize-summary > .prize-illustration {width: 64px; height: auto; flex: none;}
+.journey-panel .entry-field select {border: 0; border-radius: 0; padding: 0; background: transparent;}
+.panel-actions {padding: 16px 32px 32px; flex: none;}
+.panel-actions .button {width: 100%;}
+@media (max-width: 700px) {
+  .public-mode #journey {padding: 32px 16px 40px;}
+  .access-panel {padding: 24px;}
+  .access-panel header h1 {font-size: 24px; line-height: 32px;}
+  .access-panel .entry-field, .journey-panel .entry-field {min-height: 72px; padding-inline: 15px;}
+  .entry-field [data-eye] {right: 15px;}
+  .login-actions .primary {margin-block: 4px 12px;}
+  .login-actions {padding-top: 8px;}
+  .journey-panel:before {flex: none; background: var(--line); border-radius: 2px;}
+  .journey-panel header {padding: 12px 24px 24px;}
+  .panel-actions {padding: 16px 24px max(24px, env(safe-area-inset-bottom));}
+}
+
+.journey-panel header {display: block;}
+.panel-title-row {display: flex; align-items: center; justify-content: space-between; gap: 8px;}
+.has-panel .journey-panel.account-panel {width: min(1040px, 100%);}
+.account-panel header {padding-bottom: 32px;}
+.account-panel header h1 {font-size: 40px; line-height: 48px;}
+.account-panel header .icon-button {border-radius: 8px;}
+.account-panel header > p {margin: 16px 0 8px; color: var(--muted);}
+.account-tabs {
+  display: flex;
+  position: relative;
+  max-width: 312px;
+  padding-top: 8px;
+}
+.account-tabs::before {
+  content: "";
+  position: absolute;
+  height: 1px;
+  top: 0;
+  left: -32px;
+  width: min(calc(100vw - 48px), 1040px);
+  background: var(--line);
+}
+.account-tabs a, .settings-links a {
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  line-height: 20px;
+}
+.account-tabs a {
+  display: grid;
+  place-items: center;
+  height: 50px;
+  flex: 1;
+  border-bottom: 1px solid var(--line);
+}
+.account-tabs [aria-current] {border-bottom: 2px solid var(--ink);}
+.account-panel .panel-body {padding-top: 16px;}
+.settings-layout {display: grid; grid-template-columns: 184px minmax(0,1fr); gap: 32px;}
+.settings-links {display: flex; flex-direction: column; gap: 16px; align-self: start;}
+.settings-links a {display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 0 16px; border-radius: 8px;}
+.settings-links [aria-current], .settings-content {background: var(--bg);}
+.settings-content {padding: 24px; border-radius: 24px;}
+.settings-content > h2 {margin: 0 0 16px; font-size: 24px; line-height: 32px; font-weight: 500;}
+.settings-content > p {margin: 0 0 16px; color: var(--muted);}
+.settings-content form {gap: 12px;}
+.settings-mobile-label {display: none;}
+.settings-content .profile-field {display: grid; grid-template-columns: minmax(112px,38%) minmax(0,1fr) 20px; align-items: center; gap: 12px; min-height: 64px;}
+.profile-field:nth-child(3) {margin-top: 12px;}
+.settings-content form .button {justify-self: start; min-width: min(232px,100%); margin-top: 4px;}
+.settings-content .delete-account {border-top: 1px solid var(--line); margin: 16px 0 0; padding-top: 20px;}
+.delete-account a {color: #ac2731;}
+@media (max-width: 700px) {
+  .account-panel header {padding: 8px 24px 24px;}
+  .account-panel header h1 {font-size: 28px; line-height: 36px;}
+  .account-panel header > p, .settings-desktop-label, .settings-links img {display: none;}
+  .account-tabs {max-width: none;}
+  .account-tabs::before {width: 100vw; left: -24px;}
+  .account-panel .panel-body {padding-top: 0;}
+  .settings-layout {display: block;}
+  .settings-links {flex-direction: row; gap: 0; margin-bottom: 16px;}
+  .settings-links a {justify-content: center; flex: 1; padding: 0 3px;}
+  .settings-mobile-label {display: inline;}
+  .settings-content {padding: 0; background: white;}
+  .settings-content .profile-field {display: flex; flex-direction: column; align-items: stretch; gap: 8px; min-height: 72px; padding-right: 48px;}
+  .profile-field img {position: absolute; right: 28px; top: calc(50% - 10px);}
+}
+
+.has-panel .journey-panel.help-panel {width: min(1040px, 100%);}
+.help-panel header {padding-bottom: 8px; border-bottom: 1px solid var(--line);}
+.help-panel header h1 {font-size: 40px; line-height: 48px;}
+.help-panel header p {margin: 16px 0 0; color: var(--muted);}
+.help-panel .panel-body {
+  display: grid;
+  grid-template-columns: 280px minmax(0,1fr);
+  gap: 32px;
+  padding-top: 24px;
+  overflow: hidden;
+}
+.help-contact {background: var(--bg); border-radius: 16px; padding: 16px; align-self: start;}
+.help-contact strong, .faq-list h2 {font-size: 24px; line-height: 32px; font-weight: 500;}
+.help-contact small, .contact-methods b {display: none;}
+.contact-methods {display: grid; gap: 8px; margin-top: 16px;}
+.contact-methods .button {color: var(--ink); text-decoration: none;}
+.faq-list {overflow: auto; overscroll-behavior: contain; min-height: 0;}
+.faq-list h2 {margin: 0;}
+.faq-list details {border-bottom: 1px solid #82828f;}
+.faq-list summary {display: flex; align-items: center; justify-content: space-between; gap: 12px; list-style: none; cursor: pointer; padding: 16px 32px; font-size: 16px; line-height: 21px; font-weight: 500;}
+.faq-list summary::-webkit-details-marker {display: none;}
+.faq-list summary .icon {width: 20px; height: 20px;}
+.faq-list [open] summary .icon {transform: rotate(180deg);}
+.faq-list details p {padding: 16px 32px; margin: 0; line-height: 21px;}
+@media(max-width: 700px) {
+  .help-panel header {padding-top: 8px;}
+  .help-panel header h1 {font-size: 28px; line-height: 36px;}
+  .help-panel header p {margin-top: 8px;}
+  .help-panel .panel-body {display: flex; flex-direction: column; gap: 24px; padding-top: 16px;}
+  .faq-list {flex: 1 1 auto;}
+  .faq-list summary, .faq-list details p {padding-inline: 16px;}
+  .help-contact {order: 2; width: 100%; flex: none; position: relative;}
+  .help-contact::before {content: ""; position: absolute; top: -9px; left: -24px; right: -24px; height: 1px; background: var(--line);}
+  .contact-methods {display: grid; grid-template-columns: 1fr 1fr; gap: 8px;}
+  .contact-methods span, .help-contact strong {display: none;}
+  .help-contact small, .contact-methods b {display: inline; font-weight: 500;}
+  .contact-methods a + a {background: transparent; border-color: transparent;}
+}
