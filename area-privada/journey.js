@@ -298,17 +298,31 @@ function markProfileEdited(event){
 }
 main.addEventListener('input',markProfileEdited);
 main.addEventListener('change',markProfileEdited);
-function confirmLeavingProfile(dirty,destination){
- if(main.querySelector('.discard-profile'))return;
+function confirmAction(title,message,safe,action,cancel,accept){
  const dialog=document.createElement('dialog');
  dialog.className='discard-profile';
- dialog.setAttribute('aria-labelledby','discard-heading');
- dialog.innerHTML='<h2 id="discard-heading">'+t('¿Salir sin guardar?','Leave without saving?')+'</h2><p>'+t('Si sales ahora, perderás los cambios que has hecho.','If you leave now, your changes will be lost.')+'</p><div class="profile-actions"><button type="button" class="button" data-stay>'+t('Seguir editando','Keep editing')+'</button><button type="button" class="button" data-leave>'+t('Salir sin guardar','Leave without saving')+'</button></div>';
+ dialog.setAttribute('aria-labelledby','confirmation-heading');
+ dialog.setAttribute('aria-describedby','confirmation-message');
+ dialog.innerHTML='<h2 id="confirmation-heading"></h2><p id="confirmation-message"></p><div class="confirmation-actions"></div>';
+ dialog.querySelector('h2').textContent=title;
+ dialog.querySelector('p').textContent=message;
+ for(const [label,confirmed] of [[safe,false],[action,true]]){
+   const button=document.createElement('button');
+   button.type='button';button.textContent=label;button.className=confirmed?'confirm':'cancel';
+   button.onclick=()=>dialog.close(confirmed?'accept':'cancel');
+   dialog.lastElementChild.append(button);
+ }
  main.append(dialog);
- dialog.addEventListener('close',()=>dialog.remove(),{once:true});
- dialog.querySelector('[data-stay]').onclick=()=>dialog.close();
- dialog.querySelector('[data-leave]').onclick=()=>{delete dirty.dataset.editRoute;dialog.close();go(destination);};
+ dialog.addEventListener('close',()=>{
+   dialog.remove();
+   if(dialog.returnValue==='accept')accept();else cancel();
+ },{once:true});
  dialog.showModal();
+ dialog.querySelector('.cancel').focus({preventScroll:true});
+}
+function confirmLeavingProfile(dirty,destination){
+ if(main.querySelector('.discard-profile'))return;
+ confirmAction(t('¿Salir sin guardar?','Leave without saving?'),t('Si sales ahora, perderás los cambios que has hecho.','If you leave now, your changes will be lost.'),t('Seguir editando','Keep editing'),t('Salir sin guardar','Leave without saving'),()=>{},()=>{delete dirty.dataset.editRoute;go(destination);});
 }
 window.addEventListener('hashchange',event=>{
  const dirty=main.querySelector('form[data-edit-route]');
@@ -538,7 +552,15 @@ function draw(){
  else if(['history','orders'].includes(page))main.innerHTML=historyPage(page==='orders');
  else if(page==='help')main.innerHTML=help();
  else if(page==='received'&&registered)main.innerHTML=registrationResult();
- else if(page==='logout')main.innerHTML=panel(t('Cerrar sesión','Log out'),'<p>'+t('Tu colección seguirá guardada. Podrás continuar cuando vuelvas a entrar.','Your collection will be saved. You can continue when you sign in again.')+'</p>'+form('logout',submit(t('Cerrar sesión','Log out')))+button(t('Cancelar','Cancel'),'home'));
+ else if(page==='logout'){
+   main.replaceChildren();
+   confirmAction(t('¿Cerrar sesión?','Log out?'),t('Tu colección seguirá guardada. Podrás continuar cuando vuelvas a entrar.','Your collection will be saved. You can continue when you sign in again.'),t('Cancelar','Cancel'),t('Cerrar sesión','Log out'),()=>go('home'),()=>{db.logout();pending=null;registered=null;shipping={};historyFilter='all';go('login');});
+ }
+ else if(page.startsWith('address/delete/')&&savedAddresses(a).some(item=>item.id===page.slice(15))){
+   const item=savedAddresses(a).find(item=>item.id===page.slice(15));
+   main.innerHTML=profile('address');
+   confirmAction(t('¿Eliminar esta dirección?','Delete this address?'),t('Se eliminará '+item.alias+' de tus direcciones guardadas. No cambiará tus pedidos.',item.alias+' will be removed from your saved addresses. Your orders will stay the same.'),t('Cancelar','Cancel'),t('Eliminar dirección','Delete address'),()=>go('address'),()=>submitProfile('delete-address',{addressId:item.id}));
+ }
  else main.innerHTML=profile(page);
  document.title=(collection?t('Mi zona','My zone'):main.querySelector('h1')?.textContent||'OREO')+' · OREO × LALIGA';
 }
