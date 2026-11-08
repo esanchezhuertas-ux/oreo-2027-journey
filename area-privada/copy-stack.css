@@ -1,0 +1,13 @@
+/* Copies emerge and return to the same centre without individual tilt or shadows. */
+.copy-stack{position:absolute;left:50%;top:50%;width:160px;height:232px;margin:-116px 0 0 -80px;pointer-events:none;z-index:0}
+.copy-sheet{position:absolute;inset:0;border-radius:6px 6px 80px 80px;color:#fff;transform:translate(0,0) rotate(0);transform-origin:50% 50%;opacity:0;transition:transform .46s cubic-bezier(.22,.68,.25,1),opacity .38s ease;pointer-events:none}
+.copy-sheet,.copy-sheet>.card-face{box-shadow:none!important;filter:none!important}
+.card-scene:has(>.copy-stack){isolation:isolate}
+.card-scene:has(>.copy-stack)>.holo-card{z-index:1}
+.card-scene:has(>.holo-card:focus-visible:not(.is-lifted))>.copy-stack>.copy-sheet{transform:translate(var(--copy-x),var(--copy-y)) rotate(var(--copy-angle));opacity:var(--copy-opacity)}
+@media(hover:hover) and (pointer:fine){.card-scene:has(>.holo-card:hover:not(.is-lifted))>.copy-stack>.copy-sheet{transform:translate(var(--copy-x),var(--copy-y)) rotate(var(--copy-angle));opacity:var(--copy-opacity)}}
+.card-scene:has(>.holo-card.is-lifted)>.copy-stack>.copy-sheet{opacity:0;transform:none;transition:none}
+@media(max-width:1000px) and (min-width:761px){.copy-stack{scale:.9}}
+@media(max-width:760px){.copy-stack{scale:.825}.club-scroller .copy-stack{scale:.75}}
+@media(max-width:350px){.club-scroller .copy-stack{scale:.68}}
+@media(prefers-reduced-motion:reduce){.copy-sheet{transition:none}}

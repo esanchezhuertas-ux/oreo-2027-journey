@@ -1,0 +1,10 @@
+/* Typeface files supplied by the user, subset for the Spanish prototype. */
+@font-face{font-family:'Gotham Narrow';src:url('assets/fonts/gotham-narrow-book.woff') format('woff');font-style:normal;font-weight:400;font-display:swap}
+@font-face{font-family:'Gotham Narrow';src:url('assets/fonts/gotham-narrow-medium.woff') format('woff');font-style:normal;font-weight:500 600;font-display:swap}
+@font-face{font-family:'Gotham';src:url('assets/fonts/gotham-bold.woff') format('woff');font-style:normal;font-weight:700;font-display:swap}
+@font-face{font-family:'LALIGA Players';src:url('assets/fonts/laliga-players.woff') format('woff');font-style:normal;font-weight:400;font-display:swap}
+@font-face{font-family:'Gotham Narrow Black';src:url('assets/fonts/gotham-narrow-black.woff') format('woff');font-style:normal;font-weight:900;font-display:swap}
+:root{font-family:'Gotham Narrow',Arial,sans-serif}
+h1{font-family:'Gotham','Gotham Narrow',Arial,sans-serif;font-weight:700}
+.card-name,.player-number,.player-position{font-family:'LALIGA Players','Arial Narrow',Arial,sans-serif;font-weight:400;font-synthesis:none}
+.copies-letter{font-family:'Gotham Narrow Black','Arial Narrow',Arial,sans-serif;font-weight:900;font-synthesis:none}
