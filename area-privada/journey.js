@@ -369,7 +369,8 @@ function historyPage(ordersOnly=false){
  });
  for(const order of account.orders){
   rows.push({id:order.id,type:'orders',title:t('Solicitud recibida','Request received'),reference:order.id,time:order.time,
-   description:titleOf(order.reward),detail:[order.shipping?.size,order.shipping?.street,order.shipping?.city].filter(Boolean).map(html).join(' · ')});
+   description:[titleOf(order.reward),order.shipping?.club,order.shipping?.size].filter(Boolean).join(' · '),
+   detail:'<strong>'+t('Referencia y entrega','Reference and delivery')+'</strong><p><code>'+html(order.id)+'</code><br>'+delivery(order.shipping||{})+'</p><strong>'+t('Siguiente paso','Next step')+'</strong><p>'+t('Nos pondremos en contacto contigo a la menor brevedad posible para gestionar tu premio.','We will contact you as soon as possible about your reward.')+'</p>'});
  }
  for(const event of account.profileEvents)rows.push({id:String(event.time),type:'account',time:event.time,title:t(...event.label),description:t('Mi cuenta','My account'),detail:html(account.email)});
  const filters=Object.entries(labels).map(([id,label])=>'<button data-tab="'+id+'" aria-pressed="'+(active===id)+'">'+label+'</button>').join('');
@@ -389,11 +390,11 @@ function prizeSummary(id,choice){
  const variant=[choice.club,choice.size?t('Talla ','Size ')+choice.size:''].filter(Boolean).map(html).join(' · ');
  return '<div class="prize-summary"><img class="prize-illustration" width="64" alt="" src="assets/icons/'+art+'.svg"><div><strong>'+titleOf(id)+'</strong><small>'+t('Por ','For ')+cost(id)+' '+(id==='gold'?t('cromo dorado','gold card'):t('unidades','units'))+'</small>'+(variant?'<small>'+variant+'</small>':'')+'</div></div>';
 }
-function delivery(data){return [data.name+' '+data.surname,data.street,[data.postcode,data.city,data.province].filter(Boolean).join(' · ')].map(html).join('<br>');}
+function delivery(data){return [[data.name,data.surname].filter(Boolean).join(' '),data.street,[data.postcode,data.city,data.province].filter(Boolean).join(' · ')].map(html).join('<br>');}
 function reward(){
  const id=rewardId,a=db.account;
  if(step===3&&receipt){
-  const info=prizeSummary(id,receipt.shipping)+'<h2>'+t('Siguiente paso','Next step')+'</h2><p>'+t('Nos pondremos en contacto contigo lo antes posible para gestionar tu premio.','We will contact you as soon as possible about your reward.')+'</p><h2>'+t('Referencia y entrega','Reference and delivery')+'</h2><p><code>'+html(receipt.id)+'</code></p><p>'+delivery(receipt.shipping)+'</p>';
+  const info=prizeSummary(id,receipt.shipping)+'<h2>'+t('Siguiente paso','Next step')+'</h2><p>'+t('Nos pondremos en contacto contigo a la menor brevedad posible para gestionar tu premio.','We will contact you as soon as possible about your reward.')+'</p><h2>'+t('Referencia y entrega','Reference and delivery')+'</h2><p><code>'+html(receipt.id)+'</code></p><p>'+delivery(receipt.shipping)+'</p>';
   return panel(t('Solicitud recibida','Request received'),info,{kind:'claim-review',actions:'<p>'+t('Puedes consultar esta solicitud en tu historial.','You can find this request in your history.')+'</p>'+button(t('Volver a Mi zona','Back to My zone'),'home',true)});
  }
  if(!canClaim(id))return panel(titleOf(id),'<h2>'+(claimed(id)?t('Ya canjeado','Already redeemed'):t('Progreso','Progress'))+'</h2><p>'+balance(id)+' / '+cost(id)+' '+(id==='gold'?t('cromos dorados','gold cards'):t('unidades disponibles','available units'))+'</p>'+button(t('Volver a Mi zona','Back to My zone'),'home'));

@@ -92,6 +92,7 @@
       entry.copies++;
       entry.available+=Number(!copy.used);
       entry.records.push(copy);
+      entry.latestObtainedAt=Math.max(entry.latestObtainedAt||0,copy.time||0);
       if(copy.rarity==='gold')entry.type='gold';
       entry.daysAgo=Math.min(entry.daysAgo,Math.max(0,Math.floor((now-copy.time)/day)));
       entry.isNew=entry.daysAgo===0;

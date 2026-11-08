@@ -89,8 +89,8 @@ function render(){
  $$('[data-total-unique]').forEach(e=>e.textContent=unique+'/80');
  $$('[data-total-available]').forEach(e=>e.textContent=players.reduce((n,p)=>n+p.available,0));
  const list=filter(), grid=$('#card-results');
- $('#results-count').textContent=`${new Set(list.map(p=>p.playerId)).size} ${new Set(list.map(p=>p.playerId)).size===1?'cromo único':'cromos únicos'}${state.gold?' · Dorados':''}${state.available?' · Canjeables':''}`;
- $('#sort-label').textContent=state.view==='clubs'?'Club y posición':state.sort==='name'?'Nombre A–Z':'Más recientes';
+ $('#results-count').textContent=`${new Set(list.map(p=>p.playerId)).size} ${new Set(list.map(p=>p.playerId)).size===1?'cromo único':'cromos únicos'}${state.gold?' · Dorados':''}${state.available?' · Solo disponibles':''}`;
+ $('#sort-label').textContent=state.view==='clubs'?'Club y posición':state.sort==='name'?'Nombre A–Z':state.sort==='oldest'?'Más antiguos primero':'Más recientes primero';
  $('#available-toggle').checked=state.available;$('#clear-search').hidden=!state.q;
  $('#grid-view').setAttribute('aria-pressed',String(state.view==='grid'));$('#clubs-view').setAttribute('aria-pressed',String(state.view==='clubs'));
  $('#mobile-view').innerHTML=icon(state.view==='grid'?'shield':'grid');$('#mobile-view').setAttribute('aria-label',state.view==='grid'?'Cambiar a vista clubs':'Cambiar a vista cuadrícula');
@@ -132,7 +132,7 @@ $('#card-results').addEventListener('click',e=>{
  const step=el.clientWidth+parseFloat(getComputedStyle(el).columnGap);
  el.scrollTo({left:Number(pair.dataset.index)*step,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});
 });
-function renderChips(){const chips=[];if(state.club)chips.push(['club',clubs[state.club]]);state.positions.forEach(p=>chips.push(['position:'+p,positions[p]]));if(state.gold)chips.push(['gold','Solo dorados']);if(state.date!=='all')chips.push(['date',{today:'Hoy',week:'Últimos 7 días',month:'Últimos 30 días'}[state.date]]);if(state.available)chips.push(['available','Canjeables']);const e=$('#active-filters');e.hidden=!chips.length;e.innerHTML=chips.map(([key,label])=>`<button class="filter-chip" data-remove="${key}" aria-label="Quitar filtro ${label}">${label}${icon('close')}</button>`).join('')+(chips.length?'<button class="clear-all" data-clear-filters>Limpiar filtros</button>':'');$('#filter-count').textContent=chips.length;$('#filter-count').hidden=!chips.length;}
+function renderChips(){const chips=[];if(state.club)chips.push(['club',clubs[state.club]]);state.positions.forEach(p=>chips.push(['position:'+p,positions[p]]));if(state.gold)chips.push(['gold','Solo dorados']);if(state.date!=='all')chips.push(['date',{today:'Hoy',week:'Últimos 7 días',month:'Últimos 30 días'}[state.date]]);if(state.available)chips.push(['available','Solo disponibles']);const e=$('#active-filters');e.hidden=!chips.length;e.innerHTML=chips.map(([key,label])=>`<button class="filter-chip" data-remove="${key}" aria-label="Quitar filtro ${label}">${label}${icon('close')}</button>`).join('')+(chips.length?'<button class="clear-all" data-clear-filters>Limpiar filtros</button>':'');$('#filter-count').textContent=chips.length;$('#filter-count').hidden=!chips.length;}
 const mobileSheet=matchMedia('(max-width:760px)');
 function closeDialog(dialog){
  if(dialog.id==='card-dialog'&&window.ModalMotion?.dismiss){if(dialog.dataset.closing)return;dialog.dataset.closing='true';window.ModalMotion.dismiss(dialog).then(handled=>{if(!handled)dialog.close();}).catch(()=>dialog.close());return;}

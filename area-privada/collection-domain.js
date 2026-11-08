@@ -15,6 +15,7 @@
   function filterCollection(players, state) {
     const query = normalizeSearch(state.q?.trim());
     const limit = dateLimits[state.date] ?? Infinity;
+    const latest=player=>player.latestObtainedAt ?? -player.daysAgo*86400000;
     return players.filter((player) =>
       player.copies > 0 &&
       (!state.selectedPlayer || player.id === state.selectedPlayer) &&
@@ -27,7 +28,7 @@
       (state.date === 'all' || player.daysAgo < limit)
     ).sort((a, b) => state.sort === 'name'
       ? a.name.localeCompare(b.name, 'es')
-      : a.daysAgo - b.daysAgo);
+      : state.sort === 'oldest' ? latest(a)-latest(b) : latest(b)-latest(a));
   }
 
   const api = Object.freeze({ filterCollection, normalizeSearch });
