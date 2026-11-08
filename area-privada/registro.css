@@ -9,14 +9,7 @@
 #register-dialog .register-close {
   top: 12px;
   right: 12px;
-  width: 48px;
-  height: 48px;
-  padding: 14px;
-  border: 0;
-  border-radius: 12px;
-  background: #f8f8fa;
 }
-#register-dialog .register-close .icon { width: 20px; height: 20px; }
 #register-dialog #register-form { gap: 24px; padding-bottom: 64px; }
 #register-dialog #register-title { font: 500 24px/36px var(--ui-font, Arial, sans-serif); }
 #register-dialog .code-help { color: #555560; font: 400 14px/20px var(--ui-font, Arial, sans-serif); }
@@ -123,12 +116,8 @@
 .registration-receipt .receipt-close {
   position: absolute;
   top: 12px; right: 12px;
-  width: 48px; height: 48px;
-  background: #f8f8fa;
-  border-radius: 12px;
   z-index: 1;
 }
-.receipt-close .icon { width:20px; height:20px; }
 .receipt-handle { display:none; }
 .receipt-body {
   min-height: 0;

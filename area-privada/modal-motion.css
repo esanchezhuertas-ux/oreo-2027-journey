@@ -70,8 +70,7 @@
 #card-dialog .redeem-action{grid-row:4;margin:0;background:white}
 #card-dialog .redeem-action .button{height:48px}
 #card-dialog .redeem-feedback{position:absolute}
-#card-dialog .detail-close{position:absolute;right:32px;top:12px;width:48px;height:48px;background:var(--bg);border:0;border-radius:12px}
-#card-dialog .detail-close .icon{width:20px;height:20px}
+#card-dialog .detail-close{position:absolute;right:32px;top:12px}
 #card-dialog.modal-intro :is(.detail-rarities,.detail-close,.sheet-handle){visibility:hidden}
 @media(max-width:760px){
  #card-dialog{width:100%;max-width:none;height:calc(100dvh - max(72px,env(safe-area-inset-top)));max-height:none;border-radius:24px 24px 0 0;padding:60px 24px max(24px,env(safe-area-inset-bottom))}

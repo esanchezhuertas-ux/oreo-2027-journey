@@ -15,3 +15,30 @@ details[open] > summary > .icon-chevron { transform: rotate(180deg); }
 .toolbar-button .icon,
 .toolbar > .icon-button .icon,
 #menu-button .icon { width: 20px; height: 20px; }
+
+/* Shared Figma SM close button for sheets, dialogs and routed panels. */
+.icon-button.panel-dismiss {
+  display: inline-flex;
+  flex: 0 0 48px;
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  padding: 0;
+  border-radius: 12px;
+  background: #f8f8fa;
+  color: #272425;
+}
+.panel-dismiss::before {
+  content: "";
+  display: block;
+  width: 20px;
+  height: 20px;
+  background: currentColor;
+  -webkit-mask: url('assets/icons/panel-close.svg') center / contain no-repeat;
+  mask: url('assets/icons/panel-close.svg') center / contain no-repeat;
+}
+.icon-button.panel-dismiss:hover { background: #efeff3; }

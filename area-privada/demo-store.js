@@ -101,7 +101,7 @@
   }
   function register(raw){
     const a=db.account, code=raw.trim().toUpperCase();
-    if(!a || !/^(?:ALLCARD080|ALLGOLD080|(?:066|158|GLD)[A-Z0-9]{7})$/.test(code))return {error:'invalid'};
+    if(!a || !/^(?:ALLCARD080|ALLGOLD080|(?:066|158|160|220|140|GLD)[A-Z0-9]{7})$/.test(code))return {error:'invalid'};
     if(a.codes.includes(code))return {error:'duplicate'};
     const gold=code==='ALLGOLD080'||code.startsWith('GLD');
     const n=code.startsWith('066')?2:code.startsWith('158')?3:1;

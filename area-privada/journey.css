@@ -122,7 +122,6 @@
 .access-panel [data-flow="signup"] > strong:not(:first-child) {margin-top: 12px;}
 .journey-panel header {flex: none; padding: 32px 32px 24px; gap: 8px;}
 .journey-panel header h1 {font-size: 24px; line-height: 32px;}
-.journey-panel header .icon-button {width: 48px; height: 48px; border-radius: 12px;}
 .journey-panel header .icon {width: 20px; height: 20px;}
 .panel-body {flex: 1 1 auto;}
 .prize-summary {padding: 16px; margin-bottom: 24px;}
@@ -150,7 +149,6 @@
 .has-panel .journey-panel.account-panel {width: min(1040px, 100%);}
 .account-panel header {padding-bottom: 32px;}
 .account-panel header h1 {font-size: 40px; line-height: 48px;}
-.account-panel header .icon-button {border-radius: 8px;}
 .account-panel header > p {margin: 16px 0 8px; color: var(--muted);}
 .account-tabs {
   display: flex;

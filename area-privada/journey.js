@@ -39,13 +39,35 @@ const date=time=>new Intl.DateTimeFormat(db.lang==='es'?'es-ES':'en-GB').format(
 function authPage(title,desc,body){return '<section class="access-panel"><header><h1>'+title+'</h1><p>'+desc+'</p></header>'+body+'</section>';}
 function form(id,body){return '<form data-flow="'+id+'">'+body+error()+'</form>';}
 const dialCodes = ['+34','+33','+351','+39','+44','+49','+353','+32','+31','+41','+1','+52','+54','+56','+57','+58','+51','+55'];
-function phoneField(value='', {required=true, label=t('Teléfono móvil','Mobile number')}={}) {
+let phoneFieldIndex=0;
+function formatNationalPhone(number,dialCode){
+ const digits=String(number).replace(/[\s().-]/g,'');
+ return dialCode==='+34'&&/^\d{9}$/.test(digits)
+   ? digits.match(/.{3}/g).join(' ')
+   : number;
+}
+function phoneField(value='', {required=true, label=t('Teléfono móvil','Mobile number'),inline=false}={}) {
  const compact=String(value||'').replace(/[\s().-]/g,'');
  const code=dialCodes.find(prefix=>compact.startsWith(prefix))||'+34';
  const number=compact.startsWith(code)?compact.slice(code.length):compact;
+ const id='national-phone-'+(++phoneFieldIndex);
  const options=dialCodes.map(prefix=>'<option value="'+prefix+'" '+(prefix===code?'selected':'')+'>'+prefix+'</option>').join('');
- return '<div class="entry-field phone-field"><label>'+label+'</label><div class="phone-entry"><span class="phone-prefix"><select name="dialCode" aria-label="'+t('Prefijo internacional','International calling code')+'">'+options+'</select>'+ui.icon('chevron')+'</span><input name="phone" aria-label="'+label+'" type="tel" inputmode="tel" autocomplete="tel-national" placeholder="612 345 678" value="'+html(number)+'" '+(required?'required':'')+'></div></div>';
+ const edit=inline?'<button type="button" class="edit-phone" aria-controls="'+id+'" aria-label="'+t('Editar teléfono','Edit phone number')+'">'+ui.icon('pencil')+'</button>':'';
+ return '<div class="entry-field phone-field'+(inline?' inline-phone':'')+'"><label for="'+id+'">'+label+'</label><div class="phone-entry"><span class="phone-prefix"><select name="dialCode" aria-label="'+t('Prefijo internacional','International calling code')+'">'+options+'</select>'+ui.icon('chevron')+'</span><input id="'+id+'" name="phone" type="tel" inputmode="tel" autocomplete="tel-national" placeholder="612 345 678" value="'+html(formatNationalPhone(number,code))+'" '+(required?'required':'')+'></div>'+edit+'</div>';
 }
+main.addEventListener('focusout',event=>{
+ const input=event.target;
+ if(input.matches('.phone-entry [name="phone"]')){
+   input.value=formatNationalPhone(input.value,input.form.elements.dialCode.value);
+ }
+});
+main.addEventListener('click',event=>{
+ const edit=event.target.closest('.edit-phone');
+ if(!edit)return;
+ const input=document.getElementById(edit.getAttribute('aria-controls'));
+ input.focus();
+ input.select();
+});
 const privacyUrl='https://privacy.mondelezinternational.com/eu/es-ES/privacy-notice/';
 function preferenceControls(values={}) {
  const rows=[
@@ -150,7 +172,7 @@ function home(){
  },{passive:true});
 }
 function panel(title,body,{kind='',intro='',tabs='',actions=''}={}){
- return '<section class="journey-panel '+kind+'" role="dialog" aria-modal="true" aria-labelledby="panel-title"><header><div class="panel-title-row"><h1 id="panel-title">'+title+'</h1><button class="icon-button" data-route="home" aria-label="'+t('Cerrar','Close')+'">'+ui.icon('close')+'</button></div>'+(intro?'<p>'+intro+'</p>':'')+tabs+'</header><div class="panel-body">'+body+'</div>'+(actions?'<div class="panel-actions">'+actions+'</div>':'')+'</section>';
+ return '<section class="journey-panel '+kind+'" role="dialog" aria-modal="true" aria-labelledby="panel-title"><header><div class="panel-title-row"><h1 id="panel-title">'+title+'</h1><button class="icon-button panel-dismiss" data-route="home" aria-label="'+t('Cerrar','Close')+'"></button></div>'+(intro?'<p>'+intro+'</p>':'')+tabs+'</header><div class="panel-body">'+body+'</div>'+(actions?'<div class="panel-actions">'+actions+'</div>':'')+'</section>';
 }
 function accountPanel(content,section){
  const history=section==='history';
@@ -194,7 +216,7 @@ function personalData(a){
  const rows=accountField('name',t('Nombre','First name'),a.name,{inline:true,editIcon:true,auto:'given-name'})+
    accountField('surname',t('Apellidos','Last name'),a.surname,{inline:true,editIcon:true,auto:'family-name'})+
    accountField('email',t('Correo electrónico','Email address'),a.pendingEmail||a.email,{type:'email',inline:true,editIcon:true,auto:'email'})+
-   phoneField(a.phone,{required:false,label:t('Teléfono (opcional)','Phone (optional)')});
+   phoneField(a.phone,{required:false,label:t('Teléfono','Phone'),inline:true});
  const closeLink='<p class="delete-account">'+t('Si quieres eliminar tus datos permanentemente,','To permanently delete your data,')+' <a href="#remove">'+t('cierra la cuenta.','close your account.')+' '+ui.icon('trash')+'</a></p>';
  return settingsView('profile',t('Datos personales','Personal details'),t('Mantén tus datos al día para gestionar tu cuenta y tus premios.','Keep your details up to date to manage your account and rewards.'),
    profileFeedback()+notice+form('edit',rows+'<p class="profile-hint">'+hint+'</p><button type="submit" class="button" disabled>'+t('Guardar cambios','Save changes')+'</button>')+status+privacy+closeLink);
@@ -232,7 +254,7 @@ function addressScreen(page){
 }
 function contextLayer(base,title,intro,content,back){
  const shell=base.replace('<section class="journey-panel','<section inert aria-hidden="true" class="journey-panel').replace('aria-modal="true"','aria-modal="false"');
- return shell+'<div class="profile-overlay"><section role="dialog" aria-modal="true" aria-labelledby="subpanel-title" class="profile-dialog" data-parent="'+back+'"><div class="profile-dialog-header"><h2 id="subpanel-title">'+title+'</h2><a class="icon-button" href="#'+back+'" aria-label="'+t('Cerrar','Close')+'">'+ui.icon('close')+'</a></div><p>'+intro+'</p>'+content+'</section></div>';
+ return shell+'<div class="profile-overlay"><section role="dialog" aria-modal="true" aria-labelledby="subpanel-title" class="profile-dialog" data-parent="'+back+'"><div class="profile-dialog-header"><h2 id="subpanel-title">'+title+'</h2><a class="icon-button panel-dismiss" href="#'+back+'" aria-label="'+t('Cerrar','Close')+'"></a></div><p>'+intro+'</p>'+content+'</section></div>';
 }
 function profile(page){
  const a=db.account;
@@ -372,10 +394,16 @@ function historyPage(ordersOnly=false){
    description:[titleOf(order.reward),order.shipping?.club,order.shipping?.size].filter(Boolean).join(' · '),
    detail:'<strong>'+t('Referencia y entrega','Reference and delivery')+'</strong><p><code>'+html(order.id)+'</code><br>'+delivery(order.shipping||{})+'</p><strong>'+t('Siguiente paso','Next step')+'</strong><p>'+t('Nos pondremos en contacto contigo a la menor brevedad posible para gestionar tu premio.','We will contact you as soon as possible about your reward.')+'</p>'});
  }
- for(const event of account.profileEvents)rows.push({id:String(event.time),type:'account',time:event.time,title:t(...event.label),description:t('Mi cuenta','My account'),detail:html(account.email)});
+ const eventIds=new Set();
+ account.profileEvents.forEach((event,i)=>{
+  const key=String(event.time);
+  const id=eventIds.has(key)?'account-'+i+'-'+key:key;
+  eventIds.add(key);
+  rows.push({id,type:'account',time:event.time,title:t(...event.label),description:t('Mi cuenta','My account'),detail:html(account.email)});
+ });
  const filters=Object.entries(labels).map(([id,label])=>'<button data-tab="'+id+'" aria-pressed="'+(active===id)+'">'+label+'</button>').join('');
- const formatter=new Intl.DateTimeFormat(db.lang==='en'?'en-GB':'es-ES',{day:'numeric',month:'long',year:'numeric'});
- const list=rows.filter(row=>active==='all'||row.type===active).sort((a,b)=>(b.time||0)-(a.time||0)).map((row,i)=>{
+ const formatter=new Intl.DateTimeFormat(db.lang==='en'?'en-GB':'es-ES',{day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'});
+ const list=rows.reverse().filter(row=>active==='all'||row.type===active).sort((a,b)=>(b.time||0)-(a.time||0)).map((row,i)=>{
   const read=(account.readActivity||[]).includes(row.id),open=expanded===row.id;
   const refLabel=row.type==='orders'?t('Ref.','Ref.'):t('Código:','Code:');
   const reference=row.reference?'<div class="activity-reference"><img src="assets/history/qr.svg" width="20" height="20" alt="">'+refLabel+' <code>'+html(row.reference)+'</code><button data-copy="'+html(row.reference)+'" aria-label="'+t('Copiar','Copy')+' '+html(row.reference)+'">'+ui.icon('copy')+'</button></div>':'';
@@ -471,7 +499,7 @@ function registrationResult() {
  const carousel = count>1 ? `<div class="receipt-paging"><button type="button" data-receipt-step="-1" aria-label="${t('Cromo anterior','Previous card')}">${ui.icon('back')}</button><span aria-live="polite">${label(index)}</span><button type="button" data-receipt-step="1" aria-label="${t('Cromo siguiente','Next card')}">${ui.icon('forward')}</button></div>` : '';
  return `<section class="registration-receipt" role="dialog" aria-modal="true" aria-labelledby="receipt-title">
    <button class="receipt-handle" type="button" aria-label="${t('Cerrar','Close')}"><span></span></button>
-   <button class="icon-button receipt-close" data-route="home" aria-label="${t('Cerrar registro','Close code registration')}">${ui.icon('close')}</button>
+   <button class="icon-button panel-dismiss receipt-close" data-route="home" aria-label="${t('Cerrar registro','Close code registration')}"></button>
    <div class="receipt-body">
      <div class="receipt-stage">${receiptPreview()}</div>${carousel}
      <div class="receipt-feedback">

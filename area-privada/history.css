@@ -5,7 +5,7 @@
 .activity-filters {display:flex;gap:4px}
 .activity-filters button {height:48px;width:104px;padding:0 8px;color:#272425;background:#f8f8fa;border:1.5px solid transparent;border-radius:8px;font:500 14px/20px var(--ui-font)}
 .activity-filters button[aria-pressed=true] {background:white;border-color:#dedee4}
-.activity-list {max-height:530px;overflow:auto;overscroll-behavior:contain;border:1px solid #dedee4;border-radius:16px}
+.activity-list {border:1px solid #dedee4;border-radius:16px}
 .activity-row {display:grid;gap:4px;padding:12px 16px;border-bottom:1px solid #dedee4}
 .activity-row:last-child {border:0}
 .activity-row[data-read=true] {background:#f8f8fa}
@@ -24,7 +24,7 @@
 .activity-detail {padding:12px 0 0;margin-top:8px;border-top:1px solid #dedee4}
 .activity-empty {padding:24px}
 @media(max-width:760px) {
- .activity-list {max-height:350px}
+
  .activity-filters {display:grid;grid-template-columns:minmax(0,64px) minmax(0,80px) minmax(0,72px) minmax(0,80px)}
  .activity-filters button {width:100%;padding:0}
  .activity-heading {align-items:flex-start;flex-direction:column}
@@ -47,3 +47,10 @@
  .activity-read{grid-column:2;grid-row:2}
  .activity-detail{grid-column:1/-1}
 }
+
+/* Keep the native scrollbar in the outer margin of the Figma panel. */
+.account-panel:has(.activity-feed){container-type:inline-size;--history-inset:32px}
+.account-panel:has(.activity-feed) .panel-body{min-height:0;overflow-y:auto;overscroll-behavior-y:contain;padding-inline-end:0;padding-bottom:max(var(--history-inset),env(safe-area-inset-bottom))}
+.activity-feed{width:min(100%,calc(100cqi - var(--history-inset) - var(--history-inset)))}
+@media(max-width:700px){.account-panel:has(.activity-feed){--history-inset:24px}}
+.activity-list{overflow:clip}

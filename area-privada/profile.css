@@ -39,7 +39,6 @@
 .profile-dialog {width:min(808px,100%);padding:24px;box-sizing:border-box;border-radius:24px;background:white;max-height:calc(100dvh - 48px);overflow:auto;overscroll-behavior:contain;display:grid;gap:16px;font:400 16px/24px var(--ui-font,Arial,sans-serif);}
 .profile-dialog-header {display:flex; align-items:center; justify-content:space-between; gap:12px;}
 .profile-dialog h2 {font-size:24px; line-height:32px; font-weight:500; margin:0;}
-.profile-dialog-header > .icon-button {min-width:48px; min-height:48px; background:var(--bg); border-radius:8px; color:var(--ink);}
 .profile-dialog-header .icon {width:20px;height:20px;}
 .profile-dialog form {display:grid;gap:16px;}
 .profile-dialog > p {margin:0;color:var(--muted);}
@@ -58,3 +57,69 @@
 .discard-profile p {margin:0 0 16px;}
 .discard-profile::backdrop {background:#15131952;}
 @media(max-width:700px){.discard-profile{inset:auto 0 0;width:100%;border-radius:24px 24px 0 0;padding-bottom:max(24px,env(safe-area-inset-bottom));}.discard-profile .profile-actions{flex-direction:column;align-items:stretch;}}
+
+/* Shared identity/contact fields, including the single-row profile telephone. */
+.settings-content {container-type: inline-size;}
+.settings-content form[data-flow="edit"] {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+}
+.settings-content [data-flow="edit"] .profile-hint {margin: 4px 0 0;}
+.settings-content [data-flow="edit"] .profile-field > img {justify-self: center;}
+.settings-content [data-flow="edit"] .inline-phone {
+  display: grid;
+  grid-template-columns: min(164px, 26%) minmax(0, 1fr) 44px;
+  align-items: center;
+  gap: 12px;
+  min-height: 64px;
+  padding: 0 31px;
+}
+.inline-phone > label {min-width: 0; overflow-wrap: anywhere; cursor: text;}
+.inline-phone .phone-prefix {width: 76px;}
+.phone-field .phone-prefix select {height: 44px;}
+.phone-field .phone-prefix {height: 24px;}
+.inline-phone .phone-entry {gap: 12px;}
+.inline-phone .edit-phone {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  color: var(--ink);
+  background: transparent;
+}
+.inline-phone .edit-phone .icon {width: 20px; height: 20px;}
+@media (min-width: 701px) {
+  .settings-content [data-flow="edit"] .profile-field {
+    grid-template-columns: min(252px, 40%) minmax(0, 1fr) 44px;
+    gap: 12px;
+    padding-inline: 31px;
+  }
+}
+@container (max-width: 459px) {
+  .settings-content [data-flow="edit"] .inline-phone {
+    grid-template-columns: max-content minmax(0, 1fr) 44px;
+    gap: 6px;
+    min-height: 64px;
+    padding-inline: 15px;
+  }
+  .inline-phone > label {white-space: nowrap;}
+  .inline-phone .phone-prefix {width: 58px;}
+  .inline-phone .phone-prefix select {padding-right: 16px;}
+  .inline-phone .phone-prefix .icon {right: 1px; width: 14px; height: 14px;}
+  .inline-phone .phone-entry {gap: 4px;}
+}
+@container (max-width: 279px) {
+  .settings-content [data-flow="edit"] .inline-phone {
+    grid-template-columns: max-content minmax(0, 1fr) 32px;
+    padding-inline: 8px;
+    gap: 4px;
+  }
+  .inline-phone > label {font-size: 13px;}
+  .inline-phone .phone-prefix {width: 54px;}
+  .inline-phone .phone-entry {gap: 4px;}
+  .inline-phone .edit-phone {width: 32px;}
+}
