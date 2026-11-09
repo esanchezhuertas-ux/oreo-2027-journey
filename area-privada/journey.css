@@ -315,3 +315,13 @@
 .signup-group:has([name="confirm"]) .entry-field + .entry-field {margin-top:8px;}
 .mandatory-consent {display:grid;gap:4px;}
 @media (max-width:700px){.signup-actions .primary {margin-block:4px 12px;}}
+@media(min-width:761px){
+ .public-mode .access-panel{width:clamp(480px,41.6667vw,600px)}
+ .public-mode .access-panel:has([data-flow="signup"]){width:clamp(512px,44.4444vw,640px)}
+}
+.auth-result header{display:grid;justify-items:center;text-align:center;gap:20px;padding:8px 0}
+.auth-result header p{margin:0;font-size:16px;line-height:24px}
+.auth-success{display:grid;place-items:center;width:96px;height:96px;border-radius:50%;background:#d9f3e6;color:#219969}
+.auth-success svg{width:48px;height:48px}
+.auth-result>.button,.auth-result>a{margin:0;text-align:center}
+@media(max-width:700px){.auth-success{width:80px;height:80px}.auth-success svg{width:40px;height:40px}}

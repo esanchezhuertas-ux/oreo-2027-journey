@@ -12,7 +12,7 @@ const button = (text,target,primary=false) => '<button class="button '+(primary?
 const link = (text,target) => '<a href="#'+target+'">'+text+'</a>';
 const t=translate;
 const fields={
- email:['Correo electrónico','Email address','email','tu@correo.com'],
+ email:['Correo electrónico','Email address','email','nombre@ejemplo.com'],
  password:['Contraseña','Password','password','Tu contraseña'],
  name:['Nombre','First name','text','Escribe tu nombre'],surname:['Apellidos','Last name','text','Escribe tus apellidos'],
  phone:['Teléfono móvil','Mobile number','tel','+34'],street:['Dirección','Address','text',''],
@@ -104,20 +104,24 @@ compactAccess.addEventListener('change',()=>{
  const actions=main.querySelector('.login-actions');
  if(actions)actions.append(actions.querySelector(compactAccess.matches?'.auth-sms':'.auth-alternative'));
 });
+function authResult(title,message,actions){
+ return '<section class="access-panel auth-result"><header><span class="auth-success" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m4 12 5.5 5.5L20 7" fill="none" stroke="currentColor" stroke-width="2.2"/></svg></span><h1>'+title+'</h1><p>'+message+'</p></header>'+actions+'</section>';
+}
 function auth(page){
  if(page==='signup')return signupPage();
  if(page==='sms')return authPage(t('Entra con un SMS','Sign in with SMS'),t('Introduce el móvil verificado de tu cuenta. Te enviaremos un código de un solo uso.','Enter your verified mobile number. We will send a single-use code.'),form('sms',phoneField(pending?.mode==='sms'?pending.acc?.phone:'')+'<small class="signup-note">'+t('Usa el número que vinculaste al crear tu cuenta.','Use the number linked when you created your account.')+'</small>'+submit(t('Enviar SMS','Send SMS')))+link(t('Usar mi contraseña','Use my password'),'login'));
  if(page==='recover')return authPage(t('Recuperar contraseña','Recover password'),t('Introduce el correo asociado a tu cuenta.','Enter your account email address.'),form('recover',field('email')+submit(t('Enviar enlace','Send link')))+link(t('Volver a iniciar sesión','Back to sign in'),'login'));
  if(page==='verify'&&pending&&['sms','signup'].includes(pending.mode))return verifyPage();
- if(page==='created')return authPage(t('Cuenta creada correctamente','Account created successfully'),t('Tu cuenta está creada y tu móvil verificado. Ya puedes entrar en Mi zona.','Your account is ready and your mobile is verified. You can now sign in to access My zone.'),button(t('Iniciar sesión','Sign in'),'login',true));
- if(page==='recover-sent')return authPage(t('Revisa tu correo','Check your email'),t('Si existe una cuenta con ese correo, recibirás un enlace para crear una nueva contraseña.','If an account exists for this address, you will receive a password reset link.'),(pending?.acc?button(t('Abrir enlace de prueba','Open demo link'),'reset',true):'')+link(t('Volver a iniciar sesión','Back to sign in'),'login')+link(t('Probar con otro correo','Try another address'),'recover'));
+ if(page==='created')return authResult(t('Cuenta creada correctamente','Account created successfully'),t('Tu cuenta está creada y tu móvil verificado. Ya puedes entrar en Mi zona.','Your account is ready and your mobile is verified. You can now sign in to access My zone.'),button(t('Iniciar sesión','Sign in'),'login',true));
+ if(page==='recover-sent')return authResult(t('Revisa tu correo','Check your email'),t('Si existe una cuenta con ese correo, recibirás un enlace para crear una nueva contraseña.','If an account exists for this address, you will receive a password reset link.'),(pending?.acc?button(t('Abrir enlace de prueba','Open demo link'),'reset',true):'')+link(t('Volver a iniciar sesión','Back to sign in'),'login')+link(t('Probar con otro correo','Try another address'),'recover'));
+ if(page==='reset-done')return authResult(t('Contraseña actualizada','Password updated'),t('Tu contraseña se ha actualizado. Inicia sesión con la nueva contraseña para volver a Mi zona.','Sign in with your new password to return to My zone.'),button(t('Volver a iniciar sesión','Back to sign in'),'login',true));
  if(page==='reset'&&pending?.mode==='recover'&&pending.acc)return authPage(t('Restablecer contraseña','Reset password'),t('Define tu nueva contraseña para esta cuenta de prueba.','Set a new password for this demo account.'),form('reset',field('password')+field('confirm')+submit(t('Guardar contraseña','Save password'))));
  const newAccountLink='<p class="auth-alternative">'+t('¿No tienes cuenta?','Don’t have an account?')+' '+link(t('Crea una cuenta','Create an account'),'signup')+'</p>';
  const smsLink='<a href="#sms" class="button auth-sms">'+t('Entrar con SMS','Sign in with SMS')+'</a>';
  const loginFields='<div class="login-fields">'+field('email')+'<div class="password-recovery">'+field('password')+link(t('Recuperar contraseña','Recover password'),'recover')+'</div></div>';
  const loginActions='<div class="login-actions">'+submit(t('Iniciar sesión','Sign in'))+(compactAccess.matches?newAccountLink+smsLink:smsLink+newAccountLink)+'</div>';
  return authPage(t('Iniciar sesión','Sign in'),t('Entra para continuar tu colección y consultar tus premios.','Sign in to continue your collection and check your rewards.'),
- form('login',loginFields+loginActions)+'<aside><strong>'+t('¿No puedes entrar?','Can’t sign in?')+'</strong><small>'+t('Recupera tu contraseña o entra con el móvil verificado de tu cuenta.','Recover your password or sign in with your verified mobile number.')+'</small></aside>');
+ form('login',loginFields+loginActions));
 
 }
 function welcome(){
@@ -643,7 +647,7 @@ main.addEventListener('submit',async e=>{
      db.logout();pending=null;go('created');
    }else if(pending.mode==='sms'){db.smsLogin(pending.acc);pending=null;go('home');}
  }
- if(mode==='reset'){await db.password(pending.acc,v.password);pending=null;go('login');}
+ if(mode==='reset'){await db.password(pending.acc,v.password);pending=null;go('reset-done');}
  if(mode==='logout'){db.logout();pending=null;registered=null;shipping={};historyFilter='all';go('login');}
  if(a&&['password','edit','address','remove','profile-email','profile-recover','profile-reset','delete-address','profile-prefs'].includes(mode)){
    const keepDraft=f.dataset.editRoute;delete f.dataset.editRoute;
