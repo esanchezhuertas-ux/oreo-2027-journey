@@ -34,9 +34,9 @@
 .card-tile .holo-card[data-redeemed=true] :is(.holo-foil,.holo-glare,.holo-sparkles){display:none}
 /* Redeemed gallery copies retain a diffuse pearl reflection over the original art. */
 .card-tile .holo-card[data-redeemed=true] .card-face::after{
- content:"";position:absolute;inset:0;z-index:4;border-radius:inherit;pointer-events:none;
- background:linear-gradient(118deg,#bd93d8 8%,#85c9e4 34%,#9ed9af 57%,#efd89c 80%,#e7a1bf) var(--fx) var(--fy)/190% 160%;
- mix-blend-mode:multiply;opacity:calc(.25 + var(--glow)*.27)
+ content:"";position:absolute;inset:0;z-index:2;border-radius:inherit;pointer-events:none;
+ background:linear-gradient(118deg,transparent 33%,#addbe12b 39%,#fff9eaad 48%,#dccfea45 55%,transparent 64%) var(--fx) var(--fy)/230% 180%;
+ mix-blend-mode:screen;opacity:calc(.10 + var(--glow)*.68)
 }
 .holo-card:focus-visible{outline:3px solid #0042aa;outline-offset:7px;box-shadow:none}
 @media(prefers-reduced-motion:reduce){.holo-card,.holo-card.holo-active{transform:none!important;transition:none;will-change:auto}.holo-foil,.holo-glare,.holo-sparkles{transition:none}}
