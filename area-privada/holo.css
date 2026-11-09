@@ -12,15 +12,16 @@
 .holo-card .holo-sparkles{opacity:0}
 .holo-card.gold .holo-foil{
  z-index:2;
- mask:url("assets/gold-etch.svg?v=ridges2") center/100% 100% no-repeat;
- background:radial-gradient(ellipse at var(--hx) var(--hy),#fffef1 2%,#fff9c5 25%,#a47e35 52%,#fff1a4 81%);
- mix-blend-mode:screen;filter:none;opacity:calc(.55 + var(--glow)*.43)
+ background-image:url("https://poke-holo.b-cdn.net/foils/swsh9/foils/upscaled/186_foil_etched_swsecret_2x.webp"),linear-gradient(128deg,#fff5ac,#bc9249 60%,#fffbd7);
+ background-position:center;background-size:100% 100%;background-repeat:no-repeat;background-blend-mode:multiply;
+ mask-image:radial-gradient(ellipse farthest-corner at var(--hx) var(--hy),black 10%,#000c 49%,#0005 100%);
+ mix-blend-mode:screen;filter:contrast(1.25);opacity:calc(var(--glow)*.94)
 }
 .holo-card.gold .holo-sparkles{
  z-index:2;background-image:var(--foil-grain),var(--foil-grain);
  background-size:47px,53px;background-position:var(--foil-offset-x,0px) var(--foil-offset-y,0px),calc(13px - var(--foil-offset-x,0px)) calc(6px - var(--foil-offset-y,0px));
  background-blend-mode:multiply;filter:brightness(.86) contrast(6);mix-blend-mode:screen;
- mask-image:radial-gradient(ellipse at var(--hx) var(--hy),#000 3%,#0007 34%,transparent 71%);opacity:calc(.012 + var(--glow)*.085)
+ mask-image:radial-gradient(ellipse at var(--hx) var(--hy),#000 3%,#0007 34%,transparent 71%);opacity:calc(var(--glow)*.085)
 }
 .holo-card.blue .holo-foil::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at var(--hx) var(--hy),#fff 5%,#370c36a8 42%,#393939 100%);mix-blend-mode:hard-light;opacity:.65}
 .holo-card.gold .holo-glare{opacity:calc(var(--glow)*.16)}
@@ -28,8 +29,8 @@
 /* Redeemed gallery copies retain a diffuse pearl reflection over the original art. */
 .card-tile .holo-card[data-redeemed=true] .card-face::after{
  content:"";position:absolute;inset:0;z-index:4;border-radius:inherit;pointer-events:none;
- background:linear-gradient(118deg,#dab9ec 8%,#abdcec 34%,#c4ebcc 57%,#f4dfac 80%,#edc2da) var(--fx) var(--fy)/190% 160%;
- mix-blend-mode:color;opacity:calc(.13 + var(--glow)*.16)
+ background:linear-gradient(118deg,#bd93d8 8%,#85c9e4 34%,#9ed9af 57%,#efd89c 80%,#e7a1bf) var(--fx) var(--fy)/190% 160%;
+ mix-blend-mode:multiply;opacity:calc(.25 + var(--glow)*.27)
 }
 .holo-card:focus-visible{outline:3px solid #0042aa;outline-offset:7px;box-shadow:none}
 @media(prefers-reduced-motion:reduce){.holo-card,.holo-card.holo-active{transform:none!important;transition:none;will-change:auto}.holo-foil,.holo-glare,.holo-sparkles{transition:none}}
