@@ -118,7 +118,6 @@
   top: 12px; right: 12px;
   z-index: 1;
 }
-.receipt-handle { display:none; }
 .receipt-body {
   min-height: 0;
   overflow-y: auto;
@@ -171,8 +170,8 @@
   .registration-receipt { width:100%; height:100%; border-radius:24px 24px 0 0; padding-top:64px; }
   .receipt-body { padding:12px 24px max(24px,env(safe-area-inset-bottom)); }
   .registration-receipt .receipt-close { top:20px;right:24px; }
-  .receipt-handle { position:absolute; top:0; left:50%; transform:translateX(-50%); display:flex; justify-content:center; width:112px; height:44px; padding-top:12px; touch-action:none; }
-  .receipt-handle span { background:#b9b9c3; width:32px; height:4px; border-radius:4px; }
+  .registration-receipt > .sheet-handle {padding-top:12px;}
+  .registration-receipt > .sheet-handle span {width:32px;}
   .receipt-feedback picture { width:80px; height:80px; }
   .receipt-feedback h1 { font-size:24px; line-height:32px; }
   .registration-receipt .receipt-action { max-width:280px; }
@@ -219,7 +218,7 @@
 .receipt-feedback h1{font-size:24px;line-height:30px}
 .receipt-feedback p{font-size:14px;line-height:20px}
 .receipt-paging{margin:0}
-.opening-pack::before,.opening-pack :is(.receipt-feedback,.receipt-actions,.receipt-paging,.receipt-handle){animation:pack-arrive .5s var(--settle) backwards}
+.opening-pack::before,.opening-pack :is(.receipt-feedback,.receipt-actions,.receipt-paging,.sheet-handle){animation:pack-arrive .5s var(--settle) backwards}
 .opening-pack .reveal-spin{animation:pack-turn .88s var(--turn) both}
 .opening-pack .reveal-size::after{content:"";position:absolute;inset:-14%;pointer-events:none;background:radial-gradient(circle at 12% 23%,#fff3b8 0 2px,transparent 4px),radial-gradient(circle at 86% 10%,white 0 2px,transparent 5px),radial-gradient(circle at 96% 76%,#ffdc6f 0 3px,transparent 5px),radial-gradient(circle at 7% 82%,white 0 2px,transparent 4px);animation:pack-sparks .55s calc(var(--turn) + .22s) both}
 .reveal-size{position:relative}

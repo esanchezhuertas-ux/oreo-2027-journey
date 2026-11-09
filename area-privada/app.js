@@ -146,35 +146,41 @@ $('#card-results').addEventListener('click',e=>{
 });
 function renderChips(){const chips=[];if(state.club)chips.push(['club',clubs[state.club]]);state.positions.forEach(p=>chips.push(['position:'+p,positions[p]]));if(state.gold)chips.push(['gold','Solo dorados']);if(state.date!=='all')chips.push(['date',{today:'Hoy',week:'Últimos 7 días',month:'Últimos 30 días'}[state.date]]);if(state.available)chips.push(['available','Solo disponibles']);const e=$('#active-filters');e.hidden=!chips.length;e.innerHTML=chips.map(([key,label])=>`<button class="filter-chip" data-remove="${key}" aria-label="Quitar filtro ${label}">${label}${icon('close')}</button>`).join('')+(chips.length?'<button class="clear-all" data-clear-filters>Limpiar filtros</button>':'');}
 const mobileSheet=matchMedia('(max-width:760px)');
-function closeDialog(dialog){
- if(dialog.id==='card-dialog'&&window.ModalMotion?.dismiss){if(dialog.dataset.closing)return;dialog.dataset.closing='true';window.ModalMotion.dismiss(dialog).then(handled=>{if(!handled)dialog.close();}).catch(()=>dialog.close());return;}
- if(!mobileSheet.matches||!['card-dialog','register-dialog'].includes(dialog.id)||matchMedia('(prefers-reduced-motion: reduce)').matches){dialog.close();return;}
- if(dialog.dataset.closing)return;
- dialog.dataset.closing='true';dialog.classList.add('sheet-dragging');
- const from=dialog.style.transform||'translateY(0)';
- const animation=dialog.animate([{transform:from},{transform:'translateY(100%)'}],{duration:240,easing:'cubic-bezier(.4,0,1,1)',fill:'forwards'});
- animation.finished.then(()=>{dialog.close();animation.cancel();dialog.style.transform='';dialog.classList.remove('sheet-dragging');delete dialog.dataset.closing;}).catch(()=>{});
+function closeDialog(dialog, dragOffset = 0) {
+  if (!dialog.open || dialog.dataset.closing) return;
+  if (dialog.id === 'card-dialog' && window.ModalMotion?.dismiss) {
+    dialog.dataset.closing = 'true';
+    window.ModalMotion.dismiss(dialog, dragOffset).then(handled => {
+      if (!handled) dialog.close();
+    }).catch(() => dialog.close());
+    return;
+  }
+  if (!mobileSheet.matches || matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    dialog.close();
+    return;
+  }
+  dialog.dataset.closing = 'true';
+  const from = getComputedStyle(dialog).translate;
+  const slide = dialog.animate([{translate: from === 'none' ? '0 0' : from}, {translate: '0 100%'}],
+    {duration: 240, easing: 'cubic-bezier(.4,0,1,1)', fill: 'forwards'});
+  slide.finished.then(() => {
+    dialog.close();
+    slide.cancel();
+  }).catch(() => {});
 }
-['card-dialog','register-dialog'].forEach(id=>{
- const dialog=document.getElementById(id),handle=document.createElement('button');
- handle.type='button';handle.className='sheet-handle';handle.setAttribute('aria-label','Cerrar modal: arrastra hacia abajo o pulsa');
- handle.innerHTML='<span aria-hidden="true"></span>';dialog.prepend(handle);
- let drag=null,suppressClick=false;
- handle.addEventListener('pointerdown',e=>{
-  if(!mobileSheet.matches||dialog.classList.contains('modal-intro')||dialog.dataset.closing)return;
-  drag={y:e.clientY,lastY:e.clientY,time:e.timeStamp,lastTime:e.timeStamp,dy:0,velocity:0};suppressClick=false;
-  dialog.classList.add('sheet-dragging');handle.setPointerCapture(e.pointerId);
- });
- handle.addEventListener('pointermove',e=>{if(!drag)return;drag.dy=Math.max(0,e.clientY-drag.y);drag.velocity=(e.clientY-drag.lastY)/Math.max(1,e.timeStamp-drag.lastTime);drag.lastY=e.clientY;drag.lastTime=e.timeStamp;dialog.style.transform=`translateY(${drag.dy}px)`;if(drag.dy>5)suppressClick=true;});
- const finish=e=>{if(!drag)return;const dismiss=e.type!=='pointercancel'&&(drag.dy>88||(drag.dy>24&&drag.velocity>.5));drag=null;if(dismiss){closeDialog(dialog);}else{const animation=dialog.animate([{transform:dialog.style.transform||'translateY(0)'},{transform:'translateY(0)'}],{duration:180,easing:'ease-out'});animation.finished.then(()=>{dialog.style.transform='';dialog.classList.remove('sheet-dragging');}).catch(()=>{});}};
- handle.addEventListener('pointerup',finish);handle.addEventListener('pointercancel',finish);
- handle.addEventListener('click',()=>{if(suppressClick){suppressClick=false;return;}closeDialog(dialog);});
- dialog.addEventListener('cancel',e=>{if(mobileSheet.matches||dialog.id==='card-dialog'){e.preventDefault();closeDialog(dialog);}});
-});
+for (const dialog of document.querySelectorAll('dialog')) {
+  window.SheetHandle.mount(dialog, offset => closeDialog(dialog, offset));
+  dialog.addEventListener('cancel', event => {
+    if (mobileSheet.matches || dialog.id === 'card-dialog') {
+      event.preventDefault();
+      closeDialog(dialog);
+    }
+  });
+}
 document.addEventListener('keydown',e=>{if(e.key==='Tab')document.documentElement.classList.add('keyboard-nav');},true);
 document.addEventListener('pointerdown',()=>document.documentElement.classList.remove('keyboard-nav'),true);
 function showDialog(dialog){closeMenus();closeSuggestions();dialog.tabIndex=-1;dialog.showModal();dialog.focus({preventScroll:true});document.documentElement.style.overflow='hidden';}
-$$('dialog').forEach(d=>{d.addEventListener('click',e=>{if(e.target===d){const r=d.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)closeDialog(d);}});d.addEventListener('close',()=>{d.style.transform='';d.classList.remove('sheet-dragging');delete d.dataset.closing;document.documentElement.style.overflow='';if(d.id==='card-dialog'){window.ModalMotion?.close(d);restoreLiftedCard();$('#detail-content').innerHTML='';}});});
+$$('dialog').forEach(d=>{d.addEventListener('click',e=>{if(e.target===d){const r=d.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)closeDialog(d);}});d.addEventListener('close',()=>{delete d.dataset.closing;document.documentElement.style.overflow='';if(d.id==='card-dialog'){window.ModalMotion?.close(d);restoreLiftedCard();$('#detail-content').innerHTML='';}});});
 function openDetail(id){
  const picked=players.find(p=>p.id===id);
  if(!picked)return;

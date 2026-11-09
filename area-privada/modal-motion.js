@@ -65,7 +65,7 @@
    settle.finished.then(()=>{if(running.get(dialog)===entry&&!entry.closing)cleanup(dialog,entry);}).catch(()=>{});
   }).catch(()=>{});
  }
- async function dismiss(dialog){
+ async function dismiss(dialog, draggedY = 0){
   const entry=running.get(dialog);
   if(!entry||!dialog.open)return false;
   if(entry.closing)return true;
@@ -83,8 +83,7 @@
    if(dialog.open)dialog.close();return true;
   }
   const card=entry.card;
-  const draggedY=dialog.style.transform?new DOMMatrix(getComputedStyle(dialog).transform).m42:0;
-  dialog.style.transform='';dialog.classList.remove('sheet-dragging');
+  dialog.style.removeProperty('translate');
   card.style.setProperty('--rx','0deg');card.style.setProperty('--ry','0deg');
   const orbit=document.createElement('div');orbit.className='modal-card-orbit';
   card.replaceWith(orbit);orbit.append(card);entry.orbit=orbit;

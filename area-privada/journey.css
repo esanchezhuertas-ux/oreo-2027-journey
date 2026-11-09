@@ -44,7 +44,7 @@
 .has-panel .journey-panel{display:flex;flex-direction:column;margin:0;width:min(640px,100%);max-width:none;border-radius:24px;padding:0;overflow:hidden;box-shadow:0 18px 60px #23202a16}
 .journey-panel header{padding:32px 32px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px}.journey-panel header h1{font-size:24px;margin:0}.journey-panel header button{flex:none;background:#f8f8fa}.panel-body{padding:0 32px 32px;overflow:auto;overscroll-behavior:contain;min-height:0}
 .prize-summary,.address-choice{background:#f8f8fa;padding:20px;border-radius:12px;margin-bottom:20px}.prize-summary{display:flex;align-items:center;gap:16px}.prize-summary .icon{width:40px;height:40px}.prize-summary small{display:block;margin-top:4px}.size-picker{border:0;padding:0}.size-picker legend{padding-bottom:12px}.size-picker label{display:inline-flex;margin-right:8px}.size-picker input{position:absolute;opacity:0}.size-picker span{display:grid;place-items:center;border:1px solid #898995;border-radius:12px;width:48px;height:48px}.size-picker input:checked+span{background:#272425;color:white}.size-picker input:focus-visible+span{outline:2px solid #0044ad}
-@media(max-width:700px){.has-panel #journey{padding:max(64px,env(safe-area-inset-top)) 0 0}.has-panel .journey-panel{width:100%;border-radius:24px 24px 0 0}.journey-panel:before{content:'';width:32px;height:4px;background:#c9c9d2;border-radius:8px;align-self:center;margin:12px 0 0}.journey-panel header{padding:16px 24px}.panel-body{padding:0 24px max(24px,env(safe-area-inset-bottom))}}
+@media(max-width:700px){.has-panel #journey{padding:max(64px,env(safe-area-inset-top)) 0 0}.has-panel .journey-panel{width:100%;border-radius:24px 24px 0 0}.journey-panel header{padding:16px 24px}.panel-body{padding:0 24px max(24px,env(safe-area-inset-bottom))}}
 
 /* Public access and private account panels share the form controls in Figma. */
 .public-mode #journey {
@@ -139,7 +139,15 @@
   .entry-field [data-eye] {right: 15px;}
   .login-actions .primary {margin-block: 4px 12px;}
   .login-actions {padding-top: 8px;}
-  .journey-panel:before {flex: none; background: var(--line); border-radius: 2px;}
+  .journey-panel > .sheet-handle {
+    position: relative;
+    inset: auto;
+    align-self: center;
+    flex: none;
+    margin: 0 0 -28px;
+    padding: 12px 0 0;
+  }
+  .journey-panel > .sheet-handle span {width: 32px; background: var(--line);}
   .journey-panel header {padding: 12px 24px 24px;}
   .panel-actions {padding: 16px 24px max(24px, env(safe-area-inset-bottom));}
 }
@@ -223,8 +231,8 @@
   overflow: hidden;
 }
 .help-contact {background: var(--bg); border-radius: 16px; padding: 16px; align-self: start;}
-.help-contact strong, .faq-list h2 {font-size: 24px; line-height: 32px; font-weight: 500;}
-.help-contact small, .contact-methods b {display: none;}
+.help-contact h2, .faq-list h2 {margin: 0; font-size: 24px; line-height: 32px; font-weight: 500;}
+.contact-methods b {display: none;}
 .contact-methods {display: grid; gap: 8px; margin-top: 16px;}
 .contact-methods .button {color: var(--ink); text-decoration: none;}
 .faq-list {overflow: auto; overscroll-behavior: contain; min-height: 0;}
@@ -245,9 +253,10 @@
   .faq-list summary, .faq-list details p {padding-inline: 16px;}
   .help-contact {order: 2; width: 100%; flex: none; position: relative;}
   .help-contact::before {content: ""; position: absolute; top: -9px; left: -24px; right: -24px; height: 1px; background: var(--line);}
-  .contact-methods {display: grid; grid-template-columns: 1fr 1fr; gap: 8px;}
-  .contact-methods span, .help-contact strong {display: none;}
-  .help-contact small, .contact-methods b {display: inline; font-weight: 500;}
+  .help-contact h2 {font-size: 16px; line-height: 24px;}
+  .contact-methods {display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px;}
+  .contact-methods span {display: none;}
+  .contact-methods b {display: inline; font-weight: 500;}
   .contact-methods a + a {background: transparent; border-color: transparent;}
 }
 
@@ -298,6 +307,7 @@
 .resend-actions {display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
 .inline-link {color:var(--blue);text-decoration:underline;font-weight:500;min-height:44px;padding:0;}
 @media(min-width:701px){
+  .journey-panel > .sheet-handle, .profile-dialog > .sheet-handle, .discard-profile > .sheet-handle {display:none;}
   .has-panel .journey-panel:is(.account-panel,.help-panel) {width:clamp(640px,72.2222vw,1040px);}
   .account-tabs::before {width:min(calc(100vw - 48px),clamp(640px,72.2222vw,1040px));}
   .settings-links {position:sticky;top:0;}
@@ -348,5 +358,5 @@
 }
 @media(max-width:700px) and (prefers-reduced-motion:no-preference){
  .has-panel .closing-panel .journey-panel{animation:journey-sheet-exit .25s ease-in both}
- @keyframes journey-sheet-exit{from{transform:translateY(0);opacity:1}to{transform:translateY(52px);opacity:.16}}
+ @keyframes journey-sheet-exit{from{transform:translateY(0);opacity:1}to{transform:translateY(var(--sheet-exit-travel,52px));opacity:.16}}
 }

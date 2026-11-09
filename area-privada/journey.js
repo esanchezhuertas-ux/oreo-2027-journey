@@ -283,7 +283,7 @@ function addressScreen(page){
 }
 function contextLayer(base,title,intro,content,back){
  const shell=base.replace('<section class="journey-panel','<section inert aria-hidden="true" class="journey-panel').replace('aria-modal="true"','aria-modal="false"');
- return shell+'<div class="profile-overlay"><section role="dialog" aria-modal="true" aria-labelledby="subpanel-title" class="profile-dialog" data-parent="'+back+'"><div class="profile-dialog-header"><h2 id="subpanel-title">'+title+'</h2><a class="icon-button panel-dismiss" href="#'+back+'" aria-label="'+t('Cerrar','Close')+'"></a></div><p>'+intro+'</p>'+content+'</section></div>';
+ return shell+'<div class="profile-overlay"><section role="dialog" aria-modal="true" aria-labelledby="subpanel-title" class="profile-dialog" data-parent="'+back+'"><div class="profile-dialog-content"><div class="profile-dialog-header"><h2 id="subpanel-title">'+title+'</h2><a class="icon-button panel-dismiss" href="#'+back+'" aria-label="'+t('Cerrar','Close')+'"></a></div><p>'+intro+'</p>'+content+'</div></section></div>';
 }
 function profile(page){
  const a=db.account;
@@ -342,6 +342,7 @@ function confirmAction(title,message,safe,action,cancel,accept){
    dialog.lastElementChild.append(button);
  }
  main.append(dialog);
+ window.SheetHandle.mount(dialog,()=>dialog.close('cancel'));
  dialog.addEventListener('close',()=>{
    dialog.remove();
    if(dialog.returnValue==='accept')accept();else cancel();
@@ -351,6 +352,7 @@ function confirmAction(title,message,safe,action,cancel,accept){
 }
 function confirmLeavingProfile(dirty,destination){
  if(main.querySelector('.discard-profile'))return;
+ window.SheetHandle.reset(dirty.closest('.journey-panel'));
  confirmAction(t('¿Salir sin guardar?','Leave without saving?'),t('Si sales ahora, perderás los cambios que has hecho.','If you leave now, your changes will be lost.'),t('Seguir editando','Keep editing'),t('Salir sin guardar','Leave without saving'),()=>{},()=>{delete dirty.dataset.editRoute;go(destination);});
 }
 window.addEventListener('hashchange',event=>{
@@ -514,7 +516,13 @@ function help(){
    [t('¿Qué hago si no reconozco una acción de mi Historial?','What if I do not recognise an entry in my History?'),t('Revisa los detalles de la acción y cambia tu contraseña desde Mi cuenta.','Review the entry and change your password in My account.')]
  ];
  const faq='<div class="faq-list"><h2>'+t('Preguntas frecuentes','Frequently asked questions')+'</h2>'+questions.map(([q,answer],i)=>'<details '+(i===0?'open':'')+'><summary>'+q+ui.icon('chevron')+'</summary><p>'+answer+'</p></details>').join('')+'</div>';
- const contact='<aside class="help-contact"><strong>'+t('Contacto','Contact')+'</strong><small>900 000 000 · ayuda@oreo.es</small><div class="contact-methods"><a class="button" href="tel:900000000"><img alt="" width="20" height="20" src="assets/icons/phone.svg"><span>900 000 000</span><b>'+t('Llamar','Call')+'</b></a><a class="button" href="mailto:ayuda@oreo.es"><img alt="" width="20" height="20" src="assets/icons/mail.svg"><span>ayuda@oreo.es</span><b>'+t('Escribir','Email')+'</b></a></div></aside>';
+ const contact=`<aside class="help-contact" aria-labelledby="help-contact-title">
+   <h2 id="help-contact-title">${t('Contacto','Contact')}</h2>
+   <div class="contact-methods">
+     <a class="button" href="tel:900000000"><img alt="" width="20" height="20" src="assets/icons/phone.svg"><span>900 000 000</span><b>${t('Llamar','Call')}</b></a>
+     <a class="button" href="mailto:ayuda@oreo.es"><img alt="" width="20" height="20" src="assets/icons/mail.svg"><span>ayuda@oreo.es</span><b>${t('Escribir','Email')}</b></a>
+   </div>
+ </aside>`;
  return panel(t('Ayuda','Help'),contact+faq,{kind:'help-panel',intro:t('Resuelve tus dudas sobre tu cuenta, los códigos y los premios.','Find answers about your account, codes and rewards.')});
 }
 function receiptPreview(){
@@ -606,7 +614,6 @@ function registrationResult() {
  const label = i=>(i+1)+'–'+Math.min(i+3,count)+' / '+count;
  const carousel = count>3 ? `<div class="receipt-paging"><button type="button" data-receipt-step="-1" aria-label="${t('Cromo anterior','Previous card')}">${ui.icon('back')}</button><span aria-live="polite">${label(index)}</span><button type="button" data-receipt-step="1" aria-label="${t('Cromo siguiente','Next card')}">${ui.icon('forward')}</button></div>` : '';
  return `<section class="registration-receipt" role="dialog" aria-modal="true" aria-labelledby="receipt-title">
-   <button class="receipt-handle" type="button" aria-label="${t('Cerrar','Close')}"><span></span></button>
    <button class="icon-button panel-dismiss receipt-close" data-route="home" aria-label="${t('Cerrar registro','Close code registration')}"></button>
    <div class="receipt-body">
      <div class="receipt-stage">${receiptPreview()}</div>${carousel}
@@ -667,6 +674,12 @@ function draw(){
    confirmAction(t('¿Eliminar esta dirección?','Delete this address?'),t('Se eliminará '+item.alias+' de tus direcciones guardadas. No cambiará tus pedidos.',item.alias+' will be removed from your saved addresses. Your orders will stay the same.'),t('Cancelar','Cancel'),t('Eliminar dirección','Delete address'),()=>go('address'),()=>submitProfile('delete-address',{addressId:item.id}));
  }
  else main.innerHTML=profile(page);
+ if(overlay){
+   for(const sheet of main.querySelectorAll('.journey-panel, .profile-dialog, .registration-receipt')){
+     const close=sheet.querySelector('.panel-dismiss');
+     window.SheetHandle.mount(sheet,()=>close.click());
+   }
+ }
  document.title=(collection?t('Mi zona','My zone'):main.querySelector('h1')?.textContent||'OREO')+' · OREO × LALIGA';
 }
 function launchPrize(id,playerId=null){
@@ -776,30 +789,6 @@ window.addEventListener('oreo:registered',e=>{
    firstGold:gold && cards.filter(card=>card.rarity==='gold').length===picks.length};
  go('received');
 });
-let receiptDrag=null, receiptHandleMoved=false;
-main.addEventListener('click',e=>{
- if(e.target.closest('.receipt-handle') && (e.detail===0 || !receiptHandleMoved))go('home');
-});
-main.addEventListener('pointerdown',e=>{
- const handle=e.target.closest('.receipt-handle');
- if(!handle)return;
- receiptHandleMoved=false;
- handle.setPointerCapture(e.pointerId);
- receiptDrag={y:e.clientY, panel:handle.closest('.registration-receipt')};
-});
-main.addEventListener('pointermove',e=>{
- if(!receiptDrag)return;
- const distance=Math.max(0,e.clientY-receiptDrag.y);
- if(distance>5)receiptHandleMoved=true;
- receiptDrag.panel.style.transform='translateY('+distance+'px)';
-});
-function finishReceiptDrag(e){
- if(!receiptDrag)return;
- const {panel,y}=receiptDrag;receiptDrag=null;panel.style.transform='';
- if(e.type==='pointerup' && e.clientY-y>64)go('home');
-}
-main.addEventListener('pointerup',finishReceiptDrag);
-main.addEventListener('pointercancel',finishReceiptDrag);
 let collectionScroll=0;
 let navigationVersion=0;
 window.addEventListener('hashchange',async e=>{
@@ -810,7 +799,12 @@ window.addEventListener('hashchange',async e=>{
  if(fromCollection&&!toCollection)collectionScroll=window.scrollY;
  const panel=main.querySelector('.journey-panel');
  if(toCollection&&panel&&!main.hidden&&!matchMedia('(prefers-reduced-motion: reduce)').matches){
-  const entering=panel.getAnimations().find(a=>a.animationName?.startsWith('journey-')&&a.animationName.endsWith('-enter'));
+  const dragged=Boolean(panel.style.translate);
+  if(dragged){
+   const remaining=Math.max(0,innerHeight-panel.getBoundingClientRect().top);
+   panel.style.setProperty('--sheet-exit-travel',remaining+'px');
+  }
+  const entering=!dragged && panel.getAnimations().find(a=>a.animationName?.startsWith('journey-')&&a.animationName.endsWith('-enter'));
   if(entering)entering.reverse();
   else main.classList.add('closing-panel');
   const exit=entering||panel.getAnimations().find(a=>a.animationName?.endsWith('-exit'));
