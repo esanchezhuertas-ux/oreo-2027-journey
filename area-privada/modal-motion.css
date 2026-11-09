@@ -71,19 +71,21 @@
 #card-dialog .detail-close{position:absolute;right:32px;top:12px}
 #card-dialog.modal-intro :is(.detail-rarities,.detail-close,.sheet-handle){visibility:hidden}
 @media(max-width:760px){
- #card-dialog{width:100%;max-width:none;height:calc(100dvh - max(72px,env(safe-area-inset-top)));max-height:none;border-radius:24px 24px 0 0;padding:60px 24px max(24px,env(safe-area-inset-bottom))}
+ #card-dialog{--sheet-bottom:max(16px,env(safe-area-inset-bottom));width:100%;max-width:none;height:calc(100dvh - max(72px,env(safe-area-inset-top)));max-height:none;border-radius:24px 24px 0 0;padding:48px 24px var(--sheet-bottom)}
  #card-dialog .detail-close{top:20px;right:20px}
  #card-dialog .sheet-handle{height:32px}
  #card-dialog .sheet-handle span{width:32px;height:4px;background:var(--line)}
- #card-dialog .detail-layout{grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto auto minmax(0,1fr) 48px;row-gap:0}
+ #card-dialog .detail-layout{grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto auto minmax(0,1fr) auto;row-gap:0}
  #card-dialog .detail-identity,#card-dialog .detail-inventory,#card-dialog .detail-scroll,#card-dialog .redeem-action,.detail-figure{grid-column:1}
  #card-dialog .detail-identity{grid-row:1;text-align:center}
  #card-dialog .detail-identity h2{padding-inline:28px}
  #card-dialog .detail-identity p{font-size:12px;line-height:20px}
- .detail-figure{grid-row:2;gap:16px;margin:16px 0 24px}
- #card-dialog .detail-stage{flex:none;height:168px}
- #card-dialog .detail-stage .holo-card{scale:.7}
- #card-dialog .detail-inventory{grid-row:3;margin-bottom:24px}
+ .detail-figure{grid-row:2;gap:12px;margin:8px 0 16px}
+ #card-dialog .detail-stage{flex:none;height:232px;overflow:visible}
+ /* Draw the shadow on the rounded artwork, outside the foil's clipping layer. */
+ #card-dialog .detail-stage .holo-card{scale:1;appearance:none;overflow:visible;filter:none;box-shadow:none}
+ #card-dialog .detail-stage .card-face{box-shadow:0 7px 14px -5px rgb(27 28 32 / 24%)}
+ #card-dialog .detail-inventory{grid-row:3;margin-bottom:16px}
  #card-dialog .detail-scroll{grid-row:4;padding-bottom:6px}
  #card-dialog .redeem-action{grid-row:5;margin-top:0}
  #card-dialog .associated-codes ul{max-height:228px}
@@ -91,14 +93,20 @@
  #card-dialog .code-reference small,#card-dialog .code-status{font-size:11px;line-height:16px}
  #card-dialog .code-status .icon{width:12px;height:12px}
 }
-@media(max-width:760px) and (max-height:725px){
- #card-dialog{padding-top:48px;padding-bottom:max(16px,env(safe-area-inset-bottom))}
- .detail-figure{margin:4px 0 10px;gap:4px}
- #card-dialog .detail-stage{height:112px}
- #card-dialog .detail-stage .holo-card{scale:.46}
- #card-dialog .detail-inventory{gap:3px;margin-bottom:8px}
+@media(max-width:760px) and (max-height:760px){
+ /* Keep the same card size on short screens. Only the body scrolls above the action. */
+ #card-dialog:has(.redeem-action:not([hidden])){padding-bottom:calc(var(--sheet-bottom) + 60px)}
+ #card-dialog #detail-content{overflow-y:auto;overscroll-behavior-y:contain}
+ #card-dialog .detail-layout{height:auto;grid-template-rows:repeat(4,auto)}
+ #card-dialog .detail-scroll{overflow:visible;max-height:none}
+ #card-dialog .detail-scroll .associated-codes ul{max-height:none;overflow:visible}
+ #card-dialog .redeem-action{position:absolute;inset:auto 24px var(--sheet-bottom);z-index:2}
+ #card-dialog.modal-intro #detail-content{overflow:visible}
 }
-@media(max-height:590px){
+@media(max-width:760px) and (max-height:590px){
+ #card-dialog{height:calc(100dvh - max(16px,env(safe-area-inset-top)))}
+}
+@media(min-width:761px) and (max-height:590px){
  #card-dialog #detail-content{overflow-y:auto;overscroll-behavior:contain}
  #card-dialog .detail-layout{height:auto;min-height:100%;grid-template-rows:auto auto auto auto}
  #card-dialog .detail-scroll{max-height:240px}

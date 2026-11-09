@@ -198,17 +198,14 @@ function openDetail(id){
  <div class="redeem-action"></div></div></div>`;
  const availableRewards=window.Rewards?.available()||[];
  const action=content.querySelector('.redeem-action');
- function paintRewards(variant){
-  const direct=variant.type==='gold' && variant.available>0 && availableRewards.some(r=>r.id==='gold');
-  action.replaceChildren();
-  action.hidden=!direct;
-  content.querySelector('.detail-rewards-link')?.remove();
-  if(!direct&&!availableRewards.some(reward=>reward.id!=='gold'))return;
+ const canRedeemGold=gold>0 && availableRewards.some(reward=>reward.id==='gold');
+ action.hidden=!canRedeemGold;
+ if(canRedeemGold || availableRewards.some(reward=>reward.id!=='gold')){
   const control=document.createElement('button');
   control.type='button';
-  if(direct){
+  if(canRedeemGold){
    control.className='button primary';
-   control.innerHTML=icon('shirt')+t('Quiero mi camiseta','Get my shirt');
+   control.innerHTML=icon('shirt')+t('Canjear jugador dorado','Redeem gold player');
    action.append(control);
   }else{
    control.className='detail-history detail-rewards-link';
@@ -218,7 +215,7 @@ function openDetail(id){
   control.onclick=()=>{
    if(dialog.dataset.closing)return;
    dialog.addEventListener('close',()=>{
-    if(direct){window.Rewards.open('gold');return;}
+    if(canRedeemGold){window.Rewards.open('gold',picked.id);return;}
     const hub=document.querySelector('#hub-progress');
     hub.setAttribute('tabindex','-1');
     hub.focus({preventScroll:true});
@@ -227,7 +224,6 @@ function openDetail(id){
    closeDialog(dialog);
   };
  }
- paintRewards(initial);
  content.querySelector('.detail-history').onclick=()=>{
   dialog.addEventListener('close',()=>{location.hash='history';},{once:true});
   closeDialog(dialog);
@@ -237,7 +233,6 @@ function openDetail(id){
    const next=variants.find(p=>p.type===toggle.dataset.rarity);
    if(!next||toggle.getAttribute('aria-pressed')==='true')return;
    const element=content.querySelector('.holo-card'), template=document.createElement('template');
-   paintRewards(next);
    template.innerHTML=card(next,true);
    const face=template.content.firstElementChild;
    for(const attr of ['class','data-player','aria-label','style'])element.setAttribute(attr,face.getAttribute(attr));

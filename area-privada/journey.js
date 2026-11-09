@@ -28,13 +28,18 @@ function field(key,value='',hint){
 const submit = text => '<button class="button primary full-width" type="submit">'+text+'</button>';
 const error = () => '<p class="form-error" role="alert"></p>';
 let pending=null,historyFilter='all',expanded='',rewardId='shirt',step=1,shipping={},receipt=null,registered=null;
+let rewardPlayerId=null;
 const names={shirt:['Camiseta','Shirt'],gold:['Camiseta con cromo dorado','Gold card shirt'],scarf:['Bufanda','Scarf'],ball:['Balón','Ball']};
 const titleOf=id=>t(...names[id]);
 const cost=id=>id==='shirt'?50:id==='gold'?1:25;
 const claimed=id=>db.account.orders.some(order=>order.reward===id);
-const eligible=(card,id)=>!card.used && (id==='gold'?card.rarity==='gold':card.rarity==='blue'||claimed('gold'));
-const balance=id=>db.account.cards.filter(card=>eligible(card,id)).length;
-const canClaim=id=>!claimed(id)&&balance(id)>=cost(id);
+function eligible(card,id,playerId=null){
+ if(card.used)return false;
+ if(id==='gold')return card.rarity==='gold' && (playerId===null || card.player===playerId);
+ return card.rarity==='blue' || claimed('gold');
+}
+const balance=(id,playerId=null)=>db.account.cards.filter(card=>eligible(card,id,playerId)).length;
+const canClaim=(id,playerId=null)=>!claimed(id)&&balance(id,playerId)>=cost(id);
 const date=time=>new Intl.DateTimeFormat(db.lang==='es'?'es-ES':'en-GB').format(time);
 function authPage(title,desc,body){return '<section class="access-panel"><header><h1>'+title+'</h1><p>'+desc+'</p></header>'+body+'</section>';}
 function form(id,body){return '<form data-flow="'+id+'">'+body+error()+'</form>';}
@@ -463,7 +468,7 @@ function reward(){
   const info=prizeSummary(id,receipt.shipping)+'<h2>'+t('Siguiente paso','Next step')+'</h2><p>'+t('Nos pondremos en contacto contigo a la menor brevedad posible para gestionar tu premio.','We will contact you as soon as possible about your reward.')+'</p><h2>'+t('Referencia y entrega','Reference and delivery')+'</h2><p><code>'+html(receipt.id)+'</code></p><p>'+delivery(receipt.shipping)+'</p>';
   return panel(t('Solicitud recibida','Request received'),info,{kind:'claim-review',actions:'<p>'+t('Puedes consultar esta solicitud en tu historial.','You can find this request in your history.')+'</p>'+button(t('Volver a Mi zona','Back to My zone'),'home',true)});
  }
- if(!canClaim(id)){queueMicrotask(()=>go('home'));return '';}
+ if(!canClaim(id,rewardPlayerId)){queueMicrotask(()=>go('home'));return '';}
  if(step===2){
   const remaining=balance(id)-cost(id);
   const review=prizeSummary(id,shipping)+'<h2>'+t('Antes de confirmar','Before confirming')+'</h2><p>'+t('Usarás ','You will use ')+cost(id)+' '+(id==='gold'?t('cromo dorado.','gold card.'):t('unidades.','units.'))+'</p><p>'+(id==='gold'?t('Conservas tus unidades.','You keep your units.'):t('Te quedarán ','You will have ')+remaining+t(' unidades disponibles.',' units left.'))+'</p><small>'+t('Se usan primero tus copias más antiguas. Tu colección se conserva.','Your oldest copies are used first. You keep your collection.')+'</small><h2>'+t('Entrega','Delivery')+'</h2><p>'+delivery(shipping)+'</p><p>'+t('Después de confirmar, no podrás editar esta solicitud.','After confirmation, you cannot edit this request.')+'</p>';
@@ -664,10 +669,15 @@ function draw(){
  else main.innerHTML=profile(page);
  document.title=(collection?t('Mi zona','My zone'):main.querySelector('h1')?.textContent||'OREO')+' · OREO × LALIGA';
 }
-function launchPrize(id){if(!canClaim(id))return;rewardId=id;step=1;shipping={};receipt=null;go('reward');}
+function launchPrize(id,playerId=null){
+ if(!canClaim(id,playerId))return;
+ rewardId=id;
+ rewardPlayerId=playerId;
+ step=1;shipping={};receipt=null;go('reward');
+}
 window.Rewards={
- available:()=>['gold','shirt','scarf','ball'].filter(canClaim).map(id=>({id,label:titleOf(id)})),
- open:id=>{if(['gold','shirt','scarf','ball'].includes(id)&&canClaim(id))launchPrize(id);}
+ available:()=>['gold','shirt','scarf','ball'].filter(id=>canClaim(id)).map(id=>({id,label:titleOf(id)})),
+ open:(id,playerId)=>{if(['gold','shirt','scarf','ball'].includes(id))launchPrize(id,playerId);}
 };
 
 document.addEventListener('keydown',e=>{if(!document.body.classList.contains('has-panel'))return;if(e.key==='Escape'){go('home');return;}if(e.key==='Tab'){const list=[...main.querySelectorAll('button:not(:disabled),input,select,a,summary')].filter(el=>el.getClientRects().length);if(!list.length)return;const first=list[0],last=list.at(-1),focus=document.activeElement;if(e.shiftKey&&(focus===first||!main.contains(focus))){e.preventDefault();last.focus();}else if(!e.shiftKey&&(focus===last||!main.contains(focus))){e.preventDefault();first.focus();}}});
@@ -750,8 +760,8 @@ main.addEventListener('submit',async e=>{
    return submitProfile(mode,v,(es,en)=>{if(keepDraft)f.dataset.editRoute=keepDraft;fail(es,en);});
  }
  if(mode==='prize'){shipping=v;step=2;draw();}
- if(mode==='confirm-prize'&&canClaim(rewardId)){
- const selected=a.cards.filter(c=>eligible(c,rewardId)).sort((x,y)=>x.time-y.time).slice(0,cost(rewardId));selected.forEach(c=>c.used=true);
+ if(mode==='confirm-prize'&&canClaim(rewardId,rewardPlayerId)){
+ const selected=a.cards.filter(c=>eligible(c,rewardId,rewardPlayerId)).sort((x,y)=>x.time-y.time).slice(0,cost(rewardId));selected.forEach(c=>c.used=true);
  receipt={id:'ORE-'+new Date().getFullYear()+'-'+String(a.orders.length+1).padStart(6,'0'),reward:rewardId,shipping,time:Date.now()};
  a.orders.push(receipt);a.address={...shipping};db.save();step=3;draw();}
 });
