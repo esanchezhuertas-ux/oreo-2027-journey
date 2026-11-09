@@ -97,7 +97,7 @@ function render(){
  $$('[data-total-available]').forEach(e=>e.textContent=players.reduce((n,p)=>n+p.available,0));
  const list=filter(), grid=$('#card-results');
  $('#results-count').textContent=`${new Set(list.map(p=>p.playerId)).size} ${new Set(list.map(p=>p.playerId)).size===1?'cromo único':'cromos únicos'}${state.gold?' · Dorados':''}${state.available?' · Solo disponibles':''}`;
- $('#sort-label').textContent=state.view==='clubs'?'Club y posición':state.sort==='name'?'Nombre A–Z':state.sort==='oldest'?'Más antiguos primero':'Más recientes primero';
+ $('#sort-label').textContent=state.sort==='name'?'Nombre A–Z':state.sort==='oldest'?'Más antiguos primero':'Más recientes primero';
  $('#available-toggle').checked=state.available;$('#clear-search').hidden=!state.q;
  $('#grid-view').setAttribute('aria-pressed',String(state.view==='grid'));$('#clubs-view').setAttribute('aria-pressed',String(state.view==='clubs'));
  $('#mobile-view').innerHTML=icon(state.view==='grid'?'shield':'grid');$('#mobile-view').setAttribute('aria-label',state.view==='grid'?'Cambiar a vista clubs':'Cambiar a vista cuadrícula');
@@ -107,7 +107,10 @@ function render(){
   grid.innerHTML=Object.entries(clubs).map(([key,name])=>{
    const items=list.filter(p=>p.clubKey===key);if(!items.length)return '';
    const showMissing=!state.gold&&!state.available&&!state.q&&!state.positions.length&&state.date==='all';
-   const slots=showMissing?Object.keys(positions).map(pos=>{const found=items.filter(p=>p.position===pos);return found.length?found.map(p=>tile(p)).join(''):missing(pos,key)}):items.sort((a,b)=>Object.keys(positions).indexOf(a.position)-Object.keys(positions).indexOf(b.position)).map(p=>tile(p));
+   const slots=items.map(p=>tile(p));
+   if(showMissing)for(const pos of Object.keys(positions)){
+    if(!items.some(p=>p.position===pos))slots.push(missing(pos,key));
+   }
    const cards=slots.join('');
    const count=showMissing?Object.keys(positions).reduce((total,pos)=>total+Math.max(1,items.filter(p=>p.position===pos).length),0):items.length;
    const pages=Math.ceil(count/2);
@@ -139,7 +142,7 @@ $('#card-results').addEventListener('click',e=>{
  const step=el.clientWidth+parseFloat(getComputedStyle(el).columnGap);
  el.scrollTo({left:Number(pair.dataset.index)*step,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});
 });
-function renderChips(){const chips=[];if(state.club)chips.push(['club',clubs[state.club]]);state.positions.forEach(p=>chips.push(['position:'+p,positions[p]]));if(state.gold)chips.push(['gold','Solo dorados']);if(state.date!=='all')chips.push(['date',{today:'Hoy',week:'Últimos 7 días',month:'Últimos 30 días'}[state.date]]);if(state.available)chips.push(['available','Solo disponibles']);const e=$('#active-filters');e.hidden=!chips.length;e.innerHTML=chips.map(([key,label])=>`<button class="filter-chip" data-remove="${key}" aria-label="Quitar filtro ${label}">${label}${icon('close')}</button>`).join('')+(chips.length?'<button class="clear-all" data-clear-filters>Limpiar filtros</button>':'');$('#filter-count').textContent=chips.length;$('#filter-count').hidden=!chips.length;}
+function renderChips(){const chips=[];if(state.club)chips.push(['club',clubs[state.club]]);state.positions.forEach(p=>chips.push(['position:'+p,positions[p]]));if(state.gold)chips.push(['gold','Solo dorados']);if(state.date!=='all')chips.push(['date',{today:'Hoy',week:'Últimos 7 días',month:'Últimos 30 días'}[state.date]]);if(state.available)chips.push(['available','Solo disponibles']);const e=$('#active-filters');e.hidden=!chips.length;e.innerHTML=chips.map(([key,label])=>`<button class="filter-chip" data-remove="${key}" aria-label="Quitar filtro ${label}">${label}${icon('close')}</button>`).join('')+(chips.length?'<button class="clear-all" data-clear-filters>Limpiar filtros</button>':'');}
 const mobileSheet=matchMedia('(max-width:760px)');
 function closeDialog(dialog){
  if(dialog.id==='card-dialog'&&window.ModalMotion?.dismiss){if(dialog.dataset.closing)return;dialog.dataset.closing='true';window.ModalMotion.dismiss(dialog).then(handled=>{if(!handled)dialog.close();}).catch(()=>dialog.close());return;}
@@ -263,18 +266,17 @@ document.addEventListener('pointerdown',e=>{if(!e.target.closest('.search-field'
 document.addEventListener('focusin',e=>{if(!e.target.closest('.search-field'))closeSuggestions();});
 $('#clear-search').addEventListener('click',()=>{state.q='';state.selectedPlayer='';searchInput.value='';closeSuggestions();render();searchInput.focus({preventScroll:true});});$('#available-toggle').addEventListener('change',e=>{state.available=e.target.checked;render();});
 function setView(view){state.view=view;render();}$('#grid-view').onclick=()=>setView('grid');$('#clubs-view').onclick=()=>setView('clubs');$('#mobile-view').onclick=()=>setView(state.view==='grid'?'clubs':'grid');
-const filterForm=$('#filter-form');filterForm.elements.club.replaceChildren(new Option('Todos los clubes',''),...Object.entries(clubs).map(([k,v])=>new Option(v,k)));
-function fillFilterForm(s){filterForm.elements.club.value=s.club;filterForm.elements.date.value=s.date;filterForm.elements.gold.checked=s.gold;filterForm.elements.available.checked=s.available;filterForm.elements.group.value=s.group;filterForm.elements.sort.value=s.sort;$$('[name=position]',filterForm).forEach(el=>el.checked=s.positions.includes(el.value));updateDraftCount();}
-function draft(){return {...state,club:filterForm.elements.club.value,positions:$$('[name=position]:checked',filterForm).map(e=>e.value),date:filterForm.elements.date.value,gold:filterForm.elements.gold.checked,available:filterForm.elements.available.checked,group:filterForm.elements.group.value,sort:filterForm.elements.sort.value};}
-function updateDraftCount(){const n=filter(players,draft()).length;$('#apply-filters').textContent=`Ver ${n} ${n===1?'cromo':'cromos'}`;}
-$('#filter-button').onclick=()=>{
- const sortDialog=$('#sort-dialog');
- if(sortDialog.open){
-  sortDialog.addEventListener('close',()=>{fillFilterForm(state);showDialog($('#filter-dialog'));},{once:true});
-  sortDialog.close();
- }else{fillFilterForm(state);showDialog($('#filter-dialog'));}
-};filterForm.addEventListener('change',updateDraftCount);filterForm.addEventListener('submit',e=>{e.preventDefault();const previousGroup=state.group;Object.assign(state,draft());if(state.group!==previousGroup)state.view='grid';render();$('#filter-dialog').close();});$('#reset-draft').onclick=()=>fillFilterForm({...state,...emptyFilters()});
-const sortForm=$('#sort-form');$('#sort-button').onclick=()=>{sortForm.elements.group.value=state.group;sortForm.elements.sort.value=state.sort;showDialog($('#sort-dialog'));};sortForm.onsubmit=e=>{e.preventDefault();state.group=sortForm.elements.group.value;state.sort=sortForm.elements.sort.value;if(state.group!=='none')state.view='grid';render();$('#sort-dialog').close();};
+const sortForm=$('#sort-form');
+$('#sort-button').onclick=()=>{
+ sortForm.elements.sort.value=state.sort;
+ showDialog($('#sort-dialog'));
+};
+sortForm.onsubmit=e=>{
+ e.preventDefault();
+ state.sort=sortForm.elements.sort.value;
+ render();
+ $('#sort-dialog').close();
+};
 function closeMenus(){['account','mobile'].forEach(x=>{const menu=$(`#${x}-menu`);menu.hidden=true;$(x==='account'?'#account-button':'#menu-button').setAttribute('aria-expanded','false');});}
 function toggleMenu(button,menu){const isOpen=!menu.hidden;closeMenus();menu.hidden=isOpen;button.setAttribute('aria-expanded',String(!isOpen));}
 $('#account-button').onclick=()=>toggleMenu($('#account-button'),$('#account-menu'));$('#menu-button').onclick=()=>toggleMenu($('#menu-button'),$('#mobile-menu'));
