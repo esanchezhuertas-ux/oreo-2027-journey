@@ -425,7 +425,7 @@ function historyPage(ordersOnly=false){
  }).join('');
  const title=ordersOnly?t('Mis solicitudes','My requests'):t('Historial de la cuenta','Account history');
  const intro=t('Tus códigos, cromos, canjes y cambios de cuenta, en un mismo lugar.','Your codes, cards, redemptions and account changes, all in one place.');
- return accountPanel('<section class="activity-feed"><h2>'+title+'</h2>'+(ordersOnly?'':'<p>'+intro+'</p><div class="activity-filters">'+filters+'</div>')+'<div class="activity-list">'+(list||'<p class="activity-empty">'+t('Todavía no hay actividad.','No activity yet.')+'</p>')+'</div></section>','history');
+ return accountPanel('<section class="activity-feed"><h2>'+title+'</h2>'+(ordersOnly?'':'<p>'+intro+'</p><div class="activity-filters">'+filters+'</div>')+'<div class="activity-list" role="region" tabindex="0" aria-label="'+title+'">'+(list||'<p class="activity-empty">'+t('Todavía no hay actividad.','No activity yet.')+'</p>')+'</div></section>','history');
 }
 function prizeSummary(id,choice){
  const art={gold:'reward-shirt',shirt:'reward-shirt',scarf:'scarf',ball:'reward-ball'}[id];
