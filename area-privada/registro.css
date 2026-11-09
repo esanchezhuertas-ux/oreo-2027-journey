@@ -205,3 +205,43 @@
 @media(max-width:760px){.registration-receipt{width:100%}.receipt-body{padding-top:8px}.receipt-stage{padding:16px 0 24px}.reveal-tile{--size:1.16}.reveal-tile:not(:only-child){--size:clamp(.78,calc(100vw / 385px),1.2)}.reveal-tile:nth-last-child(3),.reveal-tile:nth-last-child(3)~.reveal-tile{--size:.85}.reveal-tile:not(:only-child):first-child{margin-right:-38px}.reveal-tile:not(:only-child):last-child{margin-left:-38px}.receipt-actions{flex-direction:column}.receipt-actions .button{min-height:48px}.receipt-feedback{gap:12px}}
 @media(max-width:360px){.reveal-tile:nth-last-child(3),.reveal-tile:nth-last-child(3)~.reveal-tile{--size:.75}}
 @media(prefers-reduced-motion:reduce){.reveal-spin{animation:none}}
+.has-panel #journey:has(.registration-receipt){backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.registration-receipt{isolation:isolate;background:transparent;overflow:visible;width:min(680px,100%);height:auto;padding:0}
+.registration-receipt::before{content:"";position:absolute;inset:0;border-radius:inherit;background:white;z-index:-1}
+.receipt-body{overflow:visible;padding:24px;gap:12px}
+.receipt-stage{padding:4px 0;gap:4px}
+.reveal-tile{transform:none;--size:1}
+.reveal-size{transform:rotate(var(--lean))}
+.reveal-spin{animation:none}
+.reveal-new{height:24px;text-align:center;position:relative;z-index:2}
+.reveal-new span{display:inline-block;background:#ffc100;color:#272425;border-radius:4px;padding:0 7px;font:500 12px/22px var(--ui-font)}
+.reveal-tile figcaption{margin:8px 0 0}
+.receipt-feedback{padding:0;gap:4px}
+.receipt-feedback h1{font-size:24px;line-height:30px}
+.receipt-feedback p{font-size:14px;line-height:20px}
+.receipt-paging{margin:0}
+.opening-pack::before,.opening-pack :is(.receipt-feedback,.receipt-actions,.receipt-paging,.receipt-handle){animation:pack-arrive .5s var(--settle) backwards}
+.opening-pack .reveal-spin{animation:pack-turn .56s var(--turn) both}
+.opening-pack .reveal-size::after{content:"";position:absolute;inset:-14%;pointer-events:none;background:radial-gradient(circle at 12% 23%,#fff3b8 0 2px,transparent 4px),radial-gradient(circle at 86% 10%,white 0 2px,transparent 5px),radial-gradient(circle at 96% 76%,#ffdc6f 0 3px,transparent 5px),radial-gradient(circle at 7% 82%,white 0 2px,transparent 4px);animation:pack-sparks .55s calc(var(--turn) + .22s) both}
+.reveal-size{position:relative}
+.opening-pack .receipt-stage::before{content:"";position:absolute;inset:-15%;pointer-events:none;background:radial-gradient(ellipse,#fff8c4 0%,#ffd771aa 14%,transparent 65%);animation:pack-sparks .5s both;z-index:-1}
+@keyframes pack-turn{from{transform:rotateY(180deg)}to{transform:rotateY(0)}}
+@keyframes pack-sparks{0%{opacity:0;transform:scale(.45)}35%{opacity:1}100%{opacity:0;transform:scale(1.25)}}
+@keyframes pack-arrive{from{opacity:0;transform:translateY(32px)}}
+@media(max-width:760px){
+ .has-panel #journey:has(.registration-receipt){place-items:end center;padding:0}
+ .registration-receipt{width:100%;height:auto}
+ .receipt-body{padding:48px 16px max(16px,env(safe-area-inset-bottom));gap:10px}
+ .registration-receipt .receipt-close{top:4px;right:8px}
+ .receipt-actions{gap:6px}
+ .opening-pack::before{animation-name:sheet-arrive}
+ @keyframes sheet-arrive{from{transform:translateY(100%)}}
+}
+@media(max-height:700px){.reveal-size{zoom:min(var(--size),.76)}.receipt-stage{min-height:0}.receipt-paging button{height:32px}}
+@media(max-height:480px) and (min-aspect-ratio:1/1){
+ .receipt-body{display:grid;grid-template-columns:1fr 1fr;align-items:center;padding:42px 20px 12px}
+ .receipt-stage{grid-column:1;grid-row:1/4}.reveal-size{zoom:.59}.receipt-actions{flex-direction:column}.receipt-paging,.receipt-feedback,.receipt-actions{grid-column:2}
+}
+.opening-pack .reveal-tile{animation:pack-emerge .28s .17s backwards}
+.opening-pack .reveal-tile :is(.reveal-new,figcaption){animation:pack-emerge .22s calc(var(--turn) + .36s) backwards}
+@keyframes pack-emerge{from{opacity:0}to{opacity:1}}

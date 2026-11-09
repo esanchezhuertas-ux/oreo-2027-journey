@@ -487,8 +487,29 @@ function receiptPreview(){
  const back=(window.BRAND_SVG||'').replace(/fill="#272425"/g,'fill="white"').replace(/fill="#fff"/g,'fill="var(--back)"');
  return group.map(({player,gold,fresh})=>{
    const rarity=gold?t('Dorada','Gold'):t('Común','Common');
-   return `<figure class="reveal-tile" data-gold="${gold}"><figcaption><span>${rarity}</span>${fresh?'<b>'+t('Nuevo','New')+'</b>':''}</figcaption><div class="reveal-size"><div class="reveal-spin"><div class="reveal-back" aria-hidden="true">${back}</div>${ui.receivedCard(player,gold)}</div></div></figure>`;
+   return `<figure class="reveal-tile" data-gold="${gold}"><div class="reveal-new">${fresh?'<span>'+t('NUEVO','NEW')+'</span>':''}</div><div class="reveal-size"><div class="reveal-spin"><div class="reveal-back" aria-hidden="true">${back}</div>${ui.receivedCard(player,gold)}</div></div><figcaption><span>${rarity}</span></figcaption></figure>`;
  }).join('');
+}
+function revealPack(panel){
+ if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+ const stage=panel.querySelector('.receipt-stage');
+ const tiles=[...stage.children].sort((a,b)=>Number(a.dataset.gold==='true')-Number(b.dataset.gold==='true'));
+ const settle=520+tiles.length*580+680;
+ panel.style.setProperty('--settle',settle+'ms');
+ panel.classList.add('opening-pack');
+ const bounds=stage.getBoundingClientRect();
+ const dy=innerHeight/2-bounds.top-bounds.height/2;
+ const edges=tiles.map(tile=>tile.getBoundingClientRect());
+ const spread=Math.max(...edges.map(box=>box.right))-Math.min(...edges.map(box=>box.left));
+ const scale=Math.min(1.45,(innerWidth-12)/Math.max(1,spread),innerHeight/(bounds.height+64));
+ const from='translateY('+dy+'px) scale('+scale+')';
+ stage.animate([{transform:from},{transform:'none'}],{delay:settle,duration:520,easing:'cubic-bezier(.22,.75,.25,1)',fill:'backwards'});
+ tiles.forEach((tile,i)=>{
+   tile.style.setProperty('--turn',(440+i*580)+'ms');
+ });
+ panel.querySelector('.receipt-actions').inert=true;
+ const finish=()=>{panel.classList.remove('opening-pack');panel.querySelector('.receipt-actions').inert=false;};
+ setTimeout(finish,settle+530);
 }
 function registrationResult() {
  const {picks, gold, first, firstGold, index} = registered;
@@ -505,7 +526,7 @@ function registrationResult() {
    title = first && count===1 ? t('¡Tu primer cromo es dorado!','Your first card is gold!')
      : firstGold && count===1 ? t('¡Tu primer cromo dorado!','Your first gold card!')
      : count===1 ? t('Cromo dorado obtenido','Gold card collected') : t('Cromos dorados obtenidos','Gold cards collected');
-   message = t('Puedes canjearlo por una camiseta sin gastar unidades. Este canje es independiente del de 50 unidades: puedes conseguir una camiseta por cada vía.','You can redeem a gold card for a shirt without spending any units. This is separate from the 50-unit shirt: you can get a shirt through each route.');
+   message = t('Puedes canjear una camiseta sin gastar unidades.','Redeem a shirt without spending any units.');
  } else if (gold) {
    title = count===1?t('Otra copia dorada','Another gold card'):t('Nuevas copias doradas','New gold cards');
    message = (count===1 ? t('Has conseguido un dorado de ','You collected a gold copy of ')+name+'.'
@@ -522,7 +543,6 @@ function registrationResult() {
    <div class="receipt-body">
      <div class="receipt-stage">${receiptPreview()}</div>${carousel}
      <div class="receipt-feedback">
-       <span class="receipt-success" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m4 12 5.5 5.5L20 7" fill="none" stroke="currentColor" stroke-width="2.4"/></svg></span>
        <h1 id="receipt-title">${title}</h1><p>${message}</p>
      </div>
      <div class="receipt-actions"><button class="button primary" data-route="home" data-register-code>${t('Seguir registrando códigos','Register another code')}</button>${window.Rewards.available().length?'<button class="button" data-prize="'+window.Rewards.available()[0].id+'">'+t('Ya puedes canjear un premio','You can now redeem a reward')+'</button>':'<button class="button" data-route="collection">'+t('Ver colección','View collection')+'</button>'}</div>
@@ -556,7 +576,7 @@ function draw(){
  else if(page==='reward')main.innerHTML=reward();
  else if(['history','orders'].includes(page))main.innerHTML=historyPage(page==='orders');
  else if(page==='help')main.innerHTML=help();
- else if(page==='received'&&registered){main.innerHTML=registrationResult();window.Holo.init(main);}
+ else if(page==='received'&&registered){main.innerHTML=registrationResult();window.Holo.init(main);revealPack(main.querySelector('.registration-receipt'));}
  else if(page==='logout'){
    main.replaceChildren();
    confirmAction(t('¿Cerrar sesión?','Log out?'),t('Tu colección seguirá guardada. Podrás continuar cuando vuelvas a entrar.','Your collection will be saved. You can continue when you sign in again.'),t('Cancelar','Cancel'),t('Cerrar sesión','Log out'),()=>go('home'),()=>{db.logout();pending=null;registered=null;shipping={};historyFilter='all';go('login');});
