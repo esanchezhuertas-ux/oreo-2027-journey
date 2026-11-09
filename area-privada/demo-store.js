@@ -8,15 +8,14 @@
   function makePablo() {
     const cards = [];
     for (const player of seed) {
-      for (let i = 0; i < player.copies; i++) {
+      for (let i = 0; i < (player.id==='mbappe'?1:player.copies); i++) {
         cards.push({ player: ({rudiger:'cucurella','le-normand':'pubill',natan:'fran-garcia',fornals:'isco'}[player.id] || player.id), rarity: player.type, used: i >= player.available,
           code: 'DEMO' + String(cards.length + 1).padStart(6, '0'),
           time: Date.now() - (player.daysAgo + i) * day });
       }
     }
-    while (cards.length < 18) {
-      const p = catalog.find(p => !cards.some(c => c.player === p.id)) || catalog[0];
-      cards.push({player:p.id, rarity:'blue', used:false, code:'DEMO'+String(cards.length+1).padStart(6,'0'), time:Date.now()-day});
+    for(const gold of cards.filter(copy=>copy.rarity==='gold')){
+      cards.push({...gold,rarity:'blue',used:false,code:'DEMO'+String(cards.length+1).padStart(6,'0')});
     }
     return {name:'Pablo', surname:'García', email, cards, orders:[], profileEvents:[], phone:'', address:{}, codes:[...new Set(cards.map(c=>c.code))]};
   }
@@ -33,6 +32,17 @@
     }
     sessionStorage.setItem(key,JSON.stringify(db));
   }
+  function syncPabloExamples(){
+    const a=db.account;
+    if(a?.email!==email)return;
+    for(const gold of a.cards.filter(copy=>copy.rarity==='gold')){
+      if(a.cards.some(copy=>copy.player===gold.player&&copy.rarity==='blue'))continue;
+      const code='PAIR-'+gold.player;
+      a.cards.push({...gold,rarity:'blue',used:false,code});
+      a.codes.push(code);
+    }
+  }
+  if(db.account?.email===email){syncPabloExamples();save();}
   async function digest(password){
     const bytes=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(password));
     return Array.from(new Uint8Array(bytes),b=>b.toString(16).padStart(2,'0')).join('');
@@ -57,7 +67,7 @@
     const id=input.trim().toLowerCase();
     const a=accounts()[id] || seedAccount(id);
     if(!await matchesPassword(a,password))return false;
-    db.account=a;save();return true;
+    db.account=a;syncPabloExamples();save();return true;
   }
   async function signup(name,surname,input,password,phone,preferences={}){
     const id=input.trim().toLowerCase();
@@ -76,7 +86,7 @@
     };
     return Object.values(accounts()).find(a=>a.email===query||(!query.includes('@')&&a.phone&&number(a.phone)===number(query)))||seedAccount(query);
   }
-  function smsLogin(a){db.account=a;save();}
+  function smsLogin(a){db.account=a;syncPabloExamples();save();}
   async function password(a,value){a.digest=await digest(value);const all=accounts();all[a.email]=a;localStorage.setItem(accountsKey,JSON.stringify(all));if(db.account?.email===a.email){db.account=a;save();}}
   function entries(){
     const groups=new Map();
