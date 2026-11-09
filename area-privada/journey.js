@@ -327,9 +327,10 @@ function markProfileEdited(event){
 }
 main.addEventListener('input',markProfileEdited);
 main.addEventListener('change',markProfileEdited);
-function confirmAction(title,message,safe,action,cancel,accept){
+function confirmAction(title,message,safe,action,cancel,accept,{destructive=false}={}){
  const dialog=document.createElement('dialog');
  dialog.className='discard-profile';
+ dialog.classList.toggle('is-destructive',destructive);
  dialog.setAttribute('aria-labelledby','confirmation-heading');
  dialog.setAttribute('aria-describedby','confirmation-message');
  dialog.innerHTML='<h2 id="confirmation-heading"></h2><p id="confirmation-message"></p><div class="confirmation-actions"></div>';
@@ -671,7 +672,7 @@ function draw(){
  else if(page.startsWith('address/delete/')&&savedAddresses(a).some(item=>item.id===page.slice(15))){
    const item=savedAddresses(a).find(item=>item.id===page.slice(15));
    main.innerHTML=profile('address');
-   confirmAction(t('¿Eliminar esta dirección?','Delete this address?'),t('Se eliminará '+item.alias+' de tus direcciones guardadas. No cambiará tus pedidos.',item.alias+' will be removed from your saved addresses. Your orders will stay the same.'),t('Cancelar','Cancel'),t('Eliminar dirección','Delete address'),()=>go('address'),()=>submitProfile('delete-address',{addressId:item.id}));
+   confirmAction(t('¿Eliminar esta dirección?','Delete this address?'),t('Se eliminará '+item.alias+' de tus direcciones guardadas. No cambiará tus pedidos.',item.alias+' will be removed from your saved addresses. Your orders will stay the same.'),t('Cancelar','Cancel'),t('Eliminar dirección','Delete address'),()=>go('address'),()=>submitProfile('delete-address',{addressId:item.id}),{destructive:true});
  }
  else main.innerHTML=profile(page);
  if(overlay){
