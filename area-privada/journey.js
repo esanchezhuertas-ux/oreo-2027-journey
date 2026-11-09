@@ -578,7 +578,14 @@ function revealPack(panel){
    effects.push(packBurst(face,turn+480,tile.dataset.gold==='true'));
    if(i===tiles.length-1){
      tile.classList.add('pack-highlight');
-     setTimeout(()=>drawPackFlare(face,tile.dataset.gold==='true'),finale);
+     setTimeout(()=>{
+       if(!face.isConnected)return;
+       const light=document.createElement('span');
+       light.className='pack-afterlight';
+       light.setAttribute('aria-hidden','true');
+       face.querySelector('.holo-card').append(light);
+       drawPackFlare(face,tile.dataset.gold==='true');
+     },finale);
    }
  });
  panel.querySelector('.receipt-actions').inert=true;
