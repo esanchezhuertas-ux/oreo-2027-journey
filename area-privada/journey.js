@@ -508,53 +508,6 @@ function packBurst(host,delay,gold,opening=false){
  host.append(layer);
  return layer;
 }
-function drawPackFlare(face,gold){
- if(!face.isConnected||matchMedia('(prefers-reduced-motion: reduce)').matches)return;
- const canvas=document.createElement('canvas');
- canvas.className='pack-flare-canvas';canvas.setAttribute('aria-hidden','true');
- const ctx=canvas.getContext('2d');
- if(!ctx)return;
- const w=innerWidth,h=innerHeight,rect=face.getBoundingClientRect();
- canvas.width=w;canvas.height=h;document.body.append(canvas);
- const cx=rect.left+rect.width/2,cy=rect.top+rect.height/2;
- const reach=Math.hypot(Math.max(cx,w-cx),Math.max(cy,h-cy));
- const tint=gold?'255,197,33':'90,208,255';
- const rays=Array.from({length:65},(_,i)=>({
-   angle:i*2.39996,length:.32+.68*Math.abs(Math.sin(i*17.19)),bend:Math.sin(i*8.3)*.13
- }));
- const start=performance.now();
- function paint(now){
-   const t=(now-start)/1500;
-   if(t>=1||!face.isConnected){canvas.remove();return;}
-   const wave=t<.31?1-(1-t/.31)**3:((1-t)/.69)**1.7;
-   const strength=Math.min(1,t*15)*(1-t);
-   const radius=Math.max(1,reach*wave);
-   ctx.clearRect(0,0,w,h);
-   const glow=ctx.createRadialGradient(cx,cy,0,cx,cy,radius);
-   for(const [at,alpha] of [[0,.96],[.13,.74],[.48,.17],[.91,.04],[.96,.43],[1,0]])
-     glow.addColorStop(at,'rgba('+tint+','+alpha*strength+')');
-   ctx.fillStyle=glow;ctx.fillRect(0,0,w,h);
-   ctx.save();ctx.translate(cx,cy);
-   for(const ray of rays){
-     ctx.save();ctx.rotate(ray.angle);
-     const length=radius*ray.length;
-     const wide=rect.width*.026*strength;
-     ctx.fillStyle='rgba('+tint+','+.55*strength+')';
-     ctx.beginPath();ctx.moveTo(0,-wide);ctx.lineTo(length,0);ctx.lineTo(0,wide);ctx.fill();
-     const end=length*.84,bend=ray.bend*end;
-     ctx.strokeStyle='rgba(255,248,209,'+strength+')';ctx.lineWidth=1.3;
-     ctx.beginPath();ctx.moveTo(end*.54,bend*.12);ctx.quadraticCurveTo(end*.88,bend*.35,end,bend);ctx.stroke();
-     ctx.fillStyle='rgba(255,255,240,'+strength+')';ctx.beginPath();ctx.arc(end,bend,2.1,0,2*Math.PI);ctx.fill();
-     ctx.restore();
-   }
-   ctx.restore();
-   const core=ctx.createRadialGradient(cx,cy,0,cx,cy,rect.height*.65);
-   core.addColorStop(0,'rgba(255,255,248,'+strength+')');core.addColorStop(.35,'rgba(255,252,208,'+.94*strength+')');core.addColorStop(1,'transparent');
-   ctx.fillStyle=core;ctx.fillRect(cx-rect.height,cy-rect.height,rect.height*2,rect.height*2);
-   requestAnimationFrame(paint);
- }
- requestAnimationFrame(paint);
-}
 function revealPack(panel){
  if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
  const stage=panel.querySelector('.receipt-stage');
@@ -578,7 +531,10 @@ function revealPack(panel){
    effects.push(packBurst(face,turn+480,tile.dataset.gold==='true'));
    if(i===tiles.length-1){
      tile.classList.add('pack-highlight');
-     setTimeout(()=>drawPackFlare(face,tile.dataset.gold==='true'),finale);
+     const halo=document.createElement('span');
+     halo.className='pack-halo';halo.setAttribute('aria-hidden','true');
+     halo.style.setProperty('--finale',finale+'ms');
+     face.append(halo);effects.push(halo);
    }
  });
  panel.querySelector('.receipt-actions').inert=true;

@@ -281,5 +281,19 @@
 }
 .reveal-size{touch-action:none}
 
-.pack-flare-canvas{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:2147483646}
+.pack-halo{pointer-events:none;position:absolute;left:50%;top:50%;width:250vmax;height:250vmax;border-radius:50%;background:radial-gradient(circle,#fffbd7 0%,var(--light) 10%,transparent 64%),repeating-conic-gradient(from 8deg,transparent 0deg 13deg,#fff5 14deg,transparent 17deg);mask-image:radial-gradient(closest-side,black 48%,transparent 100%);z-index:5;animation:pack-wave 1.45s var(--finale) both}
+@keyframes pack-wave{0%{opacity:0;transform:translate(-50%,-50%) scale(.015)}15%{opacity:.92}42%{opacity:.76;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-50%) scale(.035)}}
+.pack-halo{
+ background:radial-gradient(closest-side,#fffef3 0%,var(--light) 7%,transparent 30%,transparent 63%,color-mix(in srgb,var(--light) 36%,transparent) 68%,transparent 74%);
+ mask-image:none;
+}
+.pack-halo::before,.pack-halo::after{content:"";position:absolute;inset:0;border-radius:50%;pointer-events:none}
+.pack-halo::before{
+ background:repeating-conic-gradient(from 13deg,transparent 0deg 12deg,#fff9 12.6deg,transparent 14deg 25deg,var(--light) 26deg,transparent 29deg 41deg);
+ mask-image:radial-gradient(closest-side,transparent 1%,black 7%,#0006 31%,transparent 69%);
+}
+.pack-halo::after{
+ background:radial-gradient(ellipse closest-side,#fffefa 0%,#fffbcf 8%,transparent 39%);
+ transform:scale(.7,.34);
+}
 .reveal-back{pointer-events:none}
