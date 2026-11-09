@@ -3,11 +3,13 @@
   const mounted=new WeakSet();
   const previews=new WeakMap();
   const reduced=matchMedia('(prefers-reduced-motion: reduce)');
+  const mobile=matchMedia('(max-width: 760px)');
   const clamp=n=>Math.min(1,Math.max(0,n));
   function attach(card){
     if(mounted.has(card))return;
     mounted.add(card);
     let frame=0,box=null,x=.5,y=.4,tracking=false,touch=false;
+    let touchOrigin=null,dragged=false;
     const surface=card.closest('.reveal-size')||card;
     const draw=()=>{
       frame=0;
@@ -22,10 +24,12 @@
       s.setProperty('--ry',((px-.5)*(touch?72:24)).toFixed(2)+'deg');
       s.setProperty('--foil-offset-x',((px-.5)*2).toFixed(2)+'px');
       s.setProperty('--foil-offset-y',((py-.5)*2).toFixed(2)+'px');
-      const glint=1-Math.abs(px-.73+(py-.5)*.32)/.13;
+      const incidence=Math.abs(px-.5+(py-.5)*.32);
+      const glint=1-Math.abs(incidence-.25)/.22;
       s.setProperty('--green-glint',Math.max(0,glint).toFixed(3));
-      s.setProperty('--foil-distance',Math.min(1,2*Math.hypot(px-.5,py-.5)).toFixed(3));
-      s.setProperty('--glow','1');
+      const distance=Math.min(1,2*Math.hypot(px-.5,py-.5));
+      s.setProperty('--foil-distance',distance.toFixed(3));
+      s.setProperty('--glow',touchOrigin&&!reduced.matches?(1+.18*Math.min(1,distance*2)).toFixed(3):'1');
     };
     const schedule=()=>{if(!frame)frame=requestAnimationFrame(draw);};
     const start=()=>{
@@ -35,14 +39,22 @@
     };
     const point=e=>{
       if(!tracking)start();
-      x=clamp(.5+((e.clientX-box.left)/box.width-.5)*(touch?1.65:1));
-      y=clamp(.5+((e.clientY-box.top)/box.height-.5)*(touch?1.65:1));
+      if(touchOrigin){
+        // A short drag tilts from the point of contact, even near a card edge.
+        const dx=e.clientX-touchOrigin.x,dy=e.clientY-touchOrigin.y;
+        if(Math.hypot(dx,dy)>8)dragged=true;
+        x=clamp(.5+2.25*dx/box.width);
+        y=clamp(.5+2.25*dy/box.height);
+      }else{
+        x=clamp(.5+((e.clientX-box.left)/box.width-.5)*(touch?1.65:1));
+        y=clamp(.5+((e.clientY-box.top)/box.height-.5)*(touch?1.65:1));
+      }
       schedule();
     };
     const reset=()=>{
       if(frame)cancelAnimationFrame(frame);
-      frame=0;tracking=false;box=null;x=.5;y=.4;
-      card.classList.remove('holo-active');
+      frame=0;tracking=false;touch=false;touchOrigin=null;box=null;x=.5;y=.4;
+      card.classList.remove('holo-active','holo-touch');
       card.style.setProperty('--rx','0deg');
       card.style.setProperty('--ry','0deg');
       card.style.setProperty('--glow',card.matches(':focus-visible')?'.45':'0');
@@ -64,11 +76,31 @@
       requestAnimationFrame(sweep);
     });
     surface.addEventListener('pointerenter',e=>{if(e.pointerType!=='touch'){touch=false;start();point(e);}},{passive:true});
-    surface.addEventListener('pointermove',e=>{if(e.pointerType!=='touch'||tracking)point(e);},{passive:true});
-    surface.addEventListener('pointerdown',e=>{touch=e.pointerType==='touch';start();point(e);if(touch)surface.setPointerCapture(e.pointerId);},{passive:true});
-    surface.addEventListener('pointerleave',reset,{passive:true});
-    surface.addEventListener('pointercancel',reset,{passive:true});
-    surface.addEventListener('pointerup',e=>{if(e.pointerType==='touch')reset();},{passive:true});
+    const tracksPointer=e=>!touchOrigin||e.pointerId===touchOrigin.id;
+    surface.addEventListener('pointermove',e=>{
+      if(tracksPointer(e)&&(e.pointerType!=='touch'||tracking))point(e);
+    },{passive:true});
+    surface.addEventListener('pointerdown',e=>{
+      if(!tracksPointer(e))return;
+      dragged=false;
+      touch=e.pointerType==='touch';
+      if(touch&&mobile.matches){
+        touchOrigin={id:e.pointerId,x:e.clientX,y:e.clientY};
+        card.classList.add('holo-touch');
+      }
+      start();point(e);
+      if(touch)surface.setPointerCapture(e.pointerId);
+    },{passive:true});
+    surface.addEventListener('pointerleave',e=>{if(tracksPointer(e))reset();},{passive:true});
+    surface.addEventListener('pointercancel',e=>{if(tracksPointer(e))reset();},{passive:true});
+    surface.addEventListener('pointerup',e=>{if(tracksPointer(e)&&e.pointerType==='touch')reset();},{passive:true});
+    // A deliberate inspection gesture on a gallery card should not open its modal.
+    surface.addEventListener('click',e=>{
+      if(dragged&&e.detail>0){
+        dragged=false;
+        e.stopPropagation();
+      }
+    });
     card.addEventListener('focus',()=>{
       if(card.matches(':focus-visible')){x=.65;y=.3;start();schedule();}
     });

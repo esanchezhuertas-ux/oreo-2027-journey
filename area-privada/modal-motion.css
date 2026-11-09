@@ -5,10 +5,17 @@
 .modal-intro .detail-stage{background:none}
 .modal-intro .detail-info{visibility:hidden;opacity:0}
 .modal-intro .modal-card-orbit,.modal-settling .modal-card-orbit{will-change:transform}
-/* Filter flattens a 3D plane in some engines. The shaped box shadow keeps its depth. */
-.modal-intro .holo-card,.modal-settling .holo-card{transform:translateZ(.2px)!important;transition:none;backface-visibility:hidden;-webkit-backface-visibility:hidden;pointer-events:none;filter:none!important;box-shadow:0 14px 24px #0004}
+/* Each face carries its own exterior shadow. The orbit stays a transparent 3D container. */
+#card-dialog .detail-stage {
+  --card-exterior-shadow: 0 14px 24px rgb(0 0 0 / 24%);
+}
+#card-dialog .detail-stage .holo-card {
+  filter: none;
+  overflow: visible;
+}
+.modal-intro .holo-card,.modal-settling .holo-card{transform:translateZ(.2px)!important;transition:none;backface-visibility:hidden;-webkit-backface-visibility:hidden;pointer-events:none}
 .modal-intro .holo-card{--glow:.85!important;--fx:70%;--fy:30%}
-.modal-intro .modal-card-back{--modal-back-color:#00457c;display:grid;place-items:center;position:absolute;inset:0;scale:var(--modal-card-scale,1.4);border:5.8px solid #bfd9e5;border-radius:6px 6px 80px 80px;background:var(--modal-back-color);transform:rotateY(180deg) translateZ(.2px);backface-visibility:hidden;-webkit-backface-visibility:hidden;box-shadow:0 14px 24px #0004,inset 0 0 0 2px #005998;color:#fff}
+.modal-intro .modal-card-back{--modal-back-color:#00457c;display:grid;place-items:center;position:absolute;inset:0;scale:var(--modal-card-scale,1.4);border:5.8px solid #bfd9e5;border-radius:var(--card-contour);background:var(--modal-back-color);transform:rotateY(180deg) translateZ(.2px);backface-visibility:hidden;-webkit-backface-visibility:hidden;box-shadow:var(--card-exterior-shadow),inset 0 0 0 2px #005998;color:#fff}
 .modal-card-back>svg{display:block;width:128px;height:auto;max-width:100%;overflow:visible}
 .modal-settling .detail-info{animation:modal-info-enter .36s ease-out both}
 .detail-dialog.modal-settling{animation:modal-frame-enter .36s ease-out both}
@@ -81,10 +88,8 @@
  #card-dialog .detail-identity h2{padding-inline:28px}
  #card-dialog .detail-identity p{font-size:12px;line-height:20px}
  .detail-figure{grid-row:2;gap:12px;margin:8px 0 16px}
- #card-dialog .detail-stage{flex:none;height:232px;overflow:visible}
- /* Draw the shadow on the rounded artwork, outside the foil's clipping layer. */
- #card-dialog .detail-stage .holo-card{scale:1;appearance:none;overflow:visible;filter:none;box-shadow:none}
- #card-dialog .detail-stage .card-face{box-shadow:0 7px 14px -5px rgb(27 28 32 / 24%)}
+ #card-dialog .detail-stage{--card-exterior-shadow:0 7px 14px -5px rgb(27 28 32 / 24%);flex:none;height:232px;overflow:visible}
+ #card-dialog .detail-stage .holo-card{scale:1}
  #card-dialog .detail-inventory{grid-row:3;margin-bottom:16px}
  #card-dialog .detail-scroll{grid-row:4;padding-bottom:6px}
  #card-dialog .redeem-action{grid-row:5;margin-top:0}

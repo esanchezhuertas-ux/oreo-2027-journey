@@ -63,13 +63,15 @@ function receivedCard(player,gold) {
  return '<span class="holo-card '+card.type+'" tabindex="0" role="group" aria-label="'+esc(player.name)+'" style="--biscuit-ink:'+(gold?'#f4d74c':'#0cbcff')+'">'+cardFace(card,true,'-receipt')+'</span>';
 }
 function frontRarity(p){
- return p.records.some(copy=>copy.rarity==='blue'&&!copy.used)?'blue':p.type;
+ const availableGold=p.records.some(copy=>copy.rarity==='gold'&&!copy.used);
+ if(availableGold)return 'gold';
+ return p.available?'blue':p.type;
 }
 function fanRarities(p){
  const records=[...p.records].sort((a,b)=>Number(a.used)-Number(b.used)||b.time-a.time);
  const front=records.findIndex(copy=>copy.rarity===p.type);
  if(front>=0)records.splice(front,1);
- if(p.type==='blue')records.sort((a,b)=>Number(b.rarity==='gold')-Number(a.rarity==='gold'));
+ records.sort((a,b)=>Number(a.rarity===p.type)-Number(b.rarity===p.type));
  return records.slice(0,2).map(copy=>copy.used?(copy.rarity==='gold'?'gold-spent':'blue-spent'):copy.rarity).join(' ');
 }
 function card(p,detail=false){
@@ -235,7 +237,10 @@ function openDetail(id){
    const element=content.querySelector('.holo-card'), template=document.createElement('template');
    template.innerHTML=card(next,true);
    const face=template.content.firstElementChild;
-   for(const attr of ['class','data-player','aria-label','style'])element.setAttribute(attr,face.getAttribute(attr));
+   element.classList.remove('blue','gold');
+   element.classList.add(next.type);
+   element.style.setProperty('--biscuit-ink',face.style.getPropertyValue('--biscuit-ink'));
+   for(const attr of ['data-redeemed','data-copies','aria-label'])element.setAttribute(attr,face.getAttribute(attr));
    element.replaceChildren(...face.childNodes);
    content.querySelectorAll('[data-rarity]').forEach(b=>b.setAttribute('aria-pressed',String(b===toggle)));
   };

@@ -2,6 +2,9 @@
 /* Procedural foil: no image textures, canvas, or permanent animation. */
 .holo-card{--hx:50%;--hy:40%;--fx:50%;--fy:50%;--rx:0deg;--ry:0deg;--glow:0;transform:rotateX(var(--rx)) rotateY(var(--ry)) translateZ(0);transform-origin:center;transition:transform .5s cubic-bezier(.2,.8,.2,1);touch-action:manipulation}
 .holo-card.holo-active{transition:transform .1s ease-out;will-change:transform}
+.holo-card.holo-active.holo-touch{transition:transform 45ms ease-out}
+.holo-touch :is(.holo-foil,.holo-glare,.holo-sparkles){transition-duration:120ms}
+@media(max-width:760px){.card-grid:not(.club-scroller) .holo-card{touch-action:pan-y pinch-zoom}}
 .holo-foil,.holo-glare,.holo-sparkles{position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:4;transition:opacity .35s ease}
 /* The grain stays on the print while the reflection follows the pointer. */
 .holo-card .holo-foil{
@@ -31,12 +34,14 @@
 }
 .holo-card.gold .holo-glare::after{
  content:"";position:absolute;inset:0;
- background:radial-gradient(circle,#98efa6 .66px,transparent .95px) 3px 8px/19px 27px,radial-gradient(circle,#adffc0 .45px,transparent .85px) 7px 3px/31px 21px;
- mask-image:radial-gradient(ellipse at var(--hx) var(--hy),black,transparent 54%);
+ /* Two grain sizes catch the light beneath the portrait and lettering. */
+ background:radial-gradient(circle,#68d995 .8px,transparent 1.3px) 3px 8px/17px 23px,
+   radial-gradient(circle,#b6ffbd .65px,transparent 1.1px) 9px 4px/29px 19px;
+ mask-image:radial-gradient(ellipse at var(--hx) var(--hy),black 9%,#000a 34%,transparent 66%);
  opacity:var(--green-glint,0)
 }
 .holo-card.blue .holo-foil::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at var(--hx) var(--hy),#fff 5%,#370c36a8 42%,#393939 100%);mix-blend-mode:hard-light;opacity:.65}
-.holo-card.gold .holo-glare{z-index:2;background:none;mix-blend-mode:screen;opacity:calc(var(--glow)*.69)}
+.holo-card.gold .holo-glare{z-index:2;background:none;mix-blend-mode:normal;opacity:calc(var(--glow)*.88)}
 .card-tile .holo-card[data-redeemed=true] :is(.holo-foil,.holo-glare,.holo-sparkles){display:none}
 /* Redeemed gallery copies retain a diffuse pearl reflection over the original art. */
 .card-tile .holo-card[data-redeemed=true] .card-face::after{
@@ -45,4 +50,4 @@
  mix-blend-mode:screen;opacity:calc(.10 + var(--glow)*.68)
 }
 .holo-card:focus-visible{outline:3px solid #0042aa;outline-offset:7px;box-shadow:none}
-@media(prefers-reduced-motion:reduce){.holo-card,.holo-card.holo-active{transform:none!important;transition:none;will-change:auto}.holo-foil,.holo-glare,.holo-sparkles{transition:none}}
+@media(prefers-reduced-motion:reduce){.holo-card,.holo-card.holo-active,.holo-card.holo-active.holo-touch{transform:none!important;transition:none;will-change:auto}.holo-foil,.holo-glare,.holo-sparkles,.holo-touch :is(.holo-foil,.holo-glare,.holo-sparkles){transition:none}}

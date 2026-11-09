@@ -194,8 +194,8 @@
 .reveal-size{zoom:var(--size);width:160px;height:232px;perspective:900px}
 .reveal-spin{position:relative;width:100%;height:100%;transform-style:preserve-3d;animation:receipt-flip 1.45s cubic-bezier(.22,.72,.2,1) both}
 .reveal-spin .holo-card,.reveal-back{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden}
-.reveal-spin .holo-card{display:block;scale:1;touch-action:none}
-.reveal-back{--back:#00457c;background:var(--back);border:5px solid #bfd9e5;border-radius:7px 7px 80px 80px;display:grid;place-items:center;transform:rotateY(180deg);box-shadow:0 0 28px #9be0ff}
+.reveal-spin .holo-card{--card-exterior-shadow:0 14px 24px rgb(0 0 0 / 24%);display:block;scale:1;touch-action:none;filter:none;overflow:visible}
+.reveal-back{--back:#00457c;background:var(--back);border:5px solid #bfd9e5;border-radius:var(--card-contour);display:grid;place-items:center;transform:rotateY(180deg);box-shadow:0 0 28px #9be0ff}
 .reveal-back svg{width:82%;height:auto}
 @keyframes receipt-flip{0%,18%{transform:translateY(12%) scale(1.48) rotateY(180deg)}72%{transform:scale(1.08) rotateY(-8deg)}100%{transform:scale(1) rotateY(0deg)}}
 .receipt-success{display:grid;place-items:center;border-radius:50%;background:#d9f3e6;color:#208761;width:52px;height:52px}
