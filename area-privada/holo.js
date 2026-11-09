@@ -19,6 +19,9 @@
       s.setProperty('--fy',(20+py*60).toFixed(2)+'%');
       s.setProperty('--rx',((.5-py)*(touch?60:18)).toFixed(2)+'deg');
       s.setProperty('--ry',((px-.5)*(touch?72:24)).toFixed(2)+'deg');
+      s.setProperty('--foil-offset-x',((px-.5)*2).toFixed(2)+'px');
+      s.setProperty('--foil-offset-y',((py-.5)*2).toFixed(2)+'px');
+      s.setProperty('--foil-distance',Math.min(1,2*Math.hypot(px-.5,py-.5)).toFixed(3));
       s.setProperty('--glow','1');
     };
     const schedule=()=>{if(!frame)frame=requestAnimationFrame(draw);};

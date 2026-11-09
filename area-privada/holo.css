@@ -12,13 +12,15 @@
 .holo-card .holo-sparkles{opacity:0}
 .holo-card.gold .holo-foil{
  background-image:var(--foil-grain),var(--foil-grain),conic-gradient(#99cfc4,#89a4ca,#c38fa9,#e8bd82,#99cfc4),radial-gradient(circle at var(--hx) var(--hy),#bababa,#292929 55%);
- background-size:81px,99px,cover,cover;background-position:12px 8px,32px 26px,center,center;background-blend-mode:soft-light,hard-light,overlay;
- mix-blend-mode:color-dodge;filter:brightness(.44) contrast(1.4) saturate(.74);opacity:calc(.03 + var(--glow)*.52)
+ background-size:81px,99px,cover,cover;background-position:calc(12px + var(--foil-offset-x,0px)) calc(8px + var(--foil-offset-y,0px)),calc(32px - var(--foil-offset-x,0px)) calc(26px - var(--foil-offset-y,0px)),center,center;background-blend-mode:soft-light,hard-light,overlay;
+ mix-blend-mode:color-dodge;filter:brightness(calc(.32 + var(--foil-distance,0)*.18)) contrast(1.4) saturate(.74);opacity:calc(.03 + var(--glow)*.52)
 }
 .holo-card.gold .holo-sparkles{
  background:var(--foil-grain) center/78px;mask-image:radial-gradient(ellipse at var(--hx) var(--hy),black,transparent 61%);
  mix-blend-mode:overlay;filter:contrast(1.9);opacity:calc(.06 + var(--glow)*.28)
 }
+.holo-card.gold .holo-foil{mask-image:radial-gradient(ellipse at var(--hx) var(--hy),transparent 4%,#0006 28%,black 61%)}
+.holo-card.blue .holo-foil::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at var(--hx) var(--hy),#fff 5%,#370c36a8 42%,#393939 100%);mix-blend-mode:hard-light;opacity:.65}
 .holo-card.gold .holo-glare{opacity:calc(var(--glow)*.16)}
 .card-tile .holo-card[data-redeemed=true] :is(.holo-foil,.holo-glare,.holo-sparkles){display:none}
 .holo-card:focus-visible{outline:3px solid #0042aa;outline-offset:7px;box-shadow:none}
