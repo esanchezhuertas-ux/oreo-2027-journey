@@ -16,3 +16,12 @@
 .card-tile .holo-card.gold-spent{filter:none}
 .spent-gold-badge{gap:4px;padding:3px 6px;border-radius:10px;background:#fff5d7;color:#72540b;font:500 11px/16px var(--ui-font,Arial,sans-serif);white-space:nowrap}
 .card-meta .spent-gold-badge .icon{width:14px;height:14px}
+.cookie-emblem{border-radius:50%;background:var(--biscuit-ink,#0cbcff)}
+.cookie-emblem::after{content:"";position:absolute;inset:0;background:currentColor;mask:url("assets/oreo-emblem.svg") center/contain no-repeat;-webkit-mask:url("assets/oreo-emblem.svg") center/contain no-repeat}
+.card-face .crest,.missing-card .crest{width:44px;height:44px;left:6px;top:38px}
+.gold-spent .card-face{background:linear-gradient(175deg,#fae1a1,#f5dc96 65%,#bf9b66)}
+.gold-spent .card-face::before{background:#fff1cd}
+.gold-spent .cookie-emblem{--biscuit-ink:#fff1cd;color:#efd48c}
+.gold-spent .cookie-emblem::after{background:linear-gradient(#f7df9b,#d1ac70)}
+.gold-spent .card-face :is(.crest,.player-position,.copies-overlay){visibility:hidden}
+.reward-progress:disabled{opacity:1;cursor:default;color:inherit}

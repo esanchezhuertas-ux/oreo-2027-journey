@@ -150,7 +150,7 @@ function home(){
   const target=id;
   const units=balance(target),goal=cost(target),pct=Math.min(100,Math.round(units/goal*100));
   const description=claimed(target)?t('Ya canjeado','Already redeemed'):canClaim(target)?t('Disponible para canjear','Available to redeem'):t('Te faltan ','You need ')+(goal-units)+t(' unidades',' more units');
-  return `<button class="reward-progress" data-ready="${canClaim(target)}" data-prize="${target}"><span class="ring"><svg viewBox="0 0 64 64" aria-hidden="true"><circle class="ring-track" cx="32" cy="32" r="25"/><circle class="ring-arc" cx="32" cy="32" r="28" pathLength="100" stroke-dasharray="${pct} 100" opacity="${pct?1:0}"/></svg><b>${Math.min(units,goal)}/${goal}</b></span><span class="reward-text"><strong><span class="prize-art"><img width="24" height="20" src="assets/icons/${id==='scarf'?'scarf':'reward-'+id}.svg" alt=""></span>${titleOf(id)}</strong><small>${description}</small></span></button>`;
+  return `<button class="reward-progress" data-ready="${canClaim(target)}" ${canClaim(target)?'data-prize="'+target+'"':'disabled'}><span class="ring"><svg viewBox="0 0 64 64" aria-hidden="true"><circle class="ring-track" cx="32" cy="32" r="25"/><circle class="ring-arc" cx="32" cy="32" r="28" pathLength="100" stroke-dasharray="${pct} 100" opacity="${pct?1:0}"/></svg><b>${Math.min(units,goal)}/${goal}</b></span><span class="reward-text"><strong><span class="prize-art"><img width="24" height="20" src="assets/icons/${id==='scarf'?'scarf':'reward-'+id}.svg" alt=""></span>${titleOf(id)}</strong><small>${description}</small></span></button>`;
  }).join('');
  const dots=rewards.map((id,i)=>`<button type="button" aria-label="${titleOf(id)}" aria-pressed="${i===0}"></button>`).join('');
  const goldOffer=canClaim('gold')?`<button class="gold-offer" data-prize="gold"><img src="assets/welcome/gold-shirt.svg" width="64" height="64" alt=""><span><small>${t('Jugador dorado disponible','Gold player available')}</small><strong>${t('Tu primer jugador dorado tiene premio','Your first gold player earns a reward')}</strong><span>${t('Canjéalo por una camiseta sin gastar unidades.','Redeem it for a shirt without spending units.')}</span></span><b>${t('Canjear camiseta','Redeem shirt')}</b></button>`:'';
@@ -439,7 +439,7 @@ function reward(){
   const info=prizeSummary(id,receipt.shipping)+'<h2>'+t('Siguiente paso','Next step')+'</h2><p>'+t('Nos pondremos en contacto contigo a la menor brevedad posible para gestionar tu premio.','We will contact you as soon as possible about your reward.')+'</p><h2>'+t('Referencia y entrega','Reference and delivery')+'</h2><p><code>'+html(receipt.id)+'</code></p><p>'+delivery(receipt.shipping)+'</p>';
   return panel(t('Solicitud recibida','Request received'),info,{kind:'claim-review',actions:'<p>'+t('Puedes consultar esta solicitud en tu historial.','You can find this request in your history.')+'</p>'+button(t('Volver a Mi zona','Back to My zone'),'home',true)});
  }
- if(!canClaim(id))return panel(titleOf(id),'<h2>'+(claimed(id)?t('Ya canjeado','Already redeemed'):t('Progreso','Progress'))+'</h2><p>'+balance(id)+' / '+cost(id)+' '+(id==='gold'?t('cromos dorados','gold cards'):t('unidades disponibles','available units'))+'</p>'+button(t('Volver a Mi zona','Back to My zone'),'home'));
+ if(!canClaim(id)){queueMicrotask(()=>go('home'));return '';}
  if(step===2){
   const remaining=balance(id)-cost(id);
   const review=prizeSummary(id,shipping)+'<h2>'+t('Antes de confirmar','Before confirming')+'</h2><p>'+t('Usarás ','You will use ')+cost(id)+' '+(id==='gold'?t('cromo dorado.','gold card.'):t('unidades.','units.'))+'</p><p>'+(id==='gold'?t('Conservas tus unidades.','You keep your units.'):t('Te quedarán ','You will have ')+remaining+t(' unidades disponibles.',' units left.'))+'</p><small>'+t('Se usan primero tus copias más antiguas. Tu colección se conserva.','Your oldest copies are used first. You keep your collection.')+'</small><h2>'+t('Entrega','Delivery')+'</h2><p>'+delivery(shipping)+'</p><p>'+t('Después de confirmar, no podrás editar esta solicitud.','After confirmation, you cannot edit this request.')+'</p>';
@@ -564,7 +564,7 @@ function draw(){
  else main.innerHTML=profile(page);
  document.title=(collection?t('Mi zona','My zone'):main.querySelector('h1')?.textContent||'OREO')+' · OREO × LALIGA';
 }
-function launchPrize(id){rewardId=id;step=1;shipping={};receipt=null;go('reward');}
+function launchPrize(id){if(!canClaim(id))return;rewardId=id;step=1;shipping={};receipt=null;go('reward');}
 window.Rewards={
  available:()=>['gold','shirt','scarf','ball'].filter(canClaim).map(id=>({id,label:titleOf(id)})),
  open:id=>{if(['gold','shirt','scarf','ball'].includes(id)&&canClaim(id))launchPrize(id);}
