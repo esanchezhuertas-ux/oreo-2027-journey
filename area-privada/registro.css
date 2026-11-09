@@ -298,3 +298,5 @@
  background:radial-gradient(ellipse closest-side,#fffefa 0%,#fffbcf 8%,transparent 39%);
  transform:scale(.7,.34);
 }
+.reveal-size{touch-action:none}
+.reveal-size .holo-card{pointer-events:none;transition:none}
