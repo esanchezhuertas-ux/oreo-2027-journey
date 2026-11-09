@@ -1,5 +1,7 @@
 # OREO × LALIGA · Private area prototype
 
+[Open the live prototype on GitHub Pages](https://esanchezhuertas-ux.github.io/oreo-2027-journey/area-privada/)
+
 Open `area-privada/index.html` through a local HTTP server. From the repository root, run `python3 -m http.server 8000` and open <http://localhost:8000/area-privada/>.
 
 ## Design handoff
