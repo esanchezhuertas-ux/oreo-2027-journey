@@ -133,4 +133,6 @@ dialog.discard-profile :is(h2,p){margin:0}
 .address-grid.address-names{grid-template-columns:repeat(2,minmax(0,1fr))}
 .address-grid.address-postal{grid-template-columns:repeat(3,minmax(0,1fr))}
 .address-grid .entry-field input{width:100%;min-width:0}
-@media(max-width:700px){.address-grid{gap:8px}.address-grid .entry-field{padding-inline:8px}.address-postal .entry-field span{font-size:12px}}
+@media(max-width:700px){
+ .address-grid.address-names,.address-grid.address-postal{grid-template-columns:minmax(0,1fr)}
+}
