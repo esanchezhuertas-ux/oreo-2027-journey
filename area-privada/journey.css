@@ -326,3 +326,18 @@
 .auth-success svg{width:48px;height:48px}
 .auth-result>.button,.auth-result>a{margin:0;text-align:center}
 @media(max-width:700px){.auth-success{width:80px;height:80px}.auth-success svg{width:40px;height:40px}}
+
+.team-picker{position:relative;background:white;border:1px solid #82828e;border-radius:12px}
+.team-picker summary{padding:12px 38px 12px 20px;cursor:pointer;list-style:none}
+.team-picker summary::-webkit-details-marker{display:none}
+.team-picker summary:after{content:"⌄";position:absolute;right:16px;top:20px}
+.team-picker summary small{display:block;margin-bottom:4px}
+.team-value,.team-option{display:flex;align-items:center;gap:10px}
+.team-picker img{width:24px;height:24px;object-fit:contain}
+.team-picker fieldset{border:0;border-top:1px solid var(--line);margin:0;padding:4px;max-height:220px;overflow:auto}
+.team-picker legend{position:absolute;clip-path:inset(50%);height:1px;width:1px;overflow:hidden}
+.team-picker fieldset label{display:block;position:relative;cursor:pointer}
+.team-picker input{position:absolute;opacity:0;width:1px;height:1px}
+.team-picker label .team-option{min-height:40px;padding:4px 12px}
+.team-picker label:hover,.team-picker input:checked+.team-option{background:#f2f3f6}
+.team-picker input:focus-visible+.team-option{outline:2px solid #0042aa;outline-offset:-2px}

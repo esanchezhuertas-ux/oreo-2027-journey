@@ -451,14 +451,27 @@ function reward(){
   const actions=form('confirm-prize',submit(t('Confirmar canje','Confirm redemption')))+'<button class="button" data-back-step>'+t('Volver a editar','Back to edit')+'</button>';
   return panel(t('Revisa tu solicitud','Review your request'),review,{kind:'claim-review',actions});
  }
- const clubs=[...new Set(window.PLAYERS.map(p=>p.club))];
- const optionTeam='<label class="entry-field">'+t('Equipo','Team')+'<select required name="club"><option value="">'+t('Selecciona un equipo','Select a team')+'</option>'+clubs.map(c=>'<option '+(shipping.club===c?'selected':'')+'>'+html(c)+'</option>').join('')+'</select></label>';
+ const clubs=[...new Map(window.PLAYERS.map(p=>[p.clubKey,p])).values()];
+ const clubLabel=p=>'<img width="24" height="24" alt="" src="'+html(window.CATALOG_CRESTS[p.clubKey])+'"><span>'+html(p.club)+'</span>';
+ const selected=clubs.find(p=>p.club===shipping.club);
+ const optionTeam='<details class="team-picker"><summary><small>'+t('Equipo','Team')+'</small><span class="team-value">'+(selected?clubLabel(selected):t('Selecciona un equipo','Select a team'))+'</span></summary><fieldset><legend>'+t('Equipo','Team')+'</legend>'+clubs.map(p=>'<label><input type="radio" required name="club" value="'+html(p.club)+'" '+(p===selected?'checked':'')+'><span class="team-option">'+clubLabel(p)+'</span></label>').join('')+'</fieldset></details>';
  const sizePicker='<fieldset class="size-picker"><legend>'+t('Selecciona tu talla','Select your size')+'</legend>'+['XS','S','M','L','XL'].map(v=>'<label><input type="radio" required name="size" value="'+v+'" '+(shipping.size===v?'checked':'')+'><span>'+v+'</span></label>').join('')+'</fieldset>';
  const currentAddress={...a,...a.address,...shipping};
  const addressInput=currentAddress.street?'<details class="address-choice"><summary><strong>'+t('Casa','Home')+'</strong><p>'+html(currentAddress.name)+' '+html(currentAddress.surname)+'<br>'+html(currentAddress.street)+'<br>'+html(currentAddress.postcode)+' '+html(currentAddress.city)+'</p>'+t('Cambiar dirección','Change address')+'</summary>'+addressForm(currentAddress)+'</details>':addressForm(currentAddress);
  return panel(t('Canjear premio','Redeem reward'),'<div class="prize-summary"><img class="prize-illustration" width="64" alt="" src="assets/icons/'+({gold:'reward-shirt',shirt:'reward-shirt',scarf:'scarf',ball:'reward-ball'}[id])+'.svg"><div><strong>'+titleOf(id)+'</strong><small>'+t('Por ','For ')+cost(id)+' '+(id==='gold'?t('cromo dorado','gold card'):t('unidades','units'))+'</small></div></div><form id="prize-request" data-flow="prize">'+(id!=='ball'?optionTeam:'')+(['shirt','gold'].includes(id)?sizePicker:'')+'<strong>'+t('Dirección de entrega','Delivery address')+'</strong>'+addressInput+'<label><input required type="checkbox"> '+t('Soy mayor de edad y acepto las bases de la promoción.','I am of legal age and accept the promotion terms.')+'</label>'+error()+'</form>',{actions:'<button class="button primary" type="submit" form="prize-request">'+t('Revisar solicitud','Review request')+'</button>'});
 
 }
+document.addEventListener('change',event=>{
+ const picker=event.target.closest('.team-picker');
+ if(!picker||!event.target.checked)return;
+ picker.querySelector('.team-value').replaceChildren(event.target.nextElementSibling.cloneNode(true));
+ picker.open=false;
+ picker.querySelector('summary').focus();
+});
+document.addEventListener('invalid',event=>{
+ const picker=event.target.closest('.team-picker');
+ if(picker)picker.open=true;
+},true);
 function help(){
  const questions=[
    [t('¿Cómo registro un código?','How do I register a code?'),t('Pulsa «Registrar código» e introduce los 10 caracteres alfanuméricos del envase. Podrás consultar el cromo en Colección y el registro en Mi cuenta > Historial.','Select Register code and enter the 10 letters and numbers from your pack. Find the card in Collection and the entry in My account > History.')],
