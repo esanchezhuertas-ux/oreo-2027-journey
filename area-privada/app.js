@@ -62,7 +62,13 @@ function receivedCard(player,gold) {
  const card = {...player, type:gold?'gold':'blue', available:1};
  return '<span class="holo-card '+card.type+'" tabindex="0" role="group" aria-label="'+esc(player.name)+'" style="--biscuit-ink:'+(gold?'#f4d74c':'#0cbcff')+'">'+cardFace(card,true,'-receipt')+'</span>';
 }
-function card(p,detail=false){return `<button class="holo-card ${p.type}${p.type==='gold'&&!p.records.some(copy=>copy.rarity==='gold'&&!copy.used)?' gold-spent':p.available===0?' no-copies':''}" data-player="${p.id}" data-copies="${p.copies}" ${detail?'data-detail="true"':''} aria-label="${esc(p.name)}, ${p.type==='gold'?'cromo dorado':'cromo azul'}, ${p.available} ${p.available===1?'copia disponible':'copias disponibles'}${detail?'. Mueve el cursor para ver el brillo.':'. Ver cromo.'}" style="--biscuit-ink:${p.type==='gold'?'#f4d74c':'#0cbcff'}">${cardFace(p,detail,detail?'-detail':'')}</button>`;}
+function fanRarities(p){
+ const records=[...p.records].sort((a,b)=>Number(a.used)-Number(b.used)||b.time-a.time);
+ const front=records.findIndex(copy=>copy.rarity===p.type);
+ if(front>=0)records.splice(front,1);
+ return records.slice(0,2).map(copy=>copy.rarity).join(' ');
+}
+function card(p,detail=false){return `<button class="holo-card ${p.type}${detail?'':p.type==='gold'&&!p.records.some(copy=>copy.rarity==='gold'&&!copy.used)?' gold-spent':p.available===0?' no-copies':''}" data-player="${p.id}" data-copies="${p.copies}" data-fan="${detail?'':fanRarities(p)}" ${detail?'data-detail="true"':''} aria-label="${esc(p.name)}, ${p.type==='gold'?'cromo dorado':'cromo azul'}, ${p.available} ${p.available===1?'copia disponible':'copias disponibles'}${detail?'. Mueve el cursor para ver el brillo.':'. Ver cromo.'}" style="--biscuit-ink:${p.type==='gold'?'#f4d74c':'#0cbcff'}">${cardFace(p,detail,detail?'-detail':'')}</button>`;}
 function tile(p,slot=false){
  const goldSpent=p.type==='gold'&&!p.records.some(copy=>copy.rarity==='gold'&&!copy.used);
  const english=window.Demo.lang==='en';
