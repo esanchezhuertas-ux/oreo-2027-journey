@@ -63,7 +63,7 @@ function receivedCard(player,gold) {
  return '<span class="holo-card '+card.type+'" tabindex="0" role="group" aria-label="'+esc(player.name)+'" style="--biscuit-ink:'+(gold?'#f4d74c':'#0cbcff')+'">'+cardFace(card,true,'-receipt')+'</span>';
 }
 function frontRarity(p){
- return p.available && !p.records.some(c=>c.rarity==='gold'&&!c.used)?'blue':p.type;
+ return p.records.some(copy=>copy.rarity==='blue'&&!copy.used)?'blue':p.type;
 }
 function fanRarities(p){
  const records=[...p.records].sort((a,b)=>Number(a.used)-Number(b.used)||b.time-a.time);
