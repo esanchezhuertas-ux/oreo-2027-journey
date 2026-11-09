@@ -193,11 +193,26 @@ function openDetail(id){
  const used=total-available;
  const selector=variants.length>1?`<div class="detail-rarities" role="group" aria-label="${t('Rareza','Rarity')}">${['blue','gold'].map(type=>`<button type="button" data-rarity="${type}" aria-pressed="${type===initial.type}">${type==='gold'?t('Dorada','Gold'):t('Común','Common')}</button>`).join('')}</div>`:'';
  content.innerHTML=`<div class="detail-layout"><div class="detail-figure"><div class="detail-stage">${card(initial,true)}</div>${selector}</div>
- <div class="detail-info"><header class="detail-identity"><h2 id="detail-title">${esc(picked.name)}</h2><p>${esc(picked.club)} · ${positions[picked.position]} · #${picked.number}</p></header>
- <div class="detail-inventory"><span class="inventory-status ${available?'':'exhausted'}">${available?icon('check'):''}${available?t('Copias disponibles','Available copies'):t('Sin copias disponibles','No copies available')}</span>
- <div class="inventory-count"><strong>${available}</strong><b>${breakdown}</b></div><small>${total} ${t(total===1?'copia obtenida':'copias obtenidas',total===1?'copy collected':'copies collected')} · ${used} ${t(used===1?'utilizada':'utilizadas','used')}</small></div>
- <div class="detail-scroll">${codeList(picked,t)}<button type="button" class="detail-history">${history}</button></div>
- <div class="redeem-action"></div></div></div>`;
+ <div class="detail-info">
+   <div class="detail-body">
+     <header class="detail-identity">
+       <h2 id="detail-title">${esc(picked.name)}</h2>
+       <p>${esc(picked.club)} · ${positions[picked.position]} · #${picked.number}</p>
+     </header>
+     <div class="detail-records">
+       <div class="detail-inventory">
+         <span class="inventory-status ${available?'':'exhausted'}">${available?icon('check'):''}${available?t('Copias disponibles','Available copies'):t('Sin copias disponibles','No copies available')}</span>
+         <div class="inventory-count"><strong>${available}</strong><b>${breakdown}</b></div>
+         <small>${total} ${t(total===1?'copia obtenida':'copias obtenidas',total===1?'copy collected':'copies collected')} · ${used} ${t(used===1?'utilizada':'utilizadas','used')}</small>
+       </div>
+       <div class="detail-scroll">
+         ${codeList(picked,t)}
+         <button type="button" class="detail-history">${history}</button>
+       </div>
+     </div>
+   </div>
+   <div class="redeem-action"></div>
+ </div></div>`;
  const availableRewards=window.Rewards?.available()||[];
  const action=content.querySelector('.redeem-action');
  const canRedeemGold=gold>0 && availableRewards.some(reward=>reward.id==='gold');

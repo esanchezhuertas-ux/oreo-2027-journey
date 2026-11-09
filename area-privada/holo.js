@@ -11,6 +11,7 @@
     let frame=0,box=null,x=.5,y=.4,tracking=false,touch=false;
     let touchOrigin=null,dragged=false;
     const surface=card.closest('.reveal-size')||card;
+    const inPlayerDetail=card.matches('[data-detail]');
     const draw=()=>{
       frame=0;
       if(!card.isConnected)return;
@@ -33,7 +34,14 @@
     };
     const schedule=()=>{if(!frame)frame=requestAnimationFrame(draw);};
     const start=()=>{
-      box=surface.getBoundingClientRect();
+      if(touchOrigin&&inPlayerDetail){
+        // A new touch may arrive while the previous tilt is still easing back.
+        // Measure the resting artwork so identical drags always have the same gain.
+        const scale=parseFloat(getComputedStyle(card).scale)||1;
+        box={width:card.offsetWidth*scale,height:card.offsetHeight*scale};
+      }else{
+        box=surface.getBoundingClientRect();
+      }
       tracking=true;
       card.classList.add('holo-active');
     };
