@@ -218,7 +218,7 @@ html:not(.keyboard-nav) #card-dialog :focus,html:not(.keyboard-nav) #register-di
 #collection .collected-desktop span{font-size:12px;line-height:16px}
 #collection .collected-mobile,.mobile-card-caption,#hub-progress .reward-pages{display:none}
 #collection #hub-progress{display:flex;flex-direction:column;gap:16px;min-width:0}
-#hub-progress>strong{font-size:16px;line-height:24px;font-weight:500}
+#hub-progress .reward-balance>strong{font-size:16px;line-height:24px;font-weight:500}
 #collection #hub-progress>p{font-size:12px;line-height:20px;margin:0;color:var(--muted)}
 #hub-progress .reward-grid{margin:0;gap:24px}
 #hub-progress .reward-progress{min-width:0;min-height:0;height:96px;border:1px solid var(--line);border-radius:16px;gap:16px;padding:15px}
@@ -249,7 +249,7 @@ html:not(.keyboard-nav) #card-dialog :focus,html:not(.keyboard-nav) #register-di
  #collection #page-title{font-size:28px;line-height:32px}
  #collection .collected-desktop{display:none}
  #collection .collected-mobile{display:flex;align-items:center;justify-content:flex-end;min-height:32px;font-size:12px;line-height:16px;color:var(--muted);text-decoration:underline}
- #hub-progress>strong{font-size:14px}
+ #hub-progress .reward-balance>strong{font-size:14px}
  #hub-progress .reward-grid{display:flex;gap:12px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;scrollbar-width:none}
  #hub-progress .reward-grid::-webkit-scrollbar{display:none}
  #hub-progress .reward-grid:after{content:'';flex:0 0 max(0px,calc(100% - min(280px,90%) - 12px))}
@@ -336,5 +336,7 @@ html:not(.keyboard-nav) #card-dialog :focus,html:not(.keyboard-nav) #register-di
 .gold-offer>img{padding:6px;background:#f8f8fa;border-radius:12px;object-fit:contain}
 .gold-offer>span{display:grid;gap:4px}.gold-offer strong{font-size:20px;line-height:26px}
 .gold-offer b{margin-left:auto;background:#272425;color:white;padding:14px 18px;white-space:nowrap;border-radius:8px}
-#hub-progress .reward-progress[data-ready=true]{min-height:108px}
+#hub-progress .reward-balance p{margin:2px 0 0;font-size:12px;line-height:1.4;color:var(--muted)}
+#hub-progress .reward-progress[data-ready=true] small{text-decoration:underline;text-underline-offset:3px}
+#hub-progress .reward-progress[data-ready=true]:focus-visible{outline:2px solid currentColor;outline-offset:2px}
 @media(max-width:760px){#hub-progress .gold-offer{flex-wrap:wrap}.gold-offer>span{flex:1;min-width:140px}.gold-offer b{width:100%;text-align:center}}
