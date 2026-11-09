@@ -5,14 +5,21 @@
 .holo-foil,.holo-glare,.holo-sparkles{position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:4;transition:opacity .35s ease}
 /* The grain stays on the print while the reflection follows the pointer. */
 .holo-card .holo-foil{
- background-image:repeating-linear-gradient(105deg,#50baff 0%,#bcb1ff 11%,#ffaecf 19%,#fff6a3 27%,#8df4d3 34%,#50baff 43%),repeating-linear-gradient(164deg,#858897 0 1px,#e7efff 2px,#7e8496 3px);
- background-size:240% 220%,auto;background-position:var(--fx) var(--fy),center;background-blend-mode:hard-light;mix-blend-mode:soft-light;opacity:calc(.17 + var(--glow)*.72)
+ background:repeating-linear-gradient(-22deg,#b46cc6 5%,#d85b56 10%,#c8b547 15%,#87ba55 20%,#539d98 25%,#8ba1ff 30%,#b46cc6 35%) 0 var(--fy)/300% 400%;
+ mix-blend-mode:color-dodge;filter:brightness(.60) contrast(1.8);opacity:calc(var(--glow)*.58)
 }
-.holo-card .holo-glare{background:radial-gradient(ellipse at var(--hx) var(--hy),#fff 0%,#eef7ff88 13%,transparent 58%);mix-blend-mode:screen;opacity:calc(.03 + var(--glow)*.36)}
-.holo-card .holo-sparkles{background:var(--foil-grain) repeat;background-size:96px;mix-blend-mode:soft-light;opacity:calc(.06 + var(--glow)*.13)}
-.holo-card.gold .holo-foil{background-image:var(--foil-grain),repeating-linear-gradient(117deg,#744007 0%,#e2a02c 14%,#fff9c1 23%,#b67e17 31%,#ffe7a0 39%,#744007 52%);background-size:90px,270% 230%;background-position:center,var(--fx) var(--fy);background-blend-mode:hard-light;mix-blend-mode:hard-light;opacity:calc(.22 + var(--glow)*.42)}
-.holo-card.gold .holo-sparkles{background-image:var(--foil-grain),radial-gradient(ellipse at var(--hx) var(--hy),#fffbbd,#bf8c23 24%,#383025 65%);background-size:72px,100% 100%;background-blend-mode:color-dodge;mix-blend-mode:screen;opacity:calc(.11 + var(--glow)*.38)}
-.holo-card[data-redeemed=true] .holo-foil{display:block;background-image:repeating-radial-gradient(ellipse at 12% 70%,#fff9 0 1px,#574e7980 2px,transparent 3px 5px),linear-gradient(115deg,#f6a8b9,#ffd794,#e5ec91,#8ee2bd,#8ac9fb,#bfa7f4,#f6a8b9);background-size:125% 140%,240% 220%;background-position:center,var(--fx) var(--fy);background-blend-mode:soft-light;mix-blend-mode:hard-light;opacity:calc(.14 + var(--glow)*.53)}
-.holo-card[data-redeemed=true] .holo-sparkles{background:var(--foil-grain) repeat;background-size:85px;mix-blend-mode:soft-light;opacity:.16}
+.holo-card .holo-glare{background:radial-gradient(ellipse at var(--hx) var(--hy),#fff,#fffa 22%,#475456 75%);mix-blend-mode:soft-light;opacity:calc(var(--glow)*.45)}
+.holo-card .holo-sparkles{opacity:0}
+.holo-card.gold .holo-foil{
+ background-image:var(--foil-grain),var(--foil-grain),conic-gradient(#99cfc4,#89a4ca,#c38fa9,#e8bd82,#99cfc4),radial-gradient(circle at var(--hx) var(--hy),#bababa,#292929 55%);
+ background-size:81px,99px,cover,cover;background-position:12px 8px,32px 26px,center,center;background-blend-mode:soft-light,hard-light,overlay;
+ mix-blend-mode:color-dodge;filter:brightness(.44) contrast(1.4) saturate(.74);opacity:calc(.03 + var(--glow)*.52)
+}
+.holo-card.gold .holo-sparkles{
+ background:var(--foil-grain) center/78px;mask-image:radial-gradient(ellipse at var(--hx) var(--hy),black,transparent 61%);
+ mix-blend-mode:overlay;filter:contrast(1.9);opacity:calc(.06 + var(--glow)*.28)
+}
+.holo-card.gold .holo-glare{opacity:calc(var(--glow)*.16)}
+.card-tile .holo-card[data-redeemed=true] :is(.holo-foil,.holo-glare,.holo-sparkles){display:none}
 .holo-card:focus-visible{outline:3px solid #0042aa;outline-offset:7px;box-shadow:none}
 @media(prefers-reduced-motion:reduce){.holo-card,.holo-card.holo-active{transform:none!important;transition:none;will-change:auto}.holo-foil,.holo-glare,.holo-sparkles{transition:none}}
