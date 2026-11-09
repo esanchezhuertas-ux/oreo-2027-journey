@@ -29,3 +29,5 @@
 .copy-sheet.blue-spent .card-face{background:#dcdce1}
 .copy-sheet.blue-spent .card-face::before{background:#f0f0f3}
 .copy-sheet.blue-spent .cookie-emblem{color:#c5c5ce;--biscuit-ink:#ededf1}
+
+a.spent-gold-badge{text-decoration:underline;text-underline-offset:3px}

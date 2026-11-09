@@ -158,7 +158,9 @@ function home(){
  }).join('');
  const dots=rewards.map((id,i)=>`<button type="button" aria-label="${titleOf(id)}" aria-pressed="${i===0}"></button>`).join('');
  const goldOffer=canClaim('gold')?`<button class="gold-offer" data-prize="gold"><img src="assets/welcome/gold-shirt.svg" width="64" height="64" alt=""><span><small>${t('Jugador dorado disponible','Gold player available')}</small><strong>${t('Tu primer jugador dorado tiene premio','Your first gold player earns a reward')}</strong><span>${t('Canjéalo por una camiseta sin gastar unidades.','Redeem it for a shirt without spending units.')}</span></span><b>${t('Canjear camiseta','Redeem shirt')}</b></button>`:'';
- const goldStatus=claimed('gold')?`<span class="spent-gold-badge">${ui.icon('sparkles')}${t('Dorada canjeada · Camiseta solicitada','Gold card redeemed · Shirt requested')}</span>`:'';
+ const goldOrder=db.account.orders.find(order=>order.reward==='gold');
+ const goldStatus=goldOrder?`<a class="spent-gold-badge" href="#history/order/${encodeURIComponent(goldOrder.id)}">${ui.icon('sparkles')}${t('Dorada canjeada · Camiseta solicitada','Gold card redeemed · Shirt requested')}${ui.icon('forward')}</a>`:'';
+
  hub.innerHTML=`${goldOffer}<div class="reward-balance"><strong>${t('Saldo','Balance')} · ${balance('shirt')} ${t('unidades','units')}</strong><p>${t('Los tres canjes por unidades comparten saldo.','All three rewards use the same unit balance.')}</p></div><div class="reward-gallery"><div class="reward-grid">${widgets}</div><div class="reward-pages">${dots}</div></div>${goldStatus}${goldStatus?'':'<p>'+t('Encuentra un jugador dorado para conseguir una camiseta.','Find a gold player to get a shirt.')+'</p>'}`;
  const track=hub.querySelector('.reward-grid');
  const controls=[...hub.querySelectorAll('.reward-pages button')];
@@ -617,6 +619,18 @@ function draw(){
  else if(!a&&page==='account-closed'&&accountClosed){main.innerHTML=authPage(t('Solicitud de cierre recibida','Account closure request received'),t('Se ha cerrado tu cuenta de prueba en este dispositivo.','Your demo account has been closed on this device.'),profileButton(t('Entendido','Done'),'login'));}
  else if(!a){main.innerHTML=auth(page);}
  else if(page==='reward')main.innerHTML=reward();
+ else if(page.startsWith('history/order/')){
+  const order=a.orders.find(item=>encodeURIComponent(item.id)===page.slice('history/order/'.length));
+  historyFilter='orders';expanded=order?.id||'';
+  if(order){
+   const read=a.readActivity ||= [];
+   if(!read.includes(order.id)){read.push(order.id);db.save();}
+  }
+  main.innerHTML=historyPage();
+  history.replaceState(null,'','#history');
+  const toggle=main.querySelector('[data-activity][aria-expanded="true"]');
+  if(toggle){toggle.focus({preventScroll:true});toggle.scrollIntoView({block:'nearest'});}
+ }
  else if(['history','orders'].includes(page))main.innerHTML=historyPage(page==='orders');
  else if(page==='help')main.innerHTML=help();
  else if(page==='received'&&registered){main.innerHTML=registrationResult();window.Holo.init(main);revealPack(main.querySelector('.registration-receipt'));}
