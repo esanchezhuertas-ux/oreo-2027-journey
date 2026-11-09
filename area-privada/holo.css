@@ -11,15 +11,17 @@
 .holo-card .holo-glare{background:radial-gradient(ellipse at var(--hx) var(--hy),#fff,#fffa 22%,#475456 75%);mix-blend-mode:soft-light;opacity:calc(var(--glow)*.45)}
 .holo-card .holo-sparkles{opacity:0}
 .holo-card.gold .holo-foil{
- background-image:var(--foil-grain),var(--foil-grain),conic-gradient(#99cfc4,#89a4ca,#c38fa9,#e8bd82,#99cfc4),radial-gradient(circle at var(--hx) var(--hy),#bababa,#292929 55%);
- background-size:81px,99px,cover,cover;background-position:calc(12px + var(--foil-offset-x,0px)) calc(8px + var(--foil-offset-y,0px)),calc(32px - var(--foil-offset-x,0px)) calc(26px - var(--foil-offset-y,0px)),center,center;background-blend-mode:soft-light,hard-light,overlay;
- mix-blend-mode:color-dodge;filter:brightness(calc(.32 + var(--foil-distance,0)*.18)) contrast(1.4) saturate(.74);opacity:calc(.03 + var(--glow)*.52)
+ z-index:2;
+ mask:url("assets/gold-etch.svg") center/100% 100% no-repeat;
+ background:radial-gradient(ellipse at var(--hx) var(--hy),#ffffed 2%,#fff3a5 22%,#ae803a 55%,#f8dd8d 80%);
+ mix-blend-mode:screen;filter:none;opacity:calc(.36 + var(--glow)*.53)
 }
 .holo-card.gold .holo-sparkles{
- background:var(--foil-grain) center/78px;mask-image:radial-gradient(ellipse at var(--hx) var(--hy),black,transparent 61%);
- mix-blend-mode:overlay;filter:contrast(1.9);opacity:calc(.06 + var(--glow)*.28)
+ z-index:2;background-image:var(--foil-grain),var(--foil-grain);
+ background-size:47px,53px;background-position:var(--foil-offset-x,0px) var(--foil-offset-y,0px),calc(13px - var(--foil-offset-x,0px)) calc(6px - var(--foil-offset-y,0px));
+ background-blend-mode:multiply;filter:brightness(.86) contrast(6);mix-blend-mode:screen;
+ mask-image:radial-gradient(ellipse at var(--hx) var(--hy),#000 3%,#0007 34%,transparent 71%);opacity:calc(.06 + var(--glow)*.27)
 }
-.holo-card.gold .holo-foil{mask-image:radial-gradient(ellipse at var(--hx) var(--hy),transparent 4%,#0006 28%,black 61%)}
 .holo-card.blue .holo-foil::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at var(--hx) var(--hy),#fff 5%,#370c36a8 42%,#393939 100%);mix-blend-mode:hard-light;opacity:.65}
 .holo-card.gold .holo-glare{opacity:calc(var(--glow)*.16)}
 .card-tile .holo-card[data-redeemed=true] :is(.holo-foil,.holo-glare,.holo-sparkles){display:none}
