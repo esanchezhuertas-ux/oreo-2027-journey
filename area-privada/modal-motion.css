@@ -125,3 +125,6 @@
  #card-dialog .detail-choice{max-width:43%}
  #card-dialog .redeem-action .button{font-size:13px;padding-inline:8px}
 }
+.detail-rewards-link{margin-top:0;text-align:left}
+#hub-progress{scroll-margin-top:100px}
+@media(max-width:760px){#hub-progress{scroll-margin-top:72px}}

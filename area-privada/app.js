@@ -192,32 +192,30 @@ function openDetail(id){
  const action=content.querySelector('.redeem-action');
  function paintRewards(variant){
   const direct=variant.type==='gold' && variant.available>0 && availableRewards.some(r=>r.id==='gold');
-  const choices=availableRewards.filter(r=>direct?r.id==='gold':r.id!=='gold');
-  action.replaceChildren();action.hidden=!choices.length;
-  if(!choices.length)return;
-  const rewardIcons={gold:'shirt',shirt:'shirt',scarf:'scarf',ball:'ball'};
-  if(choices.length>1){
-   const label=document.createElement('label');
-   label.className='detail-choice';
-   label.textContent=t('Premio','Reward');
-   const select=document.createElement('select');
-   for(const reward of choices)select.add(new Option(reward.label,reward.id));
-   label.append(select);
-   action.append(label);
+  action.replaceChildren();
+  action.hidden=!direct;
+  content.querySelector('.detail-rewards-link')?.remove();
+  if(!direct&&!availableRewards.some(reward=>reward.id!=='gold'))return;
+  const control=document.createElement('button');
+  control.type='button';
+  if(direct){
+   control.className='button primary';
+   control.innerHTML=icon('shirt')+t('Quiero mi camiseta','Get my shirt');
+   action.append(control);
+  }else{
+   control.className='detail-history detail-rewards-link';
+   control.textContent=t('Ver premios disponibles','View available rewards');
+   content.querySelector('.detail-scroll').append(control);
   }
-  const button=document.createElement('button');
-  button.type='button';
-  button.className='button primary';
-  action.append(button);
-  const select=action.querySelector('select');
-  const selectedId=()=>select?.value||choices[0].id;
-  const paint=()=>{const id=selectedId();button.innerHTML=icon(rewardIcons[id])+esc(direct?t('Quiero mi camiseta','Get my shirt'):t('Tienes premios que canjear','You have rewards to redeem'));};
-  paint();
-  if(select)select.onchange=paint;
-  button.onclick=()=>{
-   const id=selectedId();
+  control.onclick=()=>{
    if(dialog.dataset.closing)return;
-   dialog.addEventListener('close',()=>window.Rewards.open(id),{once:true});
+   dialog.addEventListener('close',()=>{
+    if(direct){window.Rewards.open('gold');return;}
+    const hub=document.querySelector('#hub-progress');
+    hub.setAttribute('tabindex','-1');
+    hub.focus({preventScroll:true});
+    hub.scrollIntoView({block:'start',behavior:'instant'});
+   },{once:true});
    closeDialog(dialog);
   };
  }

@@ -228,7 +228,8 @@
 .contact-methods {display: grid; gap: 8px; margin-top: 16px;}
 .contact-methods .button {color: var(--ink); text-decoration: none;}
 .faq-list {overflow: auto; overscroll-behavior: contain; min-height: 0;}
-.faq-list h2 {margin: 0;}
+.faq-list h2 {position:sticky;top:0;z-index:1;background:white;margin:0;padding-bottom:8px;}
+.faq-list {scroll-padding-top:44px;}
 .faq-list details {border-bottom: 1px solid #82828f;}
 .faq-list summary {display: flex; align-items: center; justify-content: space-between; gap: 12px; list-style: none; cursor: pointer; padding: 16px 32px; font-size: 16px; line-height: 21px; font-weight: 500;}
 .faq-list summary::-webkit-details-marker {display: none;}

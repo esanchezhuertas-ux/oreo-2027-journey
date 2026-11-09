@@ -17,20 +17,21 @@
       s.setProperty('--hy',(py*100).toFixed(2)+'%');
       s.setProperty('--fx',(20+px*60).toFixed(2)+'%');
       s.setProperty('--fy',(20+py*60).toFixed(2)+'%');
-      s.setProperty('--rx',((.5-py)*(touch?60:reveal?44:18)).toFixed(2)+'deg');
-      s.setProperty('--ry',((px-.5)*(touch?72:reveal?56:24)).toFixed(2)+'deg');
+      s.setProperty('--rx',((.5-py)*(reveal?84:touch?60:18)).toFixed(2)+'deg');
+      s.setProperty('--ry',((px-.5)*(reveal?104:touch?72:24)).toFixed(2)+'deg');
       s.setProperty('--glow','1');
     };
     const schedule=()=>{if(!frame)frame=requestAnimationFrame(draw);};
     const start=()=>{
-      box=card.getBoundingClientRect();
+      box=(reveal?card.closest('.reveal-size'):card).getBoundingClientRect();
       tracking=true;
       card.classList.add('holo-active');
     };
     const point=e=>{
       if(!tracking)start();
-      x=clamp(.5+((e.clientX-box.left)/box.width-.5)*(touch?1.65:1));
-      y=clamp(.5+((e.clientY-box.top)/box.height-.5)*(touch?1.65:1));
+      const sensitivity=reveal?(touch?2.1:1.55):(touch?1.65:1);
+      x=clamp(.5+((e.clientX-box.left)/box.width-.5)*sensitivity);
+      y=clamp(.5+((e.clientY-box.top)/box.height-.5)*sensitivity);
       schedule();
     };
     const reset=()=>{

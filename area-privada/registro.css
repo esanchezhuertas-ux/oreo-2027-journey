@@ -273,7 +273,28 @@
 @keyframes pack-edge-spark{0%{opacity:0;transform:rotate(var(--angle)) translateY(-66px) scaleY(.25)}22%{opacity:1}100%{opacity:0;transform:rotate(var(--angle)) translateY(calc(-65px - var(--travel))) scaleY(.8)}}
 .pack-halo{pointer-events:none;position:absolute;left:50%;top:50%;width:250vmax;height:250vmax;border-radius:50%;background:radial-gradient(circle,#fffbd7 0%,var(--light) 10%,transparent 64%),repeating-conic-gradient(from 8deg,transparent 0deg 13deg,#fff5 14deg,transparent 17deg);mask-image:radial-gradient(closest-side,black 48%,transparent 100%);z-index:5;animation:pack-wave 1.45s var(--finale) both}
 @keyframes pack-wave{0%{opacity:0;transform:translate(-50%,-50%) scale(.015)}15%{opacity:.92}42%{opacity:.76;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-50%) scale(.035)}}
-.pack-highlight .reveal-spin{border-radius:6px 6px 80px 80px;box-shadow:0 0 4px 2px white,0 0 14px 4px var(--light)}
-.opening-pack .pack-highlight .reveal-spin{animation:pack-turn .88s var(--turn) both,pack-aura 1.5s calc(var(--turn) + .88s) backwards}
-@keyframes pack-aura{0%{box-shadow:none}32%{box-shadow:0 0 8px 5px white,0 0 38px 16px var(--light)}}
+/* Attach the afterglow to the face so that its silhouette follows pointer tilt. */
+.pack-highlight .holo-card{box-shadow:0 0 7px var(--light),0 0 22px color-mix(in srgb,var(--light) 66%,transparent)}
+.opening-pack .pack-highlight .holo-card{animation:pack-aura 1.5s calc(var(--turn) + .88s) backwards}
+@keyframes pack-aura{0%{box-shadow:none}32%{box-shadow:0 0 12px 4px var(--light),0 0 40px 10px var(--light)}}
 @media(max-width:760px){.receipt-stage{column-gap:clamp(8px,2.5vw,16px)}.receipt-stage:has(.reveal-tile:nth-child(3)) .reveal-size{zoom:clamp(.54,calc((100vw - 64px) / 480px),.95)}}
+
+.opening-pack .reveal-size::before{
+ border:0;inset:26% -22%;
+ background:conic-gradient(from 38deg,transparent 0 12%,#fffa 20%,white 28%,var(--light) 39%,transparent 48% 61%,#fffd 70%,white 79%,transparent 94%);
+ mask-image:radial-gradient(ellipse closest-side,transparent 81%,#0008 87%,black 91%,#0008 95%,transparent 100%);
+ filter:blur(.8px);
+}
+.pack-halo{
+ background:radial-gradient(closest-side,#fffef3 0%,var(--light) 7%,transparent 30%,transparent 63%,color-mix(in srgb,var(--light) 36%,transparent) 68%,transparent 74%);
+ mask-image:none;
+}
+.pack-halo::before,.pack-halo::after{content:"";position:absolute;inset:0;border-radius:50%;pointer-events:none}
+.pack-halo::before{
+ background:repeating-conic-gradient(from 13deg,transparent 0deg 12deg,#fff9 12.6deg,transparent 14deg 25deg,var(--light) 26deg,transparent 29deg 41deg);
+ mask-image:radial-gradient(closest-side,transparent 1%,black 7%,#0006 31%,transparent 69%);
+}
+.pack-halo::after{
+ background:radial-gradient(ellipse closest-side,#fffefa 0%,#fffbcf 8%,transparent 39%);
+ transform:scale(.7,.34);
+}
