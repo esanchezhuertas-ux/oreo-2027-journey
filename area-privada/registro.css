@@ -252,10 +252,6 @@
 .receipt-feedback{gap:8px}
 @media(min-width:761px){.receipt-body{gap:20px}.receipt-stage{gap:14px}}
 @media(max-height:640px){.reveal-new{margin-bottom:13px}.reveal-size{zoom:min(var(--size),.65)}}
-.reveal-spin .holo-active .holo-foil{opacity:.57}
-.reveal-spin .gold.holo-active .holo-foil{opacity:.72}
-.reveal-spin .holo-active .holo-glare{opacity:.56}
-.reveal-spin .holo-active{transform:perspective(550px) rotateX(var(--rx)) rotateY(var(--ry));transform-origin:center}
 .pack-particles{pointer-events:none;position:absolute;inset:0;z-index:4}
 .pack-particles i{position:absolute;left:50%;top:50%;width:2px;height:13px;border-radius:100%;background:linear-gradient(transparent,var(--tint));box-shadow:0 0 5px var(--tint);animation:pack-ember .8s var(--delay) both}
 @keyframes pack-ember{0%{opacity:0;transform:rotate(var(--angle)) translateY(-16px) scaleY(.2)}18%{opacity:1}100%{opacity:0;transform:rotate(var(--angle)) translateY(calc(-1 * var(--travel))) scaleY(.25)}}
@@ -271,8 +267,6 @@
 .pack-particles i:after{content:"";display:block;width:4px;height:4px;border-radius:50%;background:white;box-shadow:0 0 5px var(--tint)}
 .reveal-size .pack-particles i{animation-name:pack-edge-spark}
 @keyframes pack-edge-spark{0%{opacity:0;transform:rotate(var(--angle)) translateY(-66px) scaleY(.25)}22%{opacity:1}100%{opacity:0;transform:rotate(var(--angle)) translateY(calc(-65px - var(--travel))) scaleY(.8)}}
-.pack-halo{pointer-events:none;position:absolute;left:50%;top:50%;width:250vmax;height:250vmax;border-radius:50%;background:radial-gradient(circle,#fffbd7 0%,var(--light) 10%,transparent 64%),repeating-conic-gradient(from 8deg,transparent 0deg 13deg,#fff5 14deg,transparent 17deg);mask-image:radial-gradient(closest-side,black 48%,transparent 100%);z-index:5;animation:pack-wave 1.45s var(--finale) both}
-@keyframes pack-wave{0%{opacity:0;transform:translate(-50%,-50%) scale(.015)}15%{opacity:.92}42%{opacity:.76;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-50%) scale(.035)}}
 /* Attach the afterglow to the face so that its silhouette follows pointer tilt. */
 .pack-highlight .holo-card{box-shadow:0 0 7px var(--light),0 0 22px color-mix(in srgb,var(--light) 66%,transparent)}
 .opening-pack .pack-highlight .holo-card{animation:pack-aura 1.5s calc(var(--turn) + .88s) backwards}
@@ -285,18 +279,6 @@
  mask-image:radial-gradient(ellipse closest-side,transparent 81%,#0008 87%,black 91%,#0008 95%,transparent 100%);
  filter:blur(.8px);
 }
-.pack-halo{
- background:radial-gradient(closest-side,#fffef3 0%,var(--light) 7%,transparent 30%,transparent 63%,color-mix(in srgb,var(--light) 36%,transparent) 68%,transparent 74%);
- mask-image:none;
-}
-.pack-halo::before,.pack-halo::after{content:"";position:absolute;inset:0;border-radius:50%;pointer-events:none}
-.pack-halo::before{
- background:repeating-conic-gradient(from 13deg,transparent 0deg 12deg,#fff9 12.6deg,transparent 14deg 25deg,var(--light) 26deg,transparent 29deg 41deg);
- mask-image:radial-gradient(closest-side,transparent 1%,black 7%,#0006 31%,transparent 69%);
-}
-.pack-halo::after{
- background:radial-gradient(ellipse closest-side,#fffefa 0%,#fffbcf 8%,transparent 39%);
- transform:scale(.7,.34);
-}
 .reveal-size{touch-action:none}
-.reveal-size .holo-card{pointer-events:none;transition:none}
+
+.pack-flare-canvas{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:2147483646}
