@@ -62,22 +62,24 @@ function receivedCard(player,gold) {
  const card = {...player, type:gold?'gold':'blue', available:1};
  return '<span class="holo-card '+card.type+'" tabindex="0" role="group" aria-label="'+esc(player.name)+'" style="--biscuit-ink:'+(gold?'#f4d74c':'#0cbcff')+'">'+cardFace(card,true,'-receipt')+'</span>';
 }
+function frontRarity(p){
+ return p.available && !p.records.some(c=>c.rarity==='gold'&&!c.used)?'blue':p.type;
+}
 function fanRarities(p){
  const records=[...p.records].sort((a,b)=>Number(a.used)-Number(b.used)||b.time-a.time);
  const front=records.findIndex(copy=>copy.rarity===p.type);
  if(front>=0)records.splice(front,1);
- return records.slice(0,2).map(copy=>copy.rarity).join(' ');
+ if(p.type==='blue')records.sort((a,b)=>Number(b.rarity==='gold')-Number(a.rarity==='gold'));
+ return records.slice(0,2).map(copy=>copy.used?(copy.rarity==='gold'?'gold-spent':'blue-spent'):copy.rarity).join(' ');
 }
 function card(p,detail=false){return `<button class="holo-card ${p.type}${detail?'':p.type==='gold'&&!p.records.some(copy=>copy.rarity==='gold'&&!copy.used)?' gold-spent':p.available===0?' no-copies':''}" data-player="${p.id}" data-copies="${p.copies}" data-fan="${detail?'':fanRarities(p)}" ${detail?'data-detail="true"':''} aria-label="${esc(p.name)}, ${p.type==='gold'?'cromo dorado':'cromo azul'}, ${p.available} ${p.available===1?'copia disponible':'copias disponibles'}${detail?'. Mueve el cursor para ver el brillo.':'. Ver cromo.'}" style="--biscuit-ink:${p.type==='gold'?'#f4d74c':'#0cbcff'}">${cardFace(p,detail,detail?'-detail':'')}</button>`;}
 function tile(p,slot=false){
  const goldSpent=p.type==='gold'&&!p.records.some(copy=>copy.rarity==='gold'&&!copy.used);
  const english=window.Demo.lang==='en';
- const availableLabel=goldSpent
-  ?(english?`${p.available} common`:`${p.available} ${p.available===1?'común':'comunes'}`)
-  :(english?'Redeemable':'Canjeable');
+ const availableLabel=english?'Redeemable':'Canjeable';
  const mark=p.type==='gold'?`<span class="shiny-badge" aria-label="${english?'Gold finish':'Acabado dorado'}">${icon('sparkles')}</span>`:'';
  const availability=p.available?`<span class="available-badge">${icon('check')}${availableLabel}</span>`:'';
- return `<article class="card-tile">${slot?`<span class="club-slot">${p.position}</span>`:''}<div class="card-meta">${p.isNew&&!goldSpent?'<span class="new-badge">NUEVO</span>':''}${mark}</div><div class="card-scene">${card(p)}</div><div class="mobile-card-caption"><span>${esc(p.name)}</span><span>${esc(p.club)}</span></div><div class="availability-badge-wrap">${availability}</div></article>`;
+ return `<article class="card-tile">${slot?`<span class="club-slot">${p.position}</span>`:''}<div class="card-meta">${p.isNew&&!goldSpent?'<span class="new-badge">NUEVO</span>':''}${mark}</div><div class="card-scene">${card({...p,type:frontRarity(p)})}</div><div class="mobile-card-caption"><span>${esc(p.name)}</span><span>${esc(p.club)}</span></div><div class="availability-badge-wrap">${availability}</div></article>`;
 }
 function placeholder(pos,key,suffix){return `<div class="missing-card" aria-hidden="true"><span class="cookie-emblem"></span><span class="crest">${crest(key,suffix)}</span><span class="player-position">${pos}</span><img class="missing-player" src="assets/player-uncollected-clipped.svg" width="175" height="242" alt="" draggable="false"></div>`;}
 function missing(pos,key){return `<article class="card-tile missing-tile" aria-label="${positions[pos]} de ${clubs[key]} aún no conseguido"><div class="card-meta"></div><div class="card-scene">${placeholder(pos,key,`missing-${pos}`)}</div><div class="availability-badge-wrap"></div></article>`;}
@@ -174,7 +176,7 @@ function openDetail(id){
   const records=picked.records.filter(copy=>copy.rarity===type);
   return records.length?[{...picked,type,records,copies:records.length,available:records.filter(copy=>!copy.used).length}]:[];
  });
- const initial=variants.find(p=>p.type===picked.type);
+ const initial=variants.find(p=>p.type===frontRarity(picked));
  const total=picked.copies,available=picked.available;
  const gold=variants.find(p=>p.type==='gold')?.available||0,common=available-gold;
  const t=(es,en)=>window.Demo.lang==='en'?en:es;

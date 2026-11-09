@@ -25,3 +25,7 @@
 .gold-spent .cookie-emblem::after{background:linear-gradient(#f7df9b,#d1ac70)}
 .gold-spent .card-face :is(.player-position,.copies-overlay){visibility:hidden}
 .reward-progress:disabled{opacity:1;cursor:default;color:inherit}
+
+.copy-sheet.blue-spent .card-face{background:#dcdce1}
+.copy-sheet.blue-spent .card-face::before{background:#f0f0f3}
+.copy-sheet.blue-spent .cookie-emblem{color:#c5c5ce;--biscuit-ink:#ededf1}

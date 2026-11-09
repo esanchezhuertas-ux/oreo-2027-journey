@@ -33,9 +33,10 @@
   const suffix=`copy-${++serial}`;
   const positions=[[0,0,8,.72],[0,0,16,.42]];
   for(let depth=types.length;depth>0;depth--){
-   const type=types[depth-1];
+   const finish=types[depth-1];
+   const type=finish.startsWith('gold')?'gold':'blue';
    const sheet=document.createElement('span');
-   sheet.className=`copy-sheet ${type}`;
+   sheet.className=`copy-sheet ${type} ${finish}`;
    const [x,y,angle,opacity]=positions[depth-1];
    sheet.style.setProperty('--copy-x',`${x}px`);
    sheet.style.setProperty('--copy-y',`${y}px`);
