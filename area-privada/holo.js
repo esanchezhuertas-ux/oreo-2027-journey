@@ -1,6 +1,7 @@
 /* Small event-driven foil controller. Works alongside CSS's independent scale. */
 (()=>{'use strict';
   const mounted=new WeakSet();
+  const previews=new WeakMap();
   const reduced=matchMedia('(prefers-reduced-motion: reduce)');
   const clamp=n=>Math.min(1,Math.max(0,n));
   function attach(card){
@@ -46,6 +47,22 @@
       card.style.setProperty('--ry','0deg');
       card.style.setProperty('--glow',card.matches(':focus-visible')?'.45':'0');
     };
+    previews.set(card,()=>{
+      if(reduced.matches||tracking||!card.isConnected)return;
+      const startTime=performance.now();
+      function sweep(now){
+        if(!card.isConnected||tracking)return;
+        const progress=Math.min(1,(now-startTime)/1050);
+        if(progress===1||reduced.matches){reset();return;}
+        const envelope=Math.sin(Math.PI*progress);
+        x=.5+.34*Math.sin(2*Math.PI*progress)*envelope;
+        y=.5-.24*envelope;
+        draw();
+        card.style.setProperty('--glow',envelope.toFixed(3));
+        requestAnimationFrame(sweep);
+      }
+      requestAnimationFrame(sweep);
+    });
     surface.addEventListener('pointerenter',e=>{if(e.pointerType!=='touch'){touch=false;start();point(e);}},{passive:true});
     surface.addEventListener('pointermove',e=>{if(e.pointerType!=='touch'||tracking)point(e);},{passive:true});
     surface.addEventListener('pointerdown',e=>{touch=e.pointerType==='touch';start();point(e);if(touch)surface.setPointerCapture(e.pointerId);},{passive:true});
@@ -64,7 +81,7 @@
       x=clamp(x+movement[0]);y=clamp(y+movement[1]);schedule();
     });
   }
-  window.Holo={init(root=document){
+  window.Holo={preview(card){previews.get(card)?.();},init(root=document){
     if(root.matches?.('.holo-card'))attach(root);
     root.querySelectorAll('.holo-card').forEach(attach);
   }};

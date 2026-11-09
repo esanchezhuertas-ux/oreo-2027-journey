@@ -31,12 +31,12 @@
 }
 .holo-card.gold .holo-glare::after{
  content:"";position:absolute;inset:0;
- background:radial-gradient(circle,#98efa6 .55px,transparent .95px) 3px 8px/19px 27px,radial-gradient(circle,#adffc0 .45px,transparent .85px) 7px 3px/31px 21px;
+ background:radial-gradient(circle,#98efa6 .66px,transparent .95px) 3px 8px/19px 27px,radial-gradient(circle,#adffc0 .45px,transparent .85px) 7px 3px/31px 21px;
  mask-image:radial-gradient(ellipse at var(--hx) var(--hy),black,transparent 54%);
  opacity:var(--green-glint,0)
 }
 .holo-card.blue .holo-foil::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at var(--hx) var(--hy),#fff 5%,#370c36a8 42%,#393939 100%);mix-blend-mode:hard-light;opacity:.65}
-.holo-card.gold .holo-glare{z-index:2;background:none;mix-blend-mode:screen;opacity:calc(var(--glow)*.56)}
+.holo-card.gold .holo-glare{z-index:2;background:none;mix-blend-mode:screen;opacity:calc(var(--glow)*.69)}
 .card-tile .holo-card[data-redeemed=true] :is(.holo-foil,.holo-glare,.holo-sparkles){display:none}
 /* Redeemed gallery copies retain a diffuse pearl reflection over the original art. */
 .card-tile .holo-card[data-redeemed=true] .card-face::after{

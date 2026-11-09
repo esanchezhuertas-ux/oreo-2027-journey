@@ -261,8 +261,6 @@
 .receipt-stage .reveal-tile:last-child:not(:only-child){--lean:5deg}
 .reveal-tile{--light:#77d6ff}
 .reveal-tile[data-gold=true]{--light:#ffd340}
-.opening-pack .reveal-size::before{content:"";position:absolute;inset:29% -18%;border-radius:50%;border-top:4px solid white;border-bottom:2px solid #fff9;filter:drop-shadow(0 0 4px #b8e9ff);z-index:3;pointer-events:none;animation:pack-ribbon .8s var(--turn) both}
-@keyframes pack-ribbon{0%{opacity:0;transform:rotate(-34deg) scale(.55,.3)}38%{opacity:1;transform:rotate(-26deg) scale(1.08,.68)}80%{opacity:.85;transform:rotate(-16deg) scale(1,.35)}100%{opacity:0;transform:rotate(-8deg) scale(.8,.12)}}
 .pack-particles i:after{content:"";display:block;width:4px;height:4px;border-radius:50%;background:white;box-shadow:0 0 5px var(--tint)}
 .reveal-size .pack-particles i{animation-name:pack-edge-spark}
 @keyframes pack-edge-spark{0%{opacity:0;transform:rotate(var(--angle)) translateY(-66px) scaleY(.25)}22%{opacity:1}100%{opacity:0;transform:rotate(var(--angle)) translateY(calc(-65px - var(--travel))) scaleY(.8)}}
@@ -272,12 +270,6 @@
 @keyframes pack-aura{0%{box-shadow:none}32%{box-shadow:0 0 12px 4px var(--light),0 0 40px 10px var(--light)}}
 @media(max-width:760px){.receipt-stage{column-gap:clamp(8px,2.5vw,16px)}.receipt-stage:has(.reveal-tile:nth-child(3)) .reveal-size{zoom:clamp(.54,calc((100vw - 64px) / 480px),.95)}}
 
-.opening-pack .reveal-size::before{
- border:0;inset:26% -22%;
- background:conic-gradient(from 38deg,transparent 0 12%,#fffa 20%,white 28%,var(--light) 39%,transparent 48% 61%,#fffd 70%,white 79%,transparent 94%);
- mask-image:radial-gradient(ellipse closest-side,transparent 81%,#0008 87%,black 91%,#0008 95%,transparent 100%);
- filter:blur(.8px);
-}
 .reveal-size{touch-action:none}
 
 .pack-halo{pointer-events:none;position:absolute;left:50%;top:50%;width:250vmax;height:250vmax;border-radius:50%;background:radial-gradient(circle,#fffbd7 0%,var(--light) 10%,transparent 64%),repeating-conic-gradient(from 8deg,transparent 0deg 13deg,#fff5 14deg,transparent 17deg);mask-image:radial-gradient(closest-side,black 48%,transparent 100%);z-index:5;animation:pack-wave 1.45s var(--finale) both}
