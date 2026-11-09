@@ -12,15 +12,15 @@
 .holo-card .holo-sparkles{opacity:0}
 .holo-card.gold .holo-foil{
  z-index:2;
- mask:url("assets/gold-etch.svg?v=oreo-rim") center/100% 100% no-repeat;
- background:linear-gradient(116deg,#876021 8%,#cca552 24%,#fff3a4 39%,#fffef2 46%,#e6d8a4 54%,#be9559 65%,#ffe4a2 82%) var(--fx) var(--fy)/260% 180%;
- mix-blend-mode:screen;filter:none;opacity:var(--glow)
+ mask:url("assets/gold-etch.svg?v=radial2") center/100% 100% no-repeat;
+ background:linear-gradient(116deg,#82531a 8%,#bc842c 24%,#e6b746 39%,#f7d879 46%,#d4a954 54%,#a27730 65%,#edc464 82%) var(--fx) var(--fy)/260% 180%;
+ mix-blend-mode:normal;filter:none;opacity:calc(var(--glow)*.78)
 }
 /* Light the raised details through the existing biscuit artwork mask. */
 .holo-card.gold:has(.holo-foil) .cookie-emblem::before{
  content:"";position:absolute;inset:0;z-index:1;
  mask:url("assets/oreo-emblem.svg") center/contain no-repeat;
- background:radial-gradient(ellipse at var(--hx) var(--hy),#fffde0, #ffe395 17%,transparent 52%);
+ background:radial-gradient(ellipse at var(--hx) var(--hy),#f5da86, #e5ba57 17%,transparent 52%);
  opacity:calc(var(--glow)*.78);pointer-events:none
 }
 .holo-card.gold .holo-sparkles{
@@ -29,8 +29,14 @@
  background-blend-mode:multiply;filter:brightness(.86) contrast(6);mix-blend-mode:screen;
  mask-image:radial-gradient(ellipse at var(--hx) var(--hy),#000 3%,#0007 34%,transparent 71%);opacity:calc(var(--glow)*.085)
 }
+.holo-card.gold .holo-glare::after{
+ content:"";position:absolute;inset:0;
+ background:radial-gradient(circle,#98efa6 .55px,transparent .95px) 3px 8px/19px 27px,radial-gradient(circle,#adffc0 .45px,transparent .85px) 7px 3px/31px 21px;
+ mask-image:radial-gradient(ellipse at var(--hx) var(--hy),black,transparent 54%);
+ opacity:var(--green-glint,0)
+}
 .holo-card.blue .holo-foil::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at var(--hx) var(--hy),#fff 5%,#370c36a8 42%,#393939 100%);mix-blend-mode:hard-light;opacity:.65}
-.holo-card.gold .holo-glare{opacity:calc(var(--glow)*.16)}
+.holo-card.gold .holo-glare{z-index:2;background:none;mix-blend-mode:screen;opacity:calc(var(--glow)*.56)}
 .card-tile .holo-card[data-redeemed=true] :is(.holo-foil,.holo-glare,.holo-sparkles){display:none}
 /* Redeemed gallery copies retain a diffuse pearl reflection over the original art. */
 .card-tile .holo-card[data-redeemed=true] .card-face::after{

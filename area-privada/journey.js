@@ -197,10 +197,10 @@ function postalProvince(code){
 }
 function addressForm(values){
  const code=String(values.postcode||''),province=postalProvince(code);
- const names=accountField('name',t('Nombre','First name'),values.name)+accountField('surname',t('Apellidos','Last name'),values.surname);
+ const names=accountField('name',t('Nombre','First name'),values.name,{inline:true,editIcon:true})+accountField('surname',t('Apellidos','Last name'),values.surname,{inline:true,editIcon:true});
  const derived=(key,label,value)=>'<label class="entry-field"><span>'+label+'</span><input name="'+key+'" readonly value="'+html(value)+'"></label>';
  const postal=derived('country',t('País','Country'),province?t('España','Spain'):'')+derived('province',t('Provincia','Province'),province)+'<label class="entry-field"><span>'+t('Código postal','Postcode')+'</span><input name="postcode" required autocomplete="postal-code" inputmode="numeric" maxlength="5" pattern="(0[1-9]|[1-4][0-9]|5[0-2])[0-9]{3}" value="'+html(code)+'"></label>';
- return '<div class="address-grid address-names">'+names+'</div>'+phoneField(values.phone||'',{required:true,label:t('Teléfono','Phone')})+'<div class="address-grid address-postal">'+postal+'</div>'+accountField('city',t('Localidad','Town or city'),values.city,{inline:true,editIcon:true})+accountField('street',t('Dirección','Address'),values.street,{inline:true,editIcon:true});
+ return names+phoneField(values.phone||'',{inline:true,required:true,label:t('Teléfono','Phone')})+'<div class="address-grid address-postal">'+postal+'</div>'+accountField('city',t('Localidad','Town or city'),values.city,{inline:true,editIcon:true})+accountField('street',t('Dirección','Address'),values.street,{inline:true,editIcon:true});
 }
 function syncPostal(event){
  const input=event.target;

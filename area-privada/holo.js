@@ -21,6 +21,8 @@
       s.setProperty('--ry',((px-.5)*(touch?72:24)).toFixed(2)+'deg');
       s.setProperty('--foil-offset-x',((px-.5)*2).toFixed(2)+'px');
       s.setProperty('--foil-offset-y',((py-.5)*2).toFixed(2)+'px');
+      const glint=1-Math.abs(px-.73+(py-.5)*.32)/.13;
+      s.setProperty('--green-glint',Math.max(0,glint).toFixed(3));
       s.setProperty('--foil-distance',Math.min(1,2*Math.hypot(px-.5,py-.5)).toFixed(3));
       s.setProperty('--glow','1');
     };

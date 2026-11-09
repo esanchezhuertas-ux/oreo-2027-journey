@@ -130,9 +130,18 @@ dialog.discard-profile :is(h2,p){margin:0}
 .confirmation-actions .cancel{border:1.5px solid #dedee4;background:white}
 @media(max-width:700px){.confirmation-actions{flex-direction:column-reverse}dialog.discard-profile{max-width:100vw;margin:0}}
 
-.address-grid.address-names{grid-template-columns:repeat(2,minmax(0,1fr))}
+
 .address-grid.address-postal{grid-template-columns:repeat(3,minmax(0,1fr))}
 .address-grid .entry-field input{width:100%;min-width:0}
 @media(max-width:700px){
- .address-grid.address-names,.address-grid.address-postal{grid-template-columns:minmax(0,1fr)}
+ .address-grid.address-postal{grid-template-columns:minmax(0,1fr)}
+}
+
+@media(min-width:701px){
+ :is([data-flow="address"],#prize-request) :is(.profile-field,.inline-phone){display:grid;grid-template-columns:minmax(100px,36%) minmax(0,1fr) 24px;align-items:center;gap:12px;min-height:64px;margin-top:0}
+ :is([data-flow="address"],#prize-request) :is(.profile-field>img,.edit-phone){position:static;justify-self:center}
+}
+@media(max-width:700px){
+ :is([data-flow="address"],#prize-request) .inline-phone{position:relative;padding-right:48px}
+ :is([data-flow="address"],#prize-request) .inline-phone .edit-phone{position:absolute;right:12px;top:50%;transform:translateY(-50%)}
 }
