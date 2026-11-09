@@ -490,11 +490,29 @@ function receiptPreview(){
    return `<figure class="reveal-tile" data-gold="${gold}"><div class="reveal-new">${fresh?'<span>'+t('NUEVO','NEW')+'</span>':''}</div><div class="reveal-size"><div class="reveal-spin"><div class="reveal-back" aria-hidden="true">${back}</div>${ui.receivedCard(player,gold)}</div></div><figcaption><span>${rarity}</span></figcaption></figure>`;
  }).join('');
 }
+function packBurst(host,delay,gold,opening=false){
+ const layer=document.createElement('span');
+ layer.className='pack-particles';
+ layer.setAttribute('aria-hidden','true');
+ const count=opening?32:gold?24:16;
+ for(let i=0;i<count;i++){
+   const spark=document.createElement('i');
+   const angle=i*360/count+Math.sin(i*2.4)*7;
+   const distance=(opening?115:70)+(i*31%54);
+   spark.style.setProperty('--angle',angle+'deg');
+   spark.style.setProperty('--travel',distance+'px');
+   spark.style.setProperty('--delay',(delay+i%4*24)+'ms');
+   spark.style.setProperty('--tint',i%3===0?'white':gold?'#ffd167':'#8dddff');
+   layer.append(spark);
+ }
+ host.append(layer);
+ return layer;
+}
 function revealPack(panel){
  if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
  const stage=panel.querySelector('.receipt-stage');
  const tiles=[...stage.children].sort((a,b)=>Number(a.dataset.gold==='true')-Number(b.dataset.gold==='true'));
- const settle=520+tiles.length*580+680;
+ const settle=850+tiles.length*930+820;
  panel.style.setProperty('--settle',settle+'ms');
  panel.classList.add('opening-pack');
  const bounds=stage.getBoundingClientRect();
@@ -504,11 +522,14 @@ function revealPack(panel){
  const scale=Math.min(1.45,(innerWidth-12)/Math.max(1,spread),innerHeight/(bounds.height+64));
  const from='translateY('+dy+'px) scale('+scale+')';
  stage.animate([{transform:from},{transform:'none'}],{delay:settle,duration:520,easing:'cubic-bezier(.22,.75,.25,1)',fill:'backwards'});
+ const effects=[packBurst(stage,100,true,true)];
  tiles.forEach((tile,i)=>{
-   tile.style.setProperty('--turn',(440+i*580)+'ms');
+   const turn=850+i*930;
+   tile.style.setProperty('--turn',turn+'ms');
+   effects.push(packBurst(tile.querySelector('.reveal-size'),turn+400,tile.dataset.gold==='true'));
  });
  panel.querySelector('.receipt-actions').inert=true;
- const finish=()=>{panel.classList.remove('opening-pack');panel.querySelector('.receipt-actions').inert=false;};
+ const finish=()=>{effects.forEach(layer=>layer.remove());panel.classList.remove('opening-pack');panel.querySelector('.receipt-actions').inert=false;};
  setTimeout(finish,settle+530);
 }
 function registrationResult() {

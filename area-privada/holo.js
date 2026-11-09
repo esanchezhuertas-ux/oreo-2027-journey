@@ -7,6 +7,7 @@
     if(mounted.has(card))return;
     mounted.add(card);
     let frame=0,box=null,x=.5,y=.4,tracking=false,touch=false;
+    const reveal=!!card.closest('.reveal-spin');
     const draw=()=>{
       frame=0;
       if(!card.isConnected)return;
@@ -16,8 +17,8 @@
       s.setProperty('--hy',(py*100).toFixed(2)+'%');
       s.setProperty('--fx',(20+px*60).toFixed(2)+'%');
       s.setProperty('--fy',(20+py*60).toFixed(2)+'%');
-      s.setProperty('--rx',((.5-py)*(touch?60:18)).toFixed(2)+'deg');
-      s.setProperty('--ry',((px-.5)*(touch?72:24)).toFixed(2)+'deg');
+      s.setProperty('--rx',((.5-py)*(touch?60:reveal?44:18)).toFixed(2)+'deg');
+      s.setProperty('--ry',((px-.5)*(touch?72:reveal?56:24)).toFixed(2)+'deg');
       s.setProperty('--glow','1');
     };
     const schedule=()=>{if(!frame)frame=requestAnimationFrame(draw);};
