@@ -282,13 +282,4 @@
 .reveal-size{touch-action:none}
 
 .pack-flare-canvas{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:2147483646}
-
-/* The light travels with the card while the surrounding sheet settles. */
-.pack-afterlight{position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:6;background:linear-gradient(105deg,transparent,var(--light) 30%,#fff9 48%,var(--light) 64%,transparent);mix-blend-mode:screen;opacity:.32;animation:receipt-core 3.8s ease-out both}
-.pack-afterlight::before,.pack-afterlight::after{content:"";position:absolute;inset:-34% 0;pointer-events:none;background:
- linear-gradient(90deg,transparent 18%,var(--light) 19%,white 19.4%,transparent 20.5%),
- linear-gradient(90deg,transparent 47%,var(--light) 48%,white 48.5%,transparent 50%),
- linear-gradient(90deg,transparent 78%,white 79%,var(--light) 79.8%,transparent 81%);
- mask-image:linear-gradient(transparent,#0009 15%,black 31%,transparent 44% 56%,black 72%,transparent)}
-.pack-afterlight::after{inset:-19% 7%;filter:blur(2px)}
-@keyframes receipt-core{0%{opacity:.2}12%,39%{opacity:1;filter:brightness(1.9)}56%{opacity:.8}100%{opacity:.32}}
+.reveal-back{pointer-events:none}

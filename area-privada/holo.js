@@ -7,7 +7,7 @@
     if(mounted.has(card))return;
     mounted.add(card);
     let frame=0,box=null,x=.5,y=.4,tracking=false,touch=false;
-    const receipt=!!card.closest('.reveal-spin');
+    const surface=card.closest('.reveal-size')||card;
     const draw=()=>{
       frame=0;
       if(!card.isConnected)return;
@@ -17,13 +17,13 @@
       s.setProperty('--hy',(py*100).toFixed(2)+'%');
       s.setProperty('--fx',(20+px*60).toFixed(2)+'%');
       s.setProperty('--fy',(20+py*60).toFixed(2)+'%');
-      s.setProperty('--rx',((.5-py)*(touch?60:receipt?10:18)).toFixed(2)+'deg');
-      s.setProperty('--ry',((px-.5)*(touch?72:receipt?14:24)).toFixed(2)+'deg');
+      s.setProperty('--rx',((.5-py)*(touch?60:18)).toFixed(2)+'deg');
+      s.setProperty('--ry',((px-.5)*(touch?72:24)).toFixed(2)+'deg');
       s.setProperty('--glow','1');
     };
     const schedule=()=>{if(!frame)frame=requestAnimationFrame(draw);};
     const start=()=>{
-      box=card.getBoundingClientRect();
+      box=surface.getBoundingClientRect();
       tracking=true;
       card.classList.add('holo-active');
     };
@@ -41,12 +41,12 @@
       card.style.setProperty('--ry','0deg');
       card.style.setProperty('--glow',card.matches(':focus-visible')?'.45':'0');
     };
-    card.addEventListener('pointerenter',e=>{if(e.pointerType!=='touch'){touch=false;start();point(e);}},{passive:true});
-    card.addEventListener('pointermove',e=>{if(e.pointerType!=='touch'||tracking)point(e);},{passive:true});
-    card.addEventListener('pointerdown',e=>{touch=e.pointerType==='touch';start();point(e);if(touch)card.setPointerCapture(e.pointerId);},{passive:true});
-    card.addEventListener('pointerleave',reset,{passive:true});
-    card.addEventListener('pointercancel',reset,{passive:true});
-    card.addEventListener('pointerup',e=>{if(e.pointerType==='touch')reset();},{passive:true});
+    surface.addEventListener('pointerenter',e=>{if(e.pointerType!=='touch'){touch=false;start();point(e);}},{passive:true});
+    surface.addEventListener('pointermove',e=>{if(e.pointerType!=='touch'||tracking)point(e);},{passive:true});
+    surface.addEventListener('pointerdown',e=>{touch=e.pointerType==='touch';start();point(e);if(touch)surface.setPointerCapture(e.pointerId);},{passive:true});
+    surface.addEventListener('pointerleave',reset,{passive:true});
+    surface.addEventListener('pointercancel',reset,{passive:true});
+    surface.addEventListener('pointerup',e=>{if(e.pointerType==='touch')reset();},{passive:true});
     card.addEventListener('focus',()=>{
       if(card.matches(':focus-visible')){x=.65;y=.3;start();schedule();}
     });
