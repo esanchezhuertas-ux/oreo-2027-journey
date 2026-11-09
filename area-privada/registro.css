@@ -260,3 +260,20 @@
 .pack-particles i{position:absolute;left:50%;top:50%;width:2px;height:13px;border-radius:100%;background:linear-gradient(transparent,var(--tint));box-shadow:0 0 5px var(--tint);animation:pack-ember .8s var(--delay) both}
 @keyframes pack-ember{0%{opacity:0;transform:rotate(var(--angle)) translateY(-16px) scaleY(.2)}18%{opacity:1}100%{opacity:0;transform:rotate(var(--angle)) translateY(calc(-1 * var(--travel))) scaleY(.25)}}
 .opening-pack .receipt-stage::before{background:radial-gradient(ellipse,white 0%,#ffeaa6 8%,#ffc47188 24%,transparent 62%);animation-duration:.72s}
+.receipt-stage{column-gap:20px}
+.receipt-stage .reveal-tile:not(:only-child){margin-inline:0;--lean:0deg}
+.receipt-stage .reveal-tile:first-child:not(:only-child){--lean:-5deg}
+.receipt-stage .reveal-tile:last-child:not(:only-child){--lean:5deg}
+.reveal-tile{--light:#77d6ff}
+.reveal-tile[data-gold=true]{--light:#ffd340}
+.opening-pack .reveal-size::before{content:"";position:absolute;inset:29% -18%;border-radius:50%;border-top:4px solid white;border-bottom:2px solid #fff9;filter:drop-shadow(0 0 4px var(--light));z-index:3;pointer-events:none;animation:pack-ribbon .8s var(--turn) both}
+@keyframes pack-ribbon{0%{opacity:0;transform:rotate(-34deg) scale(.55,.3)}38%{opacity:1;transform:rotate(-26deg) scale(1.08,.68)}80%{opacity:.85;transform:rotate(-16deg) scale(1,.35)}100%{opacity:0;transform:rotate(-8deg) scale(.8,.12)}}
+.pack-particles i:after{content:"";display:block;width:4px;height:4px;border-radius:50%;background:white;box-shadow:0 0 5px var(--tint)}
+.reveal-size .pack-particles i{animation-name:pack-edge-spark}
+@keyframes pack-edge-spark{0%{opacity:0;transform:rotate(var(--angle)) translateY(-66px) scaleY(.25)}22%{opacity:1}100%{opacity:0;transform:rotate(var(--angle)) translateY(calc(-65px - var(--travel))) scaleY(.8)}}
+.pack-halo{pointer-events:none;position:absolute;left:50%;top:50%;width:250vmax;height:250vmax;border-radius:50%;background:radial-gradient(circle,#fffbd7 0%,var(--light) 10%,transparent 64%),repeating-conic-gradient(from 8deg,transparent 0deg 13deg,#fff5 14deg,transparent 17deg);mask-image:radial-gradient(closest-side,black 48%,transparent 100%);z-index:5;animation:pack-wave 1.45s var(--finale) both}
+@keyframes pack-wave{0%{opacity:0;transform:translate(-50%,-50%) scale(.015)}15%{opacity:.92}42%{opacity:.76;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-50%) scale(.035)}}
+.pack-highlight .reveal-spin{border-radius:6px 6px 80px 80px;box-shadow:0 0 4px 2px white,0 0 14px 4px var(--light)}
+.opening-pack .pack-highlight .reveal-spin{animation:pack-turn .88s var(--turn) both,pack-aura 1.5s calc(var(--turn) + .88s) backwards}
+@keyframes pack-aura{0%{box-shadow:none}32%{box-shadow:0 0 8px 5px white,0 0 38px 16px var(--light)}}
+@media(max-width:760px){.receipt-stage{column-gap:clamp(8px,2.5vw,16px)}.receipt-stage:has(.reveal-tile:nth-child(3)) .reveal-size{zoom:clamp(.54,calc((100vw - 64px) / 480px),.95)}}

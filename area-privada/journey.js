@@ -512,7 +512,8 @@ function revealPack(panel){
  if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
  const stage=panel.querySelector('.receipt-stage');
  const tiles=[...stage.children].sort((a,b)=>Number(a.dataset.gold==='true')-Number(b.dataset.gold==='true'));
- const settle=850+tiles.length*930+820;
+ const finale=850+(tiles.length-1)*930+880;
+ const settle=finale+1600;
  panel.style.setProperty('--settle',settle+'ms');
  panel.classList.add('opening-pack');
  const bounds=stage.getBoundingClientRect();
@@ -526,7 +527,15 @@ function revealPack(panel){
  tiles.forEach((tile,i)=>{
    const turn=850+i*930;
    tile.style.setProperty('--turn',turn+'ms');
-   effects.push(packBurst(tile.querySelector('.reveal-size'),turn+400,tile.dataset.gold==='true'));
+   const face=tile.querySelector('.reveal-size');
+   effects.push(packBurst(face,turn+480,tile.dataset.gold==='true'));
+   if(i===tiles.length-1){
+     tile.classList.add('pack-highlight');
+     const halo=document.createElement('span');
+     halo.className='pack-halo';halo.setAttribute('aria-hidden','true');
+     halo.style.setProperty('--finale',finale+'ms');
+     face.append(halo);effects.push(halo);
+   }
  });
  panel.querySelector('.receipt-actions').inert=true;
  const finish=()=>{effects.forEach(layer=>layer.remove());panel.classList.remove('opening-pack');panel.querySelector('.receipt-actions').inert=false;};
