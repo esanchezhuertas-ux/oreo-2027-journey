@@ -11,7 +11,7 @@ const iconNames = new Set([
 function icon(name) {
   if (!iconNames.has(name)) return '';
   const src = `assets/icons/${name}.svg`;
-  if (name === 'scarf' || name.startsWith('reward-')) {
+  if (name === 'help' || name === 'scarf' || name.startsWith('reward-')) {
     return `<img class="icon prize-icon" src="${src}" alt="">`;
   }
   return `<span class="icon figma-icon icon-${name}" style="--icon-file:url('${src}')" aria-hidden="true"></span>`;
@@ -60,7 +60,7 @@ function cardFace(p,detail,suffix) {
 }
 function receivedCard(player,gold) {
  const card = {...player, type:gold?'gold':'blue', available:1};
- return '<span class="holo-card '+card.type+'" aria-hidden="true" style="--biscuit-ink:'+(gold?'#f4d74c':'#0cbcff')+'">'+cardFace(card,false,'-receipt')+'</span>';
+ return '<span class="holo-card '+card.type+'" tabindex="0" role="group" aria-label="'+esc(player.name)+'" style="--biscuit-ink:'+(gold?'#f4d74c':'#0cbcff')+'">'+cardFace(card,true,'-receipt')+'</span>';
 }
 function card(p,detail=false){return `<button class="holo-card ${p.type}${p.type==='gold'&&!p.records.some(copy=>copy.rarity==='gold'&&!copy.used)?' gold-spent':p.available===0?' no-copies':''}" data-player="${p.id}" data-copies="${p.copies}" ${detail?'data-detail="true"':''} aria-label="${esc(p.name)}, ${p.type==='gold'?'cromo dorado':'cromo azul'}, ${p.available} ${p.available===1?'copia disponible':'copias disponibles'}${detail?'. Mueve el cursor para ver el brillo.':'. Ver cromo.'}" style="--biscuit-ink:${p.type==='gold'?'#f4d74c':'#0cbcff'}">${cardFace(p,detail,detail?'-detail':'')}</button>`;}
 function tile(p,slot=false){
@@ -185,15 +185,18 @@ function openDetail(id){
  <div class="redeem-action"></div></div></div>`;
  const availableRewards=window.Rewards?.available()||[];
  const action=content.querySelector('.redeem-action');
- if(availableRewards.length){
+ function paintRewards(variant){
+  const direct=variant.type==='gold' && variant.available>0 && availableRewards.some(r=>r.id==='gold');
+  const choices=availableRewards.filter(r=>direct?r.id==='gold':r.id!=='gold');
+  action.replaceChildren();action.hidden=!choices.length;
+  if(!choices.length)return;
   const rewardIcons={gold:'shirt',shirt:'shirt',scarf:'scarf',ball:'ball'};
-  const ctaText={gold:t('Quiero mi camiseta','Get my shirt'),shirt:t('Quiero mi camiseta','Get my shirt'),scarf:t('Quiero mi bufanda','Get my scarf'),ball:t('Quiero mi balón','Get my ball')};
-  if(availableRewards.length>1){
+  if(choices.length>1){
    const label=document.createElement('label');
    label.className='detail-choice';
    label.textContent=t('Premio','Reward');
    const select=document.createElement('select');
-   for(const reward of availableRewards)select.add(new Option(reward.label,reward.id));
+   for(const reward of choices)select.add(new Option(reward.label,reward.id));
    label.append(select);
    action.append(label);
   }
@@ -202,8 +205,8 @@ function openDetail(id){
   button.className='button primary';
   action.append(button);
   const select=action.querySelector('select');
-  const selectedId=()=>select?.value||availableRewards[0].id;
-  const paint=()=>{const id=selectedId();button.innerHTML=icon(rewardIcons[id])+esc(ctaText[id]||t('Canjear premio','Redeem reward'));};
+  const selectedId=()=>select?.value||choices[0].id;
+  const paint=()=>{const id=selectedId();button.innerHTML=icon(rewardIcons[id])+esc(direct?t('Quiero mi camiseta','Get my shirt'):t('Tienes premios que canjear','You have rewards to redeem'));};
   paint();
   if(select)select.onchange=paint;
   button.onclick=()=>{
@@ -212,9 +215,8 @@ function openDetail(id){
    dialog.addEventListener('close',()=>window.Rewards.open(id),{once:true});
    closeDialog(dialog);
   };
- }else{
-  action.hidden=true;
  }
+ paintRewards(initial);
  content.querySelector('.detail-history').onclick=()=>{
   dialog.addEventListener('close',()=>{location.hash='history';},{once:true});
   closeDialog(dialog);
@@ -224,6 +226,7 @@ function openDetail(id){
    const next=variants.find(p=>p.type===toggle.dataset.rarity);
    if(!next||toggle.getAttribute('aria-pressed')==='true')return;
    const element=content.querySelector('.holo-card'), template=document.createElement('template');
+   paintRewards(next);
    template.innerHTML=card(next,true);
    const face=template.content.firstElementChild;
    for(const attr of ['class','data-player','aria-label','style'])element.setAttribute(attr,face.getAttribute(attr));

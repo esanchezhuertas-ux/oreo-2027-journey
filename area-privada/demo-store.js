@@ -110,7 +110,11 @@
     const picks=code.startsWith('ALL')?catalog:Array.from({length:n},(_,i)=>catalog[(h+i)%catalog.length]);
     const time=Date.now();
     a.codes.push(code);
-    for(const p of picks)a.cards.push({player:p.id,rarity:gold?'gold':'blue',code,used:false,time});
+    const mixed=n>1 && code.endsWith('GOLD');
+    picks.forEach((player,index)=>{
+      const rarity=gold || (mixed && index===n-1) ? 'gold' : 'blue';
+      a.cards.push({player:player.id,rarity,code,used:false,time});
+    });
     save();return {picks,gold};
   }
   window.Demo={get account(){return db.account},get lang(){return db.lang},setLang(lang){db.lang=lang;save()},remove(){const all=accounts();if(db.account.email===email)localStorage.setItem(accountsKey+'-seed-retired','1');delete all[db.account.email];localStorage.setItem(accountsKey,JSON.stringify(all));logout();},matchesPassword,changeEmail,login,signup,logout,locate,smsLogin,password,save,entries,register};

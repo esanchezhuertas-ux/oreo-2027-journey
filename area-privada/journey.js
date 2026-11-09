@@ -475,16 +475,15 @@ function help(){
  const contact='<aside class="help-contact"><strong>'+t('Contacto','Contact')+'</strong><small>900 000 000 · ayuda@oreo.es</small><div class="contact-methods"><a class="button" href="tel:900000000"><img alt="" width="20" height="20" src="assets/icons/phone.svg"><span>900 000 000</span><b>'+t('Llamar','Call')+'</b></a><a class="button" href="mailto:ayuda@oreo.es"><img alt="" width="20" height="20" src="assets/icons/mail.svg"><span>ayuda@oreo.es</span><b>'+t('Escribir','Email')+'</b></a></div></aside>';
  return panel(t('Ayuda','Help'),contact+faq,{kind:'help-panel',intro:t('Resuelve tus dudas sobre tu cuenta, los códigos y los premios.','Find answers about your account, codes and rewards.')});
 }
-function receiptPreview() {
- const {picks, gold, index} = registered;
- const player = picks[index];
- const name = html(player.name);
- const rarity = gold ? t('Dorada','Gold') : t('Común','Common');
- return `<figure class="receipt-tile" aria-label="${name}, ${rarity}">
-   ${gold ? '<span class="receipt-sparkle">'+ui.icon('sparkles')+'</span>' : ''}
-   <div class="receipt-card">${ui.receivedCard(player,gold)}</div>
-   <figcaption>${ui.icon('check')}${t('Disponible','Available')}</figcaption>
- </figure>`;
+function receiptPreview(){
+ const start=registered.index;
+ const group=registered.cards.slice(start,start+3).sort((a,b)=>Number(b.gold)-Number(a.gold));
+ if(group.length===3)[group[0],group[1]]=[group[1],group[0]];
+ const back=(window.BRAND_SVG||'').replace(/fill="#272425"/g,'fill="white"').replace(/fill="#fff"/g,'fill="var(--back)"');
+ return group.map(({player,gold,fresh})=>{
+   const rarity=gold?t('Dorada','Gold'):t('Común','Common');
+   return `<figure class="reveal-tile" data-gold="${gold}"><figcaption><span>${rarity}</span>${fresh?'<b>'+t('Nuevo','New')+'</b>':''}</figcaption><div class="reveal-size"><div class="reveal-spin"><div class="reveal-back" aria-hidden="true">${back}</div>${ui.receivedCard(player,gold)}</div></div></figure>`;
+ }).join('');
 }
 function registrationResult() {
  const {picks, gold, first, firstGold, index} = registered;
@@ -509,18 +508,19 @@ function registrationResult() {
      +' '+t('Ya canjeaste tu primer dorado por la camiseta.','You have already redeemed your first gold card for a shirt.')
      +'<br>+'+quantity(count)+' · '+balanceText;
  }
- const label = i=>html(picks[i].name)+' · '+(i+1)+' / '+count;
- const carousel = count>1 ? `<div class="receipt-paging"><button type="button" data-receipt-step="-1" aria-label="${t('Cromo anterior','Previous card')}">${ui.icon('back')}</button><span aria-live="polite">${label(index)}</span><button type="button" data-receipt-step="1" aria-label="${t('Cromo siguiente','Next card')}">${ui.icon('forward')}</button></div>` : '';
+ if(!gold && registered.cards.some(card=>card.gold))message=t('Has conseguido ','You collected ')+count+t(' cromos.',' cards.')+'<br>'+balanceText;
+ const label = i=>(i+1)+'–'+Math.min(i+3,count)+' / '+count;
+ const carousel = count>3 ? `<div class="receipt-paging"><button type="button" data-receipt-step="-1" aria-label="${t('Cromo anterior','Previous card')}">${ui.icon('back')}</button><span aria-live="polite">${label(index)}</span><button type="button" data-receipt-step="1" aria-label="${t('Cromo siguiente','Next card')}">${ui.icon('forward')}</button></div>` : '';
  return `<section class="registration-receipt" role="dialog" aria-modal="true" aria-labelledby="receipt-title">
    <button class="receipt-handle" type="button" aria-label="${t('Cerrar','Close')}"><span></span></button>
    <button class="icon-button panel-dismiss receipt-close" data-route="home" aria-label="${t('Cerrar registro','Close code registration')}"></button>
    <div class="receipt-body">
      <div class="receipt-stage">${receiptPreview()}</div>${carousel}
      <div class="receipt-feedback">
-       <picture aria-hidden="true"><source media="(max-width:760px)" srcset="assets/registro/success-mobile.svg"><img alt="" src="assets/registro/success.svg"></picture>
+       <span class="receipt-success" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m4 12 5.5 5.5L20 7" fill="none" stroke="currentColor" stroke-width="2.4"/></svg></span>
        <h1 id="receipt-title">${title}</h1><p>${message}</p>
      </div>
-     ${isClaimable ? '<button class="button receipt-action" data-prize="gold">'+t('Ver mi premio','View my reward')+'</button>' : '<button class="button receipt-action" data-route="home">'+t('Ver mi colección','View my collection')+'</button>'}
+     <div class="receipt-actions"><button class="button primary" data-route="home" data-register-code>${t('Seguir registrando códigos','Register another code')}</button>${window.Rewards.available().length?'<button class="button" data-prize="'+window.Rewards.available()[0].id+'">'+t('Ya puedes canjear un premio','You can now redeem a reward')+'</button>':'<button class="button" data-route="collection">'+t('Ver colección','View collection')+'</button>'}</div>
    </div>
  </section>`;
 }
@@ -551,7 +551,7 @@ function draw(){
  else if(page==='reward')main.innerHTML=reward();
  else if(['history','orders'].includes(page))main.innerHTML=historyPage(page==='orders');
  else if(page==='help')main.innerHTML=help();
- else if(page==='received'&&registered)main.innerHTML=registrationResult();
+ else if(page==='received'&&registered){main.innerHTML=registrationResult();window.Holo.init(main);}
  else if(page==='logout'){
    main.replaceChildren();
    confirmAction(t('¿Cerrar sesión?','Log out?'),t('Tu colección seguirá guardada. Podrás continuar cuando vuelvas a entrar.','Your collection will be saved. You can continue when you sign in again.'),t('Cancelar','Cancel'),t('Cerrar sesión','Log out'),()=>go('home'),()=>{db.logout();pending=null;registered=null;shipping={};historyFilter='all';go('login');});
@@ -576,10 +576,11 @@ document.addEventListener('click',event=>{
  const b=event.target.closest('button,a');if(!b)return;
  if(b.hasAttribute('data-receipt-step') && registered) {
    const count = registered.picks.length;
-   registered.index = (registered.index + Number(b.dataset.receiptStep) + count) % count;
-   const player = registered.picks[registered.index];
-   main.querySelector('.receipt-stage').innerHTML = receiptPreview();
-   main.querySelector('.receipt-paging [aria-live]').textContent = player.name+' · '+(registered.index+1)+' / '+count;
+   const pages=Math.ceil(count/3);
+   registered.index=((registered.index/3+Number(b.dataset.receiptStep)+pages)%pages)*3;
+   main.querySelector('.receipt-stage').innerHTML=receiptPreview();
+   window.Holo.init(main);
+   main.querySelector('.receipt-paging [aria-live]').textContent=(registered.index+1)+'–'+Math.min(registered.index+3,count)+' / '+count;
    return;
  }
  if(b.id==='brand'){event.preventDefault();go(db.account?'home':'login');}
@@ -656,7 +657,12 @@ main.addEventListener('submit',async e=>{
 });
 window.addEventListener('oreo:registered',e=>{
  const {picks,gold}=e.detail, cards=db.account.cards;
- registered={picks,gold,index:0,first:cards.length===picks.length,
+ const seen=new Set(cards.slice(0,-picks.length).map(c=>c.player+':'+c.rarity));
+ const received=cards.slice(-picks.length).map((copy,i)=>{
+   const key=copy.player+':'+copy.rarity,fresh=!seen.has(key);
+   seen.add(key);return {player:picks[i],gold:copy.rarity==='gold',fresh};
+ });
+ registered={picks,gold,cards:received,index:0,first:cards.length===picks.length,
    firstGold:gold && cards.filter(card=>card.rarity==='gold').length===picks.length};
  go('received');
 });
