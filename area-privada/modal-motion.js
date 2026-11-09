@@ -33,7 +33,7 @@
   orbit.className='modal-card-orbit';
   card.replaceWith(orbit);orbit.append(card);entry.orbit=orbit;
   const back=document.createElement('div');
-  back.className='modal-card-back'+(card.classList.contains('gold')?' is-gold':'')+(card.classList.contains('no-copies')?' no-copies':'');
+  back.className='modal-card-back';
   back.setAttribute('aria-hidden','true');
   // Exact header logo. White knockout paths become the darker family background.
   back.innerHTML=(window.BRAND_SVG||'').replace(/fill="#272425"/g,'fill="currentColor"').replace(/fill="#fff"/g,'fill="var(--modal-back-color)"');
@@ -89,7 +89,7 @@
   const orbit=document.createElement('div');orbit.className='modal-card-orbit';
   card.replaceWith(orbit);orbit.append(card);entry.orbit=orbit;
   const back=document.createElement('div');
-  back.className='modal-card-back'+(card.classList.contains('gold')?' is-gold':'')+(card.classList.contains('no-copies')?' no-copies':'');
+  back.className='modal-card-back';
   back.setAttribute('aria-hidden','true');
   back.innerHTML=(window.BRAND_SVG||'').replace(/fill="#272425"/g,'fill="currentColor"').replace(/fill="#fff"/g,'fill="var(--modal-back-color)"');
   orbit.append(back);orbit.style.setProperty('--modal-card-scale',getComputedStyle(card).scale||'1');

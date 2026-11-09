@@ -12,10 +12,16 @@
 .holo-card .holo-sparkles{opacity:0}
 .holo-card.gold .holo-foil{
  z-index:2;
- background-image:url("https://poke-holo.b-cdn.net/foils/swsh9/foils/upscaled/186_foil_etched_swsecret_2x.webp"),linear-gradient(128deg,#fff5ac,#bc9249 60%,#fffbd7);
- background-position:center;background-size:100% 100%;background-repeat:no-repeat;background-blend-mode:multiply;
- mask-image:radial-gradient(ellipse farthest-corner at var(--hx) var(--hy),black 10%,#000c 49%,#0005 100%);
- mix-blend-mode:screen;filter:contrast(1.25);opacity:calc(var(--glow)*.94)
+ mask:url("assets/gold-etch.svg?v=oreo-rim") center/100% 100% no-repeat;
+ background:linear-gradient(116deg,#876021 8%,#cca552 24%,#fff3a4 39%,#fffef2 46%,#e6d8a4 54%,#be9559 65%,#ffe4a2 82%) var(--fx) var(--fy)/260% 180%;
+ mix-blend-mode:screen;filter:none;opacity:var(--glow)
+}
+/* Light the raised details through the existing biscuit artwork mask. */
+.holo-card.gold:has(.holo-foil) .cookie-emblem::before{
+ content:"";position:absolute;inset:0;z-index:1;
+ mask:url("assets/oreo-emblem.svg") center/contain no-repeat;
+ background:radial-gradient(ellipse at var(--hx) var(--hy),#fffde0, #ffe395 17%,transparent 52%);
+ opacity:calc(var(--glow)*.78);pointer-events:none
 }
 .holo-card.gold .holo-sparkles{
  z-index:2;background-image:var(--foil-grain),var(--foil-grain);
