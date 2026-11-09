@@ -191,7 +191,26 @@ function settingsLinks(page){
  const items=[['profile',t('Mis datos','My details'),t('Datos','Details'),'user'],['password',t('Contraseña','Password'),t('Contraseña','Password'),'lock'],['address',t('Direcciones','Addresses'),t('Direcciones','Addresses'),'map-pin']];
  return '<nav class="settings-links" aria-label="'+t('Configuración','Settings')+'">'+items.map(([route,long,short,icon])=>'<a href="#'+route+'" '+(page===route?'aria-current="page"':'')+'><img width="20" height="20" alt="" src="assets/icons/'+icon+'.svg"><span class="settings-desktop-label">'+long+'</span><span class="settings-mobile-label">'+short+'</span></a>').join('')+'</nav>';
 }
-function addressForm(values){return ['name','surname','phone','street','postcode','city','province'].map(k=>field(k,values[k]||'')).join('');}
+const provinces='Álava|Albacete|Alicante|Almería|Ávila|Badajoz|Illes Balears|Barcelona|Burgos|Cáceres|Cádiz|Castellón|Ciudad Real|Córdoba|A Coruña|Cuenca|Girona|Granada|Guadalajara|Gipuzkoa|Huelva|Huesca|Jaén|León|Lleida|La Rioja|Lugo|Madrid|Málaga|Murcia|Navarra|Ourense|Asturias|Palencia|Las Palmas|Pontevedra|Salamanca|Santa Cruz de Tenerife|Cantabria|Segovia|Sevilla|Soria|Tarragona|Teruel|Toledo|Valencia|Valladolid|Bizkaia|Zamora|Zaragoza|Ceuta|Melilla'.split('|');
+function postalProvince(code){
+ return /^\d{5}$/.test(code)?provinces[Number(code.slice(0,2))-1]||'':'';
+}
+function addressForm(values){
+ const code=String(values.postcode||''),province=postalProvince(code);
+ const names=accountField('name',t('Nombre','First name'),values.name)+accountField('surname',t('Apellidos','Last name'),values.surname);
+ const derived=(key,label,value)=>'<label class="entry-field"><span>'+label+'</span><input name="'+key+'" readonly value="'+html(value)+'"></label>';
+ const postal=derived('country',t('País','Country'),province?t('España','Spain'):'')+derived('province',t('Provincia','Province'),province)+'<label class="entry-field"><span>'+t('Código postal','Postcode')+'</span><input name="postcode" required autocomplete="postal-code" inputmode="numeric" maxlength="5" pattern="(0[1-9]|[1-4][0-9]|5[0-2])[0-9]{3}" value="'+html(code)+'"></label>';
+ return '<div class="address-grid address-names">'+names+'</div>'+phoneField(values.phone||'',{required:true,label:t('Teléfono','Phone')})+'<div class="address-grid address-postal">'+postal+'</div>'+accountField('city',t('Localidad','Town or city'),values.city,{inline:true,editIcon:true})+accountField('street',t('Dirección','Address'),values.street,{inline:true,editIcon:true});
+}
+function syncPostal(event){
+ const input=event.target;
+ if(!input.matches('.address-postal [name=postcode]'))return;
+ const province=postalProvince(input.value);
+ input.form.elements.province.value=province;
+ input.form.elements.country.value=province?t('España','Spain'):'';
+}
+main.addEventListener('input',syncPostal);
+main.addEventListener('change',syncPostal);
 const accountField=(key,label,value='',opts={})=>{
  const type=opts.type||'text', action=type==='password'?
    '<button type="button" data-eye aria-label="'+t('Mostrar contraseña','Show password')+'">'+ui.icon('eye')+'</button>':
@@ -249,10 +268,8 @@ function addressScreen(page){
  let body=profileFeedback();
  if(edit){
    const values=addr||{name:a.name,surname:a.surname,phone:a.phone,country:t('España','Spain')};
-   const alias=accountField('alias',t('Nombre de la dirección','Address name'),values.alias,{placeholder:t('Casa, trabajo…','Home, work…')});
-   const grid=[[accountField('name',t('Nombre','First name'),values.name),accountField('surname',t('Apellidos','Last name'),values.surname)],[phoneField(values.phone||'',{required:true,label:t('Teléfono','Phone')}),accountField('country',t('País','Country'),values.country||t('España','Spain'))],[accountField('province',t('Provincia','Province'),values.province),accountField('postcode',t('Código postal','Postcode'),values.postcode)]];
-   const rows=grid.map(cells=>'<div class="address-grid">'+cells.join('')+'</div>').join('');
-   body+=form('address','<input type="hidden" name="addressId" value="'+html(addr?.id)+'">'+alias+rows+accountField('city',t('Localidad','Town or city'),values.city)+accountField('street',t('Dirección','Address'),values.street)+accountField('flat',t('Piso y puerta (opcional)','Floor and door (optional)'),values.flat,{optional:true})+'<label class="address-default"><input type="checkbox" name="primary" '+(!list.length||addr===list[0]?'checked':'')+'> '+t('Usar como dirección predeterminada','Use as default address')+'</label><div class="profile-actions">'+profileButton(t('Cancelar','Cancel'),'address')+submit(t('Guardar dirección','Save address'))+'</div>');
+   const alias=accountField('alias',t('Nombre de la dirección','Address name'),values.alias,{inline:true,editIcon:true,placeholder:t('Casa, trabajo…','Home, work…')});
+   body+=form('address','<input type="hidden" name="addressId" value="'+html(addr?.id)+'">'+alias+addressForm(values)+accountField('flat',t('Piso y puerta (opcional)','Floor and door (optional)'),values.flat,{optional:true,inline:true,editIcon:true})+'<label class="address-default"><input type="checkbox" name="primary" '+(!list.length||addr===list[0]?'checked':'')+'> '+t('Usar como dirección predeterminada','Use as default address')+'</label><div class="profile-actions">'+profileButton(t('Cancelar','Cancel'),'address')+submit(t('Guardar dirección','Save address'))+'</div>');
  }else{
    body+=list.map((item,i)=>'<article class="address-card"><div class="address-card-title"><strong>'+html(item.alias)+'</strong>'+(i===0?'<small>'+t('Predeterminada','Default')+'</small>':'')+'</div><p>'+html([item.name,item.surname].filter(Boolean).join(' '))+'<br>'+html([item.street,item.flat].filter(Boolean).join(', '))+'<br>'+html([item.postcode,item.city,item.province].filter(Boolean).join(' · '))+'</p><div class="address-tools">'+profileButton(t('Editar','Edit'),'address/edit/'+item.id,'pencil')+profileButton(t('Eliminar','Delete'),'address/delete/'+item.id,'trash')+(i?'<button type="button" class="button" data-primary-address="'+html(item.id)+'">'+t('Usar como predeterminada','Set as default')+'</button>':'')+'</div></article>').join('')||infoBox(t('Aún no tienes direcciones guardadas','You have no saved addresses'),t('Añade una dirección para recibir tus premios.','Add an address to receive your rewards.'));
    body+=profileButton(t('Añadir dirección','Add address'),'address/new','plus')+'<p class="profile-hint">'+t('Modificar una dirección guardada no cambia la de un pedido ya realizado.','Changing a saved address does not update past orders.')+'</p>';
