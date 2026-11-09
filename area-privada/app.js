@@ -66,11 +66,10 @@ function card(p,detail=false){return `<button class="holo-card ${p.type}${p.type
 function tile(p,slot=false){
  const goldSpent=p.type==='gold'&&!p.records.some(copy=>copy.rarity==='gold'&&!copy.used);
  const english=window.Demo.lang==='en';
- const finish=goldSpent?(english?'Gold redeemed':'Dorada canjeada'):'';
  const availableLabel=goldSpent
   ?(english?`${p.available} common`:`${p.available} ${p.available===1?'común':'comunes'}`)
   :(english?'Redeemable':'Canjeable');
- const mark=p.type==='gold'?`<span class="shiny-badge${goldSpent?' spent-gold-badge':''}" aria-label="${finish||(english?'Gold finish':'Acabado dorado')}">${icon('sparkles')}${finish}</span>`:'';
+ const mark=p.type==='gold'&&!goldSpent?`<span class="shiny-badge" aria-label="${english?'Gold finish':'Acabado dorado'}">${icon('sparkles')}</span>`:'';
  const availability=p.available?`<span class="available-badge">${icon('check')}${availableLabel}</span>`:'';
  return `<article class="card-tile">${slot?`<span class="club-slot">${p.position}</span>`:''}<div class="card-meta">${p.isNew&&!goldSpent?'<span class="new-badge">NUEVO</span>':''}${mark}</div><div class="card-scene">${card(p)}</div><div class="mobile-card-caption"><span>${esc(p.name)}</span><span>${esc(p.club)}</span></div><div class="availability-badge-wrap">${availability}</div></article>`;
 }
