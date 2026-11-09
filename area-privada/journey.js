@@ -759,11 +759,27 @@ function finishReceiptDrag(e){
 main.addEventListener('pointerup',finishReceiptDrag);
 main.addEventListener('pointercancel',finishReceiptDrag);
 let collectionScroll=0;
-window.addEventListener('hashchange',e=>{
+let navigationVersion=0;
+window.addEventListener('hashchange',async e=>{
+ const version=++navigationVersion;
  const previous=new URL(e.oldURL).hash.slice(1);
  const fromCollection=['home','collection'].includes(previous);
  const toCollection=['home','collection'].includes(route());
  if(fromCollection&&!toCollection)collectionScroll=window.scrollY;
+ const panel=main.querySelector('.journey-panel');
+ if(toCollection&&panel&&!main.hidden&&!matchMedia('(prefers-reduced-motion: reduce)').matches){
+  const entering=panel.getAnimations().find(a=>a.animationName?.startsWith('journey-')&&a.animationName.endsWith('-enter'));
+  if(entering)entering.reverse();
+  else main.classList.add('closing-panel');
+  const exit=entering||panel.getAnimations().find(a=>a.animationName?.endsWith('-exit'));
+  const fade=main.animate([{backgroundColor:getComputedStyle(main).backgroundColor},{backgroundColor:'transparent'}],{duration:exit?.effect.getTiming().duration||250,fill:'forwards'});
+  main.inert=true;
+  if(exit)await exit.finished.catch(()=>{});
+  fade.cancel();
+ }
+ if(version!==navigationVersion)return;
+ main.inert=false;
+ main.classList.remove('closing-panel');
  draw();
  if(toCollection)scrollTo(0,['login','verify','received'].includes(previous)?0:collectionScroll);
  else if(!document.body.classList.contains('has-panel'))scrollTo(0,0);

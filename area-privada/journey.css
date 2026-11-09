@@ -341,3 +341,12 @@
 .team-picker label .team-option{min-height:40px;padding:4px 12px}
 .team-picker label:hover,.team-picker input:checked+.team-option{background:#f2f3f6}
 .team-picker input:focus-visible+.team-option{outline:2px solid #0042aa;outline-offset:-2px}
+
+@media(min-width:701px) and (prefers-reduced-motion:no-preference){
+ .closing-panel .journey-panel{animation:journey-panel-exit .28s cubic-bezier(.73,0,.84,.15) both}
+ @keyframes journey-panel-exit{from{transform:translateX(0);opacity:1}to{transform:translateX(100%);opacity:.12}}
+}
+@media(max-width:700px) and (prefers-reduced-motion:no-preference){
+ .has-panel .closing-panel .journey-panel{animation:journey-sheet-exit .25s ease-in both}
+ @keyframes journey-sheet-exit{from{transform:translateY(0);opacity:1}to{transform:translateY(52px);opacity:.16}}
+}
