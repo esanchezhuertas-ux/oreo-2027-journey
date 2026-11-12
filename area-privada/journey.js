@@ -228,10 +228,6 @@ function settingsView(section,title,desc,body){
  const localNav=settingsLinks(section);
  return accountPanel('<div class="settings-layout">'+localNav+'<section class="settings-content"><h2>'+title+'</h2><p>'+desc+'</p>'+body+'</section></div>',section);
 }
-function saveProfileEvent(es,en){
- db.account.profileEvents.push({time:Date.now(),label:[es,en]});
- db.save();
-}
 let profileMessage='', accountClosed=false;
 function profileFeedback(){
  const msg=profileMessage;
@@ -368,7 +364,7 @@ main.addEventListener('change',event=>{
  if(!event.target.matches('[data-profile-communications]'))return;
  const a=db.account;
  a.preferences={...a.preferences,communications:event.target.checked};
- saveProfileEvent('Preferencias actualizadas','Preferences updated');
+ db.save();
 });
 main.addEventListener('click',event=>{
  const trigger=event.target.closest('[data-primary-address]');
@@ -376,7 +372,7 @@ main.addEventListener('click',event=>{
  const a=db.account,list=savedAddresses(a),item=list.find(x=>x.id===trigger.dataset.primaryAddress);
  if(!item)return;
  a.addresses=[item,...list.filter(x=>x!==item)];a.address={...item};
- saveProfileEvent('Dirección predeterminada actualizada','Default address updated');draw();
+ db.save();draw();
 });
 document.addEventListener('keydown',event=>{
  if(event.key!=='Escape')return;
@@ -390,7 +386,7 @@ async function submitProfile(mode,v,fail){
    if(mode==='password'&&!await db.matchesPassword(a,v.currentPassword))return fail('Contraseña actual incorrecta.','Incorrect current password.');
    if(await db.matchesPassword(a,v.password))return fail('La contraseña nueva debe ser diferente.','Choose a different password.');
    if(mode==='profile-reset'&&!a.recoveryRequested)return fail('Solicita un enlace de recuperación.','Request a recovery link.');
-   delete a.recoveryRequested;await db.password(a,v.password);saveProfileEvent('Contraseña actualizada','Password updated');
+   delete a.recoveryRequested;await db.password(a,v.password);
    profileMessage=t('Contraseña actualizada.','Password updated.');go('password');
  }else if(mode==='profile-recover'){
    if(v.email.toLowerCase().trim()!==a.email)return fail('Revisa el correo de tu cuenta.','Check your account email.');
@@ -400,15 +396,15 @@ async function submitProfile(mode,v,fail){
    if(email!==a.email&&existing)return fail('El correo ya está registrado.','This email is already registered.');
    a.name=v.name.trim();a.surname=v.surname.trim();a.phone=v.phone;
    a.pendingEmail=email!==a.email?email:'';
-   saveProfileEvent('Datos personales actualizados','Personal details updated');
+   db.save();
    profileMessage=t('Cambios guardados.','Changes saved.');go('profile');
  }else if(mode==='profile-prefs'){
    a.preferences={communications:v.communications==='on',personalization:v.personalization==='on'};
-   saveProfileEvent('Preferencias actualizadas','Preferences updated');
+   db.save();
    profileMessage=t('Preferencias guardadas.','Preferences saved.');go('profile');
  }else if(mode==='profile-email'&&a.pendingEmail){
    if(!db.changeEmail(a,a.pendingEmail))return fail('El correo ya está registrado.','This email is already registered.');
-   delete a.pendingEmail;saveProfileEvent('Correo verificado','Email verified');go('profile');
+   delete a.pendingEmail;db.save();go('profile');
  }else if(mode==='address'||mode==='delete-address'){
    const list=savedAddresses(a),idx=list.findIndex(x=>x.id===v.addressId);
    if(mode==='delete-address'){if(idx!==-1)list.splice(idx,1);}
@@ -418,7 +414,7 @@ async function submitProfile(mode,v,fail){
      if(idx>=0)list[idx]=item;else list.push(item);
      if(primary){list.splice(list.indexOf(item),1);list.unshift(item);}
    }
-   a.address={...list[0]};saveProfileEvent('Direcciones actualizadas','Addresses updated');
+   a.address={...list[0]};db.save();
    profileMessage=mode==='address'?t('Dirección guardada.','Address saved.'):t('Dirección eliminada.','Address deleted.');go('address');
  }else if(mode==='remove'){
    if(!await db.matchesPassword(a,v.currentPassword))return fail('Contraseña incorrecta.','Incorrect password.');
@@ -427,7 +423,7 @@ async function submitProfile(mode,v,fail){
 }
 function historyPage(ordersOnly=false){
  const account=db.account;
- const labels={all:t('Todo','All'),codes:t('Códigos','Codes'),orders:t('Canjes','Redemptions'),account:t('Cuenta','Account')};
+ const labels={all:t('Todo','All'),codes:t('Códigos','Codes'),orders:t('Canjes','Redemptions')};
  const active=ordersOnly?'orders':historyFilter;
  const rows=account.codes.map(code=>{
   const cards=account.cards.filter(card=>card.code===code);
@@ -440,24 +436,27 @@ function historyPage(ordersOnly=false){
    description:[titleOf(order.reward),order.shipping?.club,order.shipping?.size].filter(Boolean).join(' · '),
    detail:'<strong>'+t('Referencia y entrega','Reference and delivery')+'</strong><p><code>'+html(order.id)+'</code><br>'+delivery(order.shipping||{})+'</p><strong>'+t('Siguiente paso','Next step')+'</strong><p>'+t('Nos pondremos en contacto contigo a la menor brevedad posible para gestionar tu premio.','We will contact you as soon as possible about your reward.')+'</p>'});
  }
- const eventIds=new Set();
- account.profileEvents.forEach((event,i)=>{
-  const key=String(event.time);
-  const id=eventIds.has(key)?'account-'+i+'-'+key:key;
-  eventIds.add(key);
-  rows.push({id,type:'account',time:event.time,title:t(...event.label),description:t('Mi cuenta','My account'),detail:html(account.email)});
- });
  const filters=Object.entries(labels).map(([id,label])=>'<button data-tab="'+id+'" aria-pressed="'+(active===id)+'">'+label+'</button>').join('');
  const formatter=new Intl.DateTimeFormat(db.lang==='en'?'en-GB':'es-ES',{day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'});
  const list=rows.reverse().filter(row=>active==='all'||row.type===active).sort((a,b)=>(b.time||0)-(a.time||0)).map((row,i)=>{
-  const read=(account.readActivity||[]).includes(row.id),open=expanded===row.id;
+  const open=expanded===row.id;
   const refLabel=row.type==='orders'?t('Ref.','Ref.'):t('Código:','Code:');
-  const reference=row.reference?'<div class="activity-reference"><img src="assets/history/qr.svg" width="20" height="20" alt="">'+refLabel+' <code>'+html(row.reference)+'</code><button data-copy="'+html(row.reference)+'" aria-label="'+t('Copiar','Copy')+' '+html(row.reference)+'">'+ui.icon('copy')+'</button></div>':'';
-  return '<article class="activity-row" data-read="'+read+'"><button class="activity-toggle" data-activity="'+html(row.id)+'" aria-expanded="'+open+'" aria-controls="activity-'+i+'"><span class="activity-heading"><strong>'+html(row.title)+'</strong><small><img src="assets/history/time.svg" width="16" height="16" alt="">'+(row.time?formatter.format(row.time):'')+'</small></span><span class="activity-chevron">'+ui.icon('chevron')+'</span></button>'+reference+'<p>'+html(row.description)+'</p><small class="activity-read">'+(read?t('Leído','Read'):t('Sin leer','Unread'))+'</small><div class="activity-detail" id="activity-'+i+'" '+(open?'':'hidden')+'>'+row.detail+'</div></article>';
+  const reference='<div class="activity-reference"><img src="assets/history/qr.svg" width="20" height="20" alt="">'+refLabel+' <code>'+html(row.reference)+'</code><button data-copy="'+html(row.reference)+'" aria-label="'+t('Copiar','Copy')+' '+html(row.reference)+'">'+ui.icon('copy')+'</button></div>';
+  return '<article class="activity-row"><button class="activity-toggle" data-activity="'+html(row.id)+'" aria-expanded="'+open+'" aria-controls="activity-'+i+'"><span class="activity-heading"><strong>'+html(row.title)+'</strong><small><img src="assets/history/time.svg" width="16" height="16" alt="">'+(row.time?formatter.format(row.time):'')+'</small></span><span class="activity-chevron">'+ui.icon('chevron')+'</span></button>'+reference+'<p>'+html(row.description)+'</p><div class="activity-detail" id="activity-'+i+'" '+(open?'':'hidden')+'>'+row.detail+'</div></article>';
  }).join('');
  const title=ordersOnly?t('Mis solicitudes','My requests'):t('Historial de la cuenta','Account history');
- const intro=t('Tus códigos, cromos, canjes y cambios de cuenta, en un mismo lugar.','Your codes, cards, redemptions and account changes, all in one place.');
- return accountPanel('<section class="activity-feed"><h2>'+title+'</h2>'+(ordersOnly?'':'<p>'+intro+'</p><div class="activity-filters">'+filters+'</div>')+'<div class="activity-list" role="region" tabindex="0" aria-label="'+title+'">'+(list||'<p class="activity-empty">'+t('Todavía no hay actividad.','No activity yet.')+'</p>')+'</div></section>','history');
+ const intro=t('Consulta tus códigos registrados y tus canjes.','View your registered codes and redemptions.');
+ let empty='';
+ if(!list){
+  if(ordersOnly){
+   empty='<p class="activity-empty">'+t('Todavía no has solicitado ningún premio.','You have not requested a reward yet.')+'</p>';
+  }else if(rows.length){
+   empty='<div class="activity-empty"><strong>'+t('No hay acciones de este tipo','No activity of this type')+'</strong><p>'+t('Prueba con otro filtro para consultar el resto de tu historial.','Try another filter to see the rest of your history.')+'</p><button type="button" class="button" data-tab="all">'+t('Ver todo','View all')+'</button></div>';
+  }else{
+   empty='<div class="activity-empty"><strong>'+t('Tu historial empieza aquí','Your history starts here')+'</strong><p>'+t('Cuando registres un código o canjees un premio, lo verás aquí.','When you register a code or redeem a reward, it will appear here.')+'</p></div>';
+  }
+ }
+ return accountPanel('<section class="activity-feed"><h2>'+title+'</h2>'+(ordersOnly?'':'<p>'+intro+'</p><div class="activity-filters">'+filters+'</div>')+'<div class="activity-list" role="region" tabindex="0" aria-label="'+title+'">'+(list||empty)+'</div></section>','history');
 }
 function prizeSummary(id,choice){
  const art={gold:'reward-shirt',shirt:'reward-shirt',scarf:'scarf',ball:'reward-ball'}[id];
@@ -653,10 +652,6 @@ function draw(){
  else if(page.startsWith('history/order/')){
   const order=a.orders.find(item=>encodeURIComponent(item.id)===page.slice('history/order/'.length));
   historyFilter='orders';expanded=order?.id||'';
-  if(order){
-   const read=a.readActivity ||= [];
-   if(!read.includes(order.id)){read.push(order.id);db.save();}
-  }
   main.innerHTML=historyPage();
   history.replaceState(null,'','#history');
   const toggle=main.querySelector('[data-activity][aria-expanded="true"]');
@@ -725,12 +720,6 @@ document.addEventListener('click',event=>{
    const active=open&&toggle===b;
    toggle.setAttribute('aria-expanded',String(active));
    document.getElementById(toggle.getAttribute('aria-controls')).hidden=!active;
-  }
-  if(open){
-   const read=db.account.readActivity ||= [];
-   if(!read.includes(id)){read.push(id);db.save();}
-   b.closest('.activity-row').dataset.read='true';
-   b.closest('.activity-row').querySelector('.activity-read').textContent=t('Leído','Read');
   }
  }
  if(b.dataset.prize)launchPrize(b.dataset.prize);
