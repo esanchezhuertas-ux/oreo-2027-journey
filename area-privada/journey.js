@@ -193,7 +193,7 @@ function accountPanel(content,section){
  return panel(t('Mi cuenta','My account'),content,{kind:'account-panel',intro:t('Tu cuenta, tus códigos y tus premios, bajo control.','Manage your account, codes and rewards.'),tabs});
 }
 function settingsLinks(page){
- const items=[['profile',t('Mis datos','My details'),t('Datos','Details'),'user'],['password',t('Contraseña','Password'),t('Contraseña','Password'),'lock'],['address',t('Direcciones','Addresses'),t('Direcciones','Addresses'),'map-pin']];
+ const items=[['profile',t('Mis datos','My details'),t('Datos','Details'),'user'],['password',t('Contraseña','Password'),t('Contraseña','Password'),'lock'],['address',t('Dirección','Address'),t('Dirección','Address'),'map-pin']];
  return '<nav class="settings-links" aria-label="'+t('Configuración','Settings')+'">'+items.map(([route,long,short,icon])=>'<a href="#'+route+'" '+(page===route?'aria-current="page"':'')+'><img width="20" height="20" alt="" src="assets/icons/'+icon+'.svg"><span class="settings-desktop-label">'+long+'</span><span class="settings-mobile-label">'+short+'</span></a>').join('')+'</nav>';
 }
 const provinces='Álava|Albacete|Alicante|Almería|Ávila|Badajoz|Illes Balears|Barcelona|Burgos|Cáceres|Cádiz|Castellón|Ciudad Real|Córdoba|A Coruña|Cuenca|Girona|Granada|Guadalajara|Gipuzkoa|Huelva|Huesca|Jaén|León|Lleida|La Rioja|Lugo|Madrid|Málaga|Murcia|Navarra|Ourense|Asturias|Palencia|Las Palmas|Pontevedra|Salamanca|Santa Cruz de Tenerife|Cantabria|Segovia|Sevilla|Soria|Tarragona|Teruel|Toledo|Valencia|Valladolid|Bizkaia|Zamora|Zaragoza|Ceuta|Melilla'.split('|');
@@ -205,7 +205,9 @@ function addressForm(values){
  const names=accountField('name',t('Nombre','First name'),values.name,{inline:true,editIcon:true})+accountField('surname',t('Apellidos','Last name'),values.surname,{inline:true,editIcon:true});
  const derived=(key,label,value)=>'<label class="entry-field"><span>'+label+'</span><input name="'+key+'" readonly value="'+html(value)+'"></label>';
  const postal=derived('country',t('País','Country'),province?t('España','Spain'):'')+derived('province',t('Provincia','Province'),province)+'<label class="entry-field"><span>'+t('Código postal','Postcode')+'</span><input name="postcode" required autocomplete="postal-code" inputmode="numeric" maxlength="5" pattern="(0[1-9]|[1-4][0-9]|5[0-2])[0-9]{3}" value="'+html(code)+'"></label>';
- return names+phoneField(values.phone||'',{inline:true,required:true,label:t('Teléfono','Phone')})+'<div class="address-grid address-postal">'+postal+'</div>'+accountField('city',t('Localidad','Town or city'),values.city,{inline:true,editIcon:true})+accountField('street',t('Dirección','Address'),values.street,{inline:true,editIcon:true});
+ const alias=accountField('alias',t('Nombre de la dirección','Address name'),values.alias,{optional:true,inline:true,editIcon:true,placeholder:t('Casa, trabajo…','Home, work…')});
+ const flat=accountField('flat',t('Piso y puerta (opcional)','Floor and door (optional)'),values.flat,{optional:true,inline:true,editIcon:true});
+ return alias+names+phoneField(values.phone||'',{inline:true,required:true,label:t('Teléfono','Phone')})+'<div class="address-grid address-postal">'+postal+'</div>'+accountField('city',t('Localidad','Town or city'),values.city,{inline:true,editIcon:true})+accountField('street',t('Dirección','Address'),values.street,{inline:true,editIcon:true})+flat;
 }
 function syncPostal(event){
  const input=event.target;
@@ -257,25 +259,49 @@ function passwordScreen(page){
    profileFeedback()+infoBox(t('Tu contraseña','Your password'),t('Por seguridad, no mostramos tu contraseña actual.','For security, we hide your current password.'))+profileButton(t('Cambiar contraseña','Change password'),'password/edit');
  return settingsView('password',t('Contraseña','Password'),t('Protege el acceso a tu cuenta.','Protect access to your account.'),body);
 }
-function savedAddresses(a){
- if(!a.addresses)a.addresses=a.address?.street?[{...a.address,id:'primary',alias:a.address.alias||t('Casa','Home')}]:[];
- return a.addresses;
+const addressKeys=['alias','name','surname','phone','street','flat','postcode','city','province','country'];
+function deliveryFields(source){
+ return Object.fromEntries(addressKeys.map(key=>[key,String(source[key]??'').trim()]));
+}
+function savedAddress(account){
+ const legacy=Array.isArray(account.addresses)?account.addresses.filter(item=>item?.street?.trim()):[];
+ const stored=account.address?.street?.trim()?account.address:null;
+ const primary=legacy.find(item=>item.primary===true || item.isDefault===true || item.default===true)||legacy[0];
+ if(!stored && !primary)return null;
+ // Older redemptions wrote the latest delivery into address without its label or apartment.
+ // Recover those fields only when the previous profile entry is for the same destination.
+ const matches=stored?legacy.filter(item=>item.street.trim()===stored.street.trim() &&
+   String(item.postcode||'')===String(stored.postcode||'') && String(item.city||'')===String(stored.city||'')):[];
+ const matching=matches.length===1?matches[0]:matches.find(item=>stored.id && item.id===stored.id);
+ const address=deliveryFields({...matching,...(stored||primary)});
+ address.name ||= account.name||'';
+ address.surname ||= account.surname||'';
+ address.phone ||= account.phone||'';
+ return address;
+}
+function setDeliveryAddress(account,values){
+ account.address=deliveryFields(values);
+ delete account.addresses;
+}
+function hasDeliveryDetails(address){
+ return ['name','surname','phone','street','city'].every(key=>address[key]?.trim()) && Boolean(postalProvince(address.postcode));
 }
 function addressScreen(page){
- const a=db.account,list=savedAddresses(a),[,action,id]=page.split('/');
- const addr=id&&list.find(item=>item.id===id);
- const edit=action==='new'||(action==='edit'&&addr);
- const title=edit?(addr?t('Editar dirección','Edit address'):t('Añadir dirección','Add address')):t('Direcciones de envío','Delivery addresses');
+ const a=db.account,stored=savedAddress(a);
+ const requestedEditor=page==='address/new' || page==='address/edit' || page.startsWith('address/edit/');
+ const destination=requestedEditor?(stored?'address/edit':'address/new'):'address';
+ if(page!==destination)history.replaceState(null,'','#'+destination);
+ const title=requestedEditor?(stored?t('Editar dirección','Edit address'):t('Añadir dirección','Add address')):t('Dirección de entrega','Delivery address');
  let body=profileFeedback();
- if(edit){
-   const values=addr||{name:a.name,surname:a.surname,phone:a.phone,country:t('España','Spain')};
-   const alias=accountField('alias',t('Nombre de la dirección','Address name'),values.alias,{inline:true,editIcon:true,placeholder:t('Casa, trabajo…','Home, work…')});
-   body+=form('address','<input type="hidden" name="addressId" value="'+html(addr?.id)+'">'+alias+addressForm(values)+accountField('flat',t('Piso y puerta (opcional)','Floor and door (optional)'),values.flat,{optional:true,inline:true,editIcon:true})+'<label class="address-default"><input type="checkbox" name="primary" '+(!list.length||addr===list[0]?'checked':'')+'> '+t('Usar como dirección predeterminada','Use as default address')+'</label><div class="profile-actions">'+profileButton(t('Cancelar','Cancel'),'address')+submit(t('Guardar dirección','Save address'))+'</div>');
+ if(requestedEditor){
+   const values=stored||{name:a.name,surname:a.surname,phone:a.phone};
+   body+=form('address',addressForm(values)+'<div class="profile-actions">'+profileButton(t('Cancelar','Cancel'),'address')+submit(t('Guardar dirección','Save address'))+'</div>');
+ }else if(stored){
+   body+='<article class="address-card"><strong>'+html(stored.alias||t('Dirección de entrega','Delivery address'))+'</strong><p>'+delivery(stored,false)+'</p><div class="address-tools">'+profileButton(t('Editar dirección','Edit address'),'address/edit','pencil')+'</div></article>';
  }else{
-   body+=list.map((item,i)=>'<article class="address-card"><div class="address-card-title"><strong>'+html(item.alias)+'</strong>'+(i===0?'<small>'+t('Predeterminada','Default')+'</small>':'')+'</div><p>'+html([item.name,item.surname].filter(Boolean).join(' '))+'<br>'+html([item.street,item.flat].filter(Boolean).join(', '))+'<br>'+html([item.postcode,item.city,item.province].filter(Boolean).join(' · '))+'</p><div class="address-tools">'+profileButton(t('Editar','Edit'),'address/edit/'+item.id,'pencil')+profileButton(t('Eliminar','Delete'),'address/delete/'+item.id,'trash')+(i?'<button type="button" class="button" data-primary-address="'+html(item.id)+'">'+t('Usar como predeterminada','Set as default')+'</button>':'')+'</div></article>').join('')||infoBox(t('Aún no tienes direcciones guardadas','You have no saved addresses'),t('Añade una dirección para recibir tus premios.','Add an address to receive your rewards.'));
-   body+=profileButton(t('Añadir dirección','Add address'),'address/new','plus')+'<p class="profile-hint">'+t('Modificar una dirección guardada no cambia la de un pedido ya realizado.','Changing a saved address does not update past orders.')+'</p>';
+   body+=infoBox(t('Aún no tienes una dirección de entrega','You don’t have a delivery address yet'),t('Añade una dirección para recibir tus premios.','Add an address to receive your rewards.'))+profileButton(t('Añadir dirección','Add address'),'address/new','plus');
  }
- return settingsView('address',title,t('Guarda tus direcciones y elige cuál utilizar al pedir un premio.','Save your addresses and choose one when requesting a reward.'),body);
+ return settingsView('address',title,t('Esta dirección se utilizará para enviar tus próximos premios.','Your next rewards will be sent to this address.'),body);
 }
 function contextLayer(base,title,intro,content,back){
  const shell=base.replace('<section class="journey-panel','<section inert aria-hidden="true" class="journey-panel').replace('aria-modal="true"','aria-modal="false"');
@@ -294,11 +320,7 @@ function profile(page){
    if(page==='password/reset')return contextLayer(passwordScreen('password'),t('Restablecer contraseña','Reset password'),t('Crea una contraseña nueva para tu cuenta.','Set a new password for your account.'),form('profile-reset',field('password')+field('confirm')+submit(t('Guardar contraseña','Save password'))),'password');
    return passwordScreen(page);
  }
- if(page.startsWith('address')){
-   const [,action,id]=page.split('/'),addr=savedAddresses(a).find(x=>x.id===id);
-   if(action==='delete'&&addr)return contextLayer(addressScreen('address'),t('¿Eliminar esta dirección?','Delete this address?'),html(addr.alias),form('delete-address','<input type="hidden" name="addressId" value="'+html(id)+'"><div class="profile-actions">'+profileButton(t('Cancelar','Cancel'),'address')+submit(t('Eliminar dirección','Delete address'))+'</div>'),'address');
-   return addressScreen(page);
- }
+ if(page==='address' || page.startsWith('address/'))return addressScreen(page);
  if(page==='remove'||page==='remove/identity'){
    const identity=page.endsWith('identity');
    const title=identity?t('Confirma el cierre de tu cuenta','Confirm account closure'):t('¿Seguro que quieres cerrar tu cuenta?','Are you sure you want to close your account?');
@@ -366,14 +388,6 @@ main.addEventListener('change',event=>{
  a.preferences={...a.preferences,communications:event.target.checked};
  db.save();
 });
-main.addEventListener('click',event=>{
- const trigger=event.target.closest('[data-primary-address]');
- if(!trigger)return;
- const a=db.account,list=savedAddresses(a),item=list.find(x=>x.id===trigger.dataset.primaryAddress);
- if(!item)return;
- a.addresses=[item,...list.filter(x=>x!==item)];a.address={...item};
- db.save();draw();
-});
 document.addEventListener('keydown',event=>{
  if(event.key!=='Escape')return;
  if(main.querySelector('.discard-profile[open]')){event.stopImmediatePropagation();return;}
@@ -405,17 +419,11 @@ async function submitProfile(mode,v,fail){
  }else if(mode==='profile-email'&&a.pendingEmail){
    if(!db.changeEmail(a,a.pendingEmail))return fail('El correo ya está registrado.','This email is already registered.');
    delete a.pendingEmail;db.save();go('profile');
- }else if(mode==='address'||mode==='delete-address'){
-   const list=savedAddresses(a),idx=list.findIndex(x=>x.id===v.addressId);
-   if(mode==='delete-address'){if(idx!==-1)list.splice(idx,1);}
-   else{
-     const {addressId,primary,...data}=v;
-     const item={...data,id:addressId||(crypto.randomUUID?.() || Array.from(crypto.getRandomValues(new Uint8Array(16)),n=>n.toString(16).padStart(2,'0')).join(''))};
-     if(idx>=0)list[idx]=item;else list.push(item);
-     if(primary){list.splice(list.indexOf(item),1);list.unshift(item);}
-   }
-   a.address={...list[0]};db.save();
-   profileMessage=mode==='address'?t('Dirección guardada.','Address saved.'):t('Dirección eliminada.','Address deleted.');go('address');
+ }else if(mode==='address'){
+   setDeliveryAddress(a,v);
+   db.save();
+   profileMessage=t('Dirección guardada.','Address saved.');
+   go('address');
  }else if(mode==='remove'){
    if(!await db.matchesPassword(a,v.currentPassword))return fail('Contraseña incorrecta.','Incorrect password.');
    db.remove();accountClosed=true;go('account-closed');
@@ -463,7 +471,21 @@ function prizeSummary(id,choice){
  const variant=[choice.club,choice.size?t('Talla ','Size ')+choice.size:''].filter(Boolean).map(html).join(' · ');
  return '<div class="prize-summary"><img class="prize-illustration" width="64" alt="" src="assets/icons/'+art+'.svg"><div><strong>'+titleOf(id)+'</strong><small>'+t('Por ','For ')+cost(id)+' '+(id==='gold'?t('cromo dorado','gold card'):t('unidades','units'))+'</small>'+(variant?'<small>'+variant+'</small>':'')+'</div></div>';
 }
-function delivery(data){return [[data.name,data.surname].filter(Boolean).join(' '),data.street,[data.postcode,data.city,data.province].filter(Boolean).join(' · ')].map(html).join('<br>');}
+function delivery(data,includeAlias=true){
+ const country=['España','Spain'].includes(data.country)?t('España','Spain'):data.country;
+ const lines=[
+  includeAlias && data.alias,
+  [data.name,data.surname].filter(Boolean).join(' '),
+  [data.street,data.flat].filter(Boolean).join(', '),
+  [data.postcode,data.city,data.province].filter(Boolean).join(' · '),
+  country,
+  data.phone
+ ];
+ return lines.filter(Boolean).map(html).join('<br>');
+}
+function addressSummary(address){
+ return '<strong>'+html(address.alias||t('Dirección de entrega','Delivery address'))+'</strong><span>'+delivery(address,false)+'</span><span class="address-edit-label">'+t('Editar dirección','Edit address')+'</span>';
+}
 function reward(){
  const id=rewardId,a=db.account;
  if(step===3&&receipt){
@@ -482,9 +504,13 @@ function reward(){
  const selected=clubs.find(p=>p.club===shipping.club);
  const optionTeam='<details class="team-picker"><summary><small>'+t('Equipo','Team')+'</small><span class="team-value">'+(selected?clubLabel(selected):t('Selecciona un equipo','Select a team'))+'</span></summary><fieldset><legend>'+t('Equipo','Team')+'</legend>'+clubs.map(p=>'<label><input type="radio" required name="club" value="'+html(p.club)+'" '+(p===selected?'checked':'')+'><span class="team-option">'+clubLabel(p)+'</span></label>').join('')+'</fieldset></details>';
  const sizePicker='<fieldset class="size-picker"><legend>'+t('Selecciona tu talla','Select your size')+'</legend>'+['XS','S','M','L','XL'].map(v=>'<label><input type="radio" required name="size" value="'+v+'" '+(shipping.size===v?'checked':'')+'><span>'+v+'</span></label>').join('')+'</fieldset>';
- const currentAddress={...a,...a.address,...shipping};
- const addressInput=currentAddress.street?'<details class="address-choice"><summary><strong>'+t('Casa','Home')+'</strong><p>'+html(currentAddress.name)+' '+html(currentAddress.surname)+'<br>'+html(currentAddress.street)+'<br>'+html(currentAddress.postcode)+' '+html(currentAddress.city)+'</p>'+t('Cambiar dirección','Change address')+'</summary>'+addressForm(currentAddress)+'</details>':addressForm(currentAddress);
- return panel(t('Canjear premio','Redeem reward'),'<div class="prize-summary"><img class="prize-illustration" width="64" alt="" src="assets/icons/'+({gold:'reward-shirt',shirt:'reward-shirt',scarf:'scarf',ball:'reward-ball'}[id])+'.svg"><div><strong>'+titleOf(id)+'</strong><small>'+t('Por ','For ')+cost(id)+' '+(id==='gold'?t('cromo dorado','gold card'):t('unidades','units'))+'</small></div></div><form id="prize-request" data-flow="prize">'+(id!=='ball'?optionTeam:'')+(['shirt','gold'].includes(id)?sizePicker:'')+'<strong>'+t('Dirección de entrega','Delivery address')+'</strong>'+addressInput+'<label><input required type="checkbox"> '+t('Soy mayor de edad y acepto las bases de la promoción.','I am of legal age and accept the promotion terms.')+'</label>'+error()+'</form>',{actions:'<button class="button primary" type="submit" form="prize-request">'+t('Revisar solicitud','Review request')+'</button>'});
+ const stored=savedAddress(a);
+ const currentAddress=shipping.street?shipping:stored||{name:a.name,surname:a.surname,phone:a.phone};
+ const addressInput=hasDeliveryDetails(currentAddress)
+   ? '<details class="address-choice"><summary>'+addressSummary(currentAddress)+'</summary><div class="address-fields">'+addressForm(currentAddress)+'</div></details>'
+   : addressForm(currentAddress);
+ const addressNote='<p class="address-note">'+t('Al confirmar el canje, esta dirección se guardará en Mi cuenta.','When you confirm your redemption, this address will be saved in My account.')+'</p>';
+ return panel(t('Canjear premio','Redeem reward'),'<div class="prize-summary"><img class="prize-illustration" width="64" alt="" src="assets/icons/'+({gold:'reward-shirt',shirt:'reward-shirt',scarf:'scarf',ball:'reward-ball'}[id])+'.svg"><div><strong>'+titleOf(id)+'</strong><small>'+t('Por ','For ')+cost(id)+' '+(id==='gold'?t('cromo dorado','gold card'):t('unidades','units'))+'</small></div></div><form id="prize-request" data-flow="prize">'+(id!=='ball'?optionTeam:'')+(['shirt','gold'].includes(id)?sizePicker:'')+'<strong>'+t('Dirección de entrega','Delivery address')+'</strong>'+addressInput+addressNote+'<label><input required type="checkbox"> '+t('Soy mayor de edad y acepto las bases de la promoción.','I am of legal age and accept the promotion terms.')+'</label>'+error()+'</form>',{actions:'<button class="button primary" type="submit" form="prize-request">'+t('Revisar solicitud','Review request')+'</button>'});
 
 }
 document.addEventListener('change',event=>{
@@ -494,8 +520,15 @@ document.addEventListener('change',event=>{
  picker.open=false;
  picker.querySelector('summary').focus();
 });
+main.addEventListener('toggle',event=>{
+ const details=event.target;
+ if(!details.matches('.address-choice') || details.open)return;
+ const values=Object.fromEntries(new FormData(details.closest('form')));
+ values.phone=values.phone?values.dialCode+' '+values.phone:'';
+ details.querySelector('summary').innerHTML=addressSummary(values);
+},true);
 document.addEventListener('invalid',event=>{
- const picker=event.target.closest('.team-picker');
+ const picker=event.target.closest('.team-picker, .address-choice');
  if(picker)picker.open=true;
 },true);
 function help(){
@@ -510,7 +543,7 @@ function help(){
    [t('¿Qué debo revisar antes de confirmar un canje?','What should I check before confirming a redemption?'),t('Revisa el premio, tu selección y la dirección de entrega.','Check the reward, your selection and the delivery address.')],
    [t('¿Dónde consulto mi solicitud?','Where can I check my request?'),t('Abre Mi cuenta > Historial y selecciona Canjes.','Open My account > History and select Redemptions.')],
    [t('¿Cómo cambio o recupero mi contraseña?','How can I change or recover my password?'),t('En Mi cuenta selecciona Contraseña. Si necesitas recuperar el acceso, pulsa Recuperar contraseña en la pantalla de inicio de sesión.','Choose Password in My account, or Recover password on the sign-in screen if you need to regain access.')],
-   [t('¿Puedo guardar y modificar varias direcciones?','Can I save and edit my addresses?'),t('Puedes consultar y modificar tu dirección guardada desde Mi cuenta > Direcciones.','You can view and edit your saved delivery address in My account > Addresses.')],
+   [t('¿Cómo cambio mi dirección de entrega?','How do I change my delivery address?'),t('Puedes editarla en Mi cuenta > Dirección o al solicitar un premio. La dirección que confirmes en el canje se guardará para tus próximos envíos.','Edit it in My account > Address or when requesting a reward. The address you confirm for a redemption will be saved for future deliveries.')],
    [t('¿Dónde gestiono mis preferencias de privacidad?','Where can I manage my privacy preferences?'),t('Al crear la cuenta puedes elegir tus preferencias. Puedes revisarlas después en Mi cuenta, en Datos personales.','Choose your preferences at registration, then review them in My account under Personal details.')],
    [t('¿Qué pasa si elimino mi cuenta?','What happens if I delete my account?'),t('Se eliminan tus datos de prueba guardados en este dispositivo.','Your saved demo account data is removed from this device.')],
    [t('¿Qué hago si no reconozco una acción de mi Historial?','What if I do not recognise an entry in my History?'),t('Revisa los detalles de la acción y cambia tu contraseña desde Mi cuenta.','Review the entry and change your password in My account.')]
@@ -664,11 +697,6 @@ function draw(){
    main.replaceChildren();
    confirmAction(t('¿Cerrar sesión?','Log out?'),t('Tu colección seguirá guardada. Podrás continuar cuando vuelvas a entrar.','Your collection will be saved. You can continue when you sign in again.'),t('Cancelar','Cancel'),t('Cerrar sesión','Log out'),()=>go('home'),()=>{db.logout();pending=null;registered=null;shipping={};historyFilter='all';go('login');});
  }
- else if(page.startsWith('address/delete/')&&savedAddresses(a).some(item=>item.id===page.slice(15))){
-   const item=savedAddresses(a).find(item=>item.id===page.slice(15));
-   main.innerHTML=profile('address');
-   confirmAction(t('¿Eliminar esta dirección?','Delete this address?'),t('Se eliminará '+item.alias+' de tus direcciones guardadas. No cambiará tus pedidos.',item.alias+' will be removed from your saved addresses. Your orders will stay the same.'),t('Cancelar','Cancel'),t('Eliminar dirección','Delete address'),()=>go('address'),()=>submitProfile('delete-address',{addressId:item.id}),{destructive:true});
- }
  else main.innerHTML=profile(page);
  if(overlay){
    for(const sheet of main.querySelectorAll('.journey-panel, .profile-dialog, .registration-receipt')){
@@ -734,6 +762,13 @@ main.addEventListener('submit',async e=>{
    if(national&&(!/^\d{4,14}$/.test(national)||national.length+v.dialCode.length-1>15||(v.dialCode==='+34'&&national.length!==9)))return fail('Introduce un número válido para el prefijo seleccionado.','Enter a valid number for the selected calling code.');
    v.phone=national?v.dialCode+national:''; delete v.dialCode;
  }
+ if(mode==='address'||mode==='prize'){
+   const address=deliveryFields(v);
+   if(!hasDeliveryDetails(address))return fail('Completa los datos de la dirección de entrega.','Complete the delivery address details.');
+   address.province=postalProvince(address.postcode);
+   address.country='España';
+   Object.assign(v,address);
+ }
  if(v.confirm!==undefined&&v.confirm!==v.password)return fail('Las contraseñas no coinciden.','The passwords do not match.');
  if(v.confirm!==undefined&&v.password.length<8)return fail('Introduce al menos 8 caracteres.','Enter at least 8 characters.');
  if(mode==='login'){if(!await db.login(v.email,v.password))return fail('Correo o contraseña incorrectos.','Incorrect email or password.');go('home');}
@@ -758,7 +793,7 @@ main.addEventListener('submit',async e=>{
  }
  if(mode==='reset'){await db.password(pending.acc,v.password);pending=null;go('reset-done');}
  if(mode==='logout'){db.logout();pending=null;registered=null;shipping={};historyFilter='all';go('login');}
- if(a&&['password','edit','address','remove','profile-email','profile-recover','profile-reset','delete-address','profile-prefs'].includes(mode)){
+ if(a&&['password','edit','address','remove','profile-email','profile-recover','profile-reset','profile-prefs'].includes(mode)){
    const keepDraft=f.dataset.editRoute;delete f.dataset.editRoute;
    return submitProfile(mode,v,(es,en)=>{if(keepDraft)f.dataset.editRoute=keepDraft;fail(es,en);});
  }
@@ -766,7 +801,7 @@ main.addEventListener('submit',async e=>{
  if(mode==='confirm-prize'&&canClaim(rewardId,rewardPlayerId)){
  const selected=a.cards.filter(c=>eligible(c,rewardId,rewardPlayerId)).sort((x,y)=>x.time-y.time).slice(0,cost(rewardId));selected.forEach(c=>c.used=true);
  receipt={id:'ORE-'+new Date().getFullYear()+'-'+String(a.orders.length+1).padStart(6,'0'),reward:rewardId,shipping,time:Date.now()};
- a.orders.push(receipt);a.address={...shipping};db.save();step=3;draw();}
+ a.orders.push(receipt);setDeliveryAddress(a,shipping);db.save();step=3;draw();}
 });
 window.addEventListener('oreo:registered',e=>{
  const {picks,gold}=e.detail, cards=db.account.cards;
